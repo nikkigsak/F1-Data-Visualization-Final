@@ -17,4 +17,6 @@ Christa Chiao | cjc2297@columbia.edu
 Lauren Deitz | lmd2231@columbia.edu
 Donald Stephens | ds3478@columbia.edu
 
+## Extra Materials
+The Drive to Survive Netflix Docu-series ([Trailer](https://www.youtube.com/watch?v=wtJPe1ksS6E)) is extremely fun and dramatic and will give you some insight into this sport.
 
