@@ -12,7 +12,7 @@ Some questions that we could answer (but haven't decided yet!) are:
 - Which drivers are the most consistent producers of output?
 
 ## Group Members
-- Yu Cheng | 
+- Yu Cheng | yc3984@columbia.edu
 - Christa Chiao | cjc2297@columbia.edu
 - Lauren Deitz | lmd2231@columbia.edu
 - Donald Stephens | ds3478@columbia.edu
