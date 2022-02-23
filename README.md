@@ -15,6 +15,7 @@ Some questions that we could answer (but haven't decided yet!) are:
 - Yu Cheng | yc3984@columbia.edu
 - Christa Chiao | cjc2297@columbia.edu
 - Lauren Deitz | lmd2231@columbia.edu
+- Nikki Gerjarusak | sg4011@columbia.edu
 - Donald Stephens | ds3478@columbia.edu
 
 ## Extra Materials
