@@ -11,7 +11,7 @@
 ### Brief description of the proposed visualizations / analyses
 Our questions are broken out by category below. We will not try to answer *all* of these questions, but this is a sense of what is possible.
 
-###### Driver Performance 
+###### Driver Performance
 - Race Wins over the last 10 years
 - Race Podiums (Top 3) over the last 10 years
 - Fastest Laps (by season/by circuit/all time)
@@ -29,7 +29,7 @@ Our questions are broken out by category below. We will not try to answer *all* 
 - Which circuits have the most incidents or accidents? Specific parts of the circuit?
 - Is there a circuit that has a greater impact on timings?
 - Is there a circuit that has correlation with tire burnout rate?
-- Historic lap times 
+- Historic lap times
 
 ###### Car Element Performance
 - Top 3 rankings/titles by chassis manufacturer
@@ -43,7 +43,7 @@ Our questions are broken out by category below. We will not try to answer *all* 
 The full scope of the project is still in discussion, but the primary data source is a [Kaggle dataset](https://www.kaggle.com/rohanrao/formula-1-world-championship-1950-2020), which is sourced from a motor sports racing API ([Ergast Developer API](http://ergast.com/mrd/)). There is a chance that we would incorporate data from the [Racing Statistics](https://www.racing-statistics.com/en) website as well.
 
 ### Outline briefly which types of visualizations you plan to use.
-For over time data that show comparison features, we'll include **line graphs**, or other **time series graphs**. We could include an **interactive map feature**, illustrating the various circuits or races that might make up an F1 season and the globe-trotting nature of the sport. If there is data to include a **topographical dynamic map** for race track elevation, we are interested in illustrating this element of the circuit. If the data allows, we'd like to illustrate crashes or contact between drivers by location on the race track or the lap number of the race. 
+For over time data that show comparison features, we'll include line graphs, or other time series graphs. We could include an interactive map feature, illustrating the various circuits or races that might make up an F1 season and the globe-trotting nature of the sport. If there is data to include a topographical dynamic map for race track elevation, we are interested in illustrating this element of the circuit. If the data allows, we'd like to illustrate crashes or contact between drivers by location on the race track or the lap number of the race.
 
 ### Are there any significant hurdles that you have doubts about? Would not solving them render the project incomplete?
-There are not any significant hurdles that threaten the completeness of our project.  Finding and joining in outside data to our core data set could be challenging (ie. tracking down records of engine manufacturers over time) although this is dependent on the direction that we'd take this analysis.
+There are not any significant hurdles that threaten the completeness of our project. Finding and joining in outside data to our core data set could be challenging (ie. tracking down records of engine manufacturers over time) although this is dependent on the direction that we'd take this analysis.
