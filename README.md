@@ -2,7 +2,6 @@
 This repo is the home for **F1 Analytics** final team project that will house data, code, and related files for a project analyzing F1 data. 
 
 ## Group Members
-- Yu Cheng | yc3984@columbia.edu
 - Christa Chiao | cjc2297@columbia.edu
 - Lauren Deitz | lmd2231@columbia.edu
 - Nikki Gerjarusak | sg4011@columbia.edu
