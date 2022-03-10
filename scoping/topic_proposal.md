@@ -2,7 +2,6 @@
 ### Title of the project:  Formula 1 Analytics (Group F)
 
 ### Project Participants
-- Yu Cheng | yc3984@columbia.edu
 - Christa Chiao | cjc2297@columbia.edu
 - Lauren Deitz | lmd2231@columbia.edu
 - Nikki Gerjarusak | sg4011@columbia.edu
