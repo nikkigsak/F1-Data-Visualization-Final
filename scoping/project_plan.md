@@ -25,6 +25,13 @@
   - The first purpose of this meeting is to agree on the project plan (this doc), dates, goals, and to assign owners to relevant goals/tasks.
   - The second purpose of this meeting is to take the ideas generated when writing the (topic proposal)[https://github.com/QMSS-G5063-2022/group_f_f1/blob/main/scoping/topic_proposal.pdf], subdivide them into distinct areas of research/exploration and assign them out to group members. 
     - It is worth noting that group members who are taking a heavier lift of project managing or compiling the website could take a lighter load of creating viz or doing exploratory work.
+
+Assigned out exploratory viz:
+- Christa: Circuit-specific stats
+- Lauren: Driver Performance (Qualifying Positions, Podiums, Pit Stops)
+- Nikki: Constructor Ranking, Driver Performance (Clinches, etc)
+- Donald: Car Performance, Financial Analysis
+
 ##### 3 - 5: Report out on exploratory viz, decide on main theme, assign final viz
   - Group members should walk through some exploratory viz that each person created
   - Group members should decide on a main theme. ie:
