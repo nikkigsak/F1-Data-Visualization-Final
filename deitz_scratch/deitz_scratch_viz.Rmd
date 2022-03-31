@@ -26,10 +26,9 @@ pole position
 ```{r}
 qp_drivers <- left_join(qps, drivers, by='driverId')
 
-qp_drivers %>% filter(position == 1) %>% group_by(driverRef) %>% mutate(pole_position=n()) %>% 
+qp_drivers %>% filter(position == 1) %>% group_by(driverRef) %>% summarise(pole_position=n()) %>% 
   arrange(-pole_position) %>% 
   ggplot(.,aes(x=driverRef,y=pole_position)) + geom_bar(stat='identity') + coord_flip()
-
 ```
 qualifying positions
 
@@ -45,4 +44,9 @@ pit stops
 pt_drivers <- left_join(pitstops, drivers, by="driverId")
 pt_drivers %>% group_by(driverRef) %>% summarise(shortest=min(milliseconds)) %>% arrange(shortest)
 pt_drivers %>% group_by(driverRef) %>% summarise(avg_pt = mean(milliseconds)) %>% arrange(avg_pt)
+
+avg_shortest_pt <- pt_drivers %>% group_by(driverRef,stop) %>% summarise(avg_pt = mean(milliseconds)) %>% arrange(driverRef,avg_pt) %>% mutate(pt_rank=row_number(avg_pt)) %>% filter(pt_rank==1)
+avg_shortest_pt %>% group_by(stop) %>% summarise(stop_count=n()) %>% ggplot(.,aes(x=stop,y=stop_count)) + geom_bar(stat='identity') + ggtitle('Shortest pit stop on average by driver')
+
+avg_shortest_pt
 ```
