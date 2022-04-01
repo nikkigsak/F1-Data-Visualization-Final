@@ -1,0 +1,206 @@
+---
+title: "f1_exploratory"
+author: "Christa Chiao"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+rm(list = ls())
+```
+
+```{r}
+# broken thing to call files but just run the `load_files_code.R` script that is 
+# in the scoping folder. 
+
+# library(dplyr)
+# library(stringr)
+
+# if the files are in a different location than your working directory, change
+# the file path in the list.files function
+# file_names <- list.files()
+
+# read all 13 csvs into a list called "all_csvs"
+# all_csvs <- lapply(file_names, read.csv)
+
+# Set the name of each list element to its respective file name.
+# names(all_csvs) <- gsub(".csv","",
+#                        list.files(full.names = FALSE),
+#                        fixed = TRUE)
+
+# break list out into separate dfs
+# list2env(all_csvs, envir=.GlobalEnv)
+
+```
+
+
+##Let's investigate: Circuit-specific stats
+
+- Purpose-built circuits v closed public roads (performance/timings)
+- Which circuits have the most incidents or accidents? Specific parts of the circuit?
+- What's the fastest circuit?
+- Is there a circuit that has correlation with tire burnout rate?
+- Historic lap times
+
+##### Let's take a look
+```{r}
+head(circuits)
+
+head(lap_times)
+
+head(races)
+
+head(results)
+```
+
+##### `Circuits.csv`
+```{r}
+library(dplyr)
+
+circuits_joined <- circuits %>%
+                  left_join(circuit_type) %>%
+                  rename(circuit_name = name)
+
+head(circuits_joined)
+
+circuits_by_year <- races %>%
+  select(raceId, year, circuitId, name) %>%
+  rename(race_name = name) %>%
+  left_join(circuits_joined, by = c("circuitId")) %>%
+  mutate(circuit_type = 
+           case_when(street_circuit == 1 ~ "street",
+                     road_circuit == 1 ~ "street",
+                     race_circuit == 1 ~ "race",
+                     )
+         ) %>%
+  select(year, circuitId, circuit_name, circuit_type)
+
+head(circuits_by_year)
+
+library(ggplot2)
+
+# this graph is fucked up. need to fix.
+ggplot(data = circuits_by_year, 
+       aes(x = year, fill = circuit_type)) +
+       geom_histogram()
+  
+circuits_by_year %>%
+  group_by(year) %>%
+  summarise (n = n())
+```
+This is a weird looking histogram, but basically we're looking at road circuits being phased out in the first 15 years of F1 (1950-65). The majority of races are on purpose-built race circuits with street circuits making up a small percent of races. Most notably, the top 5 street circuits in use over the course of F1 are: the 
+```{r}
+circuits_by_year %>%
+  filter(circuit_type == "street") %>%
+  group_by(circuitId, circuit_name, race_name) %>%
+  summarise(n = n()) %>%
+  arrange(desc(n)) %>%
+  head(5)
+```
+
+Let's take a look at the average fastest Lap Time, in milliseconds, by circuit type and plot that on a scatter plot.
+```{r}
+skinny_races_circuits <- races %>%
+  rename(race_name = name) %>%
+  select(raceId, circuitId, race_name, year)
+
+lap_times_by_circuit <- lap_times %>%
+  group_by(raceId) %>%
+  summarise(max(milliseconds)) %>%
+  rename(fastestLap = "max(milliseconds)") %>%
+  left_join(skinny_races_circuits, by = ("raceId")) %>%
+  left_join(circuits_joined, by = ("circuitId")) %>%
+  mutate(circuit_type = 
+           case_when(street_circuit == 1 ~ "street",
+                     road_circuit == 1 ~ "road",
+                     race_circuit == 1 ~ "race",
+                     )
+         ) %>%
+  group_by(circuitId, circuit_name, circuit_type, year) %>%
+  summarise(mean(fastestLap)) %>%
+  filter(circuitId != 7 & year != 2011) %>%
+  rename(average_fast_Laps = "mean(fastestLap)") %>%
+  mutate(average_fast_Laps = average_fast_Laps/1000)
+
+lap_times_by_circuit %>%
+  ggplot(aes(x = year, y = average_fast_Laps, color = circuit_type)) + 
+  geom_point(size = 2) + 
+  facet_wrap(vars(circuit_name))
+```
+* This filters out the 2011 Canadian Grand Prix which took over four hours (with a two-hour safety car deployment). The winning speed of the Grand Prix was ~78 kmh or 46mph.
+
+Now I'm interested in seeing the average time per lap over the course of a race by circuit.
+```{r}
+library(tidyverse)
+
+lap_time_by_lap <- lap_times %>%
+  drop_na(milliseconds) %>%
+  group_by(raceId, lap, time) %>%
+  summarise(mean(milliseconds)/1000) %>%
+  rename(mean_lap_speed_ms = `mean(milliseconds)/1000`) %>%
+  left_join(skinny_races_circuits, by = ("raceId")) %>%
+  left_join(circuits_joined, by = ("circuitId")) %>%
+    mutate(circuit_type = 
+           case_when(street_circuit == 1 ~ "street",
+                     road_circuit == 1 ~ "road",
+                     race_circuit == 1 ~ "race",
+                     )
+         ) %>%
+  select(raceId, lap, mean_lap_speed_ms, time, circuitId, race_name, year,
+          circuit_name, circuit_type) %>%
+    filter(circuitId != 7 & year != 2011) %>%
+  mutate_at(c("year"), as.factor)
+
+library(RColorBrewer)
+
+lap_time_by_lap %>%
+  ggplot(aes(x = lap, y = mean_lap_speed_ms, color = year)) + 
+  geom_point() + ylim(0,300) + 
+  scale_fill_brewer(palette = "Spectral") +
+  facet_wrap(vars(circuit_name))
+```
+
+This looks cool, but I think it would be better as an interactive/drop down so you can really zoom in.
+```{r}
+library(plotly)
+
+lap_time_by_lap %>%
+    plot_ly(x = ~lap, y = ~mean_lap_speed_ms, color = ~year,
+            hoverinfo = "text", hovertext = ~time) +  facet_wrap(~circuit_name)
+
+lap_time_by_lap %>%
+  filter(year > 2010 fdf)
+    group_by(circuit_name) %>%
+    do(p=plot_ly(., x = ~lap, y = ~mean_lap_speed_ms, color = ~year, type = "scatter")) %>%
+  subplot(nrows = 5, shareX = TRUE, shareY = TRUE)
+            
+iris%>%
+  group_by(Species) %>%
+  do(p=plot_ly(., x = ~Sepal.Length, y = ~Sepal.Width, color = ~Species, type = "scatter")) %>%
+  subplot(nrows = 1, shareX = TRUE, shareY = TRUE)
+
+```
+
+
+Now let's take a look at the fastest Qualifying laps, in milliseconds, by circuit type and put that on a scatter plot.
+```{r}
+
+```
+
+
+And finally, the number of incidents by circuit
+```{r}
+
+```
+
+
+
+
+
+##### Historic Lap Times
+The question I'm interested in answering here is who/what/when has the fastest lap time over time. 
+```{r}
+
+```
