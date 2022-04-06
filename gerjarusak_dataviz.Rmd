@@ -1,0 +1,104 @@
+---
+title: "gerjarusak_viz"
+author: "Nikki Gerjarusak"
+date: "4/6/2022"
+output: html_document
+---
+Constructor Ranking, Driver Performance (Clinches, etc)
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(magrittr)
+library(plotly)
+```
+
+read in constructor data
+```{r}
+constructors <- read.csv("/Users/nikkigerjarusak/desktop/DataVizProj/group_f_f1/raw_data/constructors.csv")
+standings <- read.csv("/Users/nikkigerjarusak/desktop/DataVizProj/group_f_f1/raw_data/constructor_standings.csv")
+results <- read.csv("/Users/nikkigerjarusak/desktop/DataVizProj/group_f_f1/raw_data/constructor_results.csv")
+```
+
+read in driver data
+```{r}
+
+```
+
+```{r}
+## merge data frames
+c_standings <- left_join(constructors, standings, by = "constructorId")
+```
+
+```{r}
+c_winnings <- c_standings %>%
+  group_by(constructorId, name) %>%
+  summarize(totalwins = sum(wins)) %>%
+  arrange(desc(totalwins)) %>%
+  filter(totalwins != 0)
+
+win_plot <- ggplot(c_winnings, aes(x = name, y = totalwins, fill = name)) +
+  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+  labs (x = "Constructors", y = "Number of Wins",
+        title = "Wins by Constructor")
+ggplotly(win_plot)
+```
+
+```{r}
+total_points <- c_standings %>%
+  group_by(constructorId, name) %>%
+  summarize(totalpoints = sum(points)) %>%
+  arrange(desc(totalpoints)) %>%
+  filter(totalpoints > 700)
+
+average_points <- c_standings %>%
+  group_by(constructorId, name) %>%
+  summarize(avg_points = mean(points)) %>%
+  arrange(desc(avg_points)) %>%
+  filter(avg_points > 10)
+```
+```{r}
+total_plot <- ggplot(total_points, aes(x = name, y = totalpoints, fill = name)) +
+  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+  labs (x = "Constructors", y = "Total Points",
+        title = "Total Points Earned by Constructor")
+ggplotly(total_plot)
+```
+
+```{r}
+## top 10 constructors by total points earned 
+top_points <- total_points %>%
+  ungroup %>%
+  slice(1:10)
+
+top_points_plot <- ggplot(top_points, aes(x = name, y = totalpoints, fill = name)) +
+  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+  labs (x = "Constructors", y = "Total Points",
+        title = "Top 10 Constructors by Points")
+ggplotly(top_points_plot)
+```
+
+```{r}
+avg_points_plot <- ggplot(average_points, aes(x = name, y = avg_points, fill = name)) +
+  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+  labs (x = "Constructors", y = "Average Points",
+        title = "Average Points Earned by Constructor")
+ggplotly(avg_points_plot)
+```
+```{r}
+## top 10 constructors by average points
+top_avg_points <- average_points %>%
+  ungroup %>%
+  slice(1:10)
+
+top_avg_plot <- ggplot(top_avg_points, aes(x = name, y = avg_points, fill = name)) +
+  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+  labs (x = "Constructors", y = "Average Points",
+        title = "Top 10 Constructors by Average Points Earned")
+ggplotly(top_avg_plot)
+```
+
