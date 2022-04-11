@@ -18,6 +18,8 @@ library(magrittr)
 drivers <- read.csv("../raw_data/drivers.csv")
 qps <- read.csv("../raw_data/qualifying.csv")
 pitstops <- read.csv("../raw_data/pit_stops.csv")
+standings <- read.csv("../raw_data/driver_standings.csv")
+races <- read.csv("../raw_data/races.csv")
 ```
 
 ## viz
@@ -49,4 +51,36 @@ avg_shortest_pt <- pt_drivers %>% group_by(driverRef,stop) %>% summarise(avg_pt 
 avg_shortest_pt %>% group_by(stop) %>% summarise(stop_count=n()) %>% ggplot(.,aes(x=stop,y=stop_count)) + geom_bar(stat='identity') + ggtitle('Shortest pit stop on average by driver')
 
 avg_shortest_pt
+```
+
+standings over time
+```{r}
+race_standings <- left_join(standings, races, by="raceId")
+driver_race_standings <- left_join(race_standings, drivers, by="driverId")
+
+races2021 <- driver_race_standings %>% filter(year==2021)
+races2019 <- driver_race_standings %>% filter(year==2019)
+
+ggplot(races2021, aes(x=date,y=position,group=driverRef, color=driverRef)) + geom_line() + coord_flip() + ggtitle("2021")
+ggplot(races2019, aes(x=date,y=position,group=driverRef, color=driverRef)) + geom_line() + coord_flip() + ggtitle("2019")
+
+```
+
+points over time
+```{r}
+ggplot(races2021, aes(x=date,y=points,group=driverRef,color=driverRef)) + geom_point() + geom_smooth(se=FALSE) + coord_flip() + ggtitle("2021")
+ggplot(races2019, aes(x=date,y=points,group=driverRef,color=driverRef)) + geom_point() + geom_smooth(se=FALSE) + coord_flip() + ggtitle("2019")
+
+```
+
+pit stops over time
+```{r}
+pt_drivers <- left_join(pitstops, drivers, by="driverId")
+pt_driver_races <- left_join(pt_drivers, races, by="raceId")
+
+pt_2021 <- pt_driver_races %>% filter(year==2021)
+pt_2019 <- pt_driver_races %>% filter(year==2019)
+
+pt_2021 %>% group_by(driverRef,stop) %>% summarise(avg_pt = mean(milliseconds)) %>% arrange(driverRef,avg_pt)
+
 ```
