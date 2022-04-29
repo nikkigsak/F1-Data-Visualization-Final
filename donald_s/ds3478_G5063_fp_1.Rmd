@@ -1,5 +1,5 @@
 ---
-title: "Final Project - Partials"
+title: "Final Project - Partials (P1)"
 author: "Donald Stephens (ds3478)"
 date: "4/2/2022"
 always_allow_html: yes
