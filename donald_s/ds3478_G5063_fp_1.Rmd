@@ -24,6 +24,7 @@ library(sf)
 library(rgdal) # for reading shape files into R
 library(rgeos)
 library(maps)
+library(crosstalk)
 ```
 
 ## Cleaned Data and Statistics
@@ -39,7 +40,7 @@ circuits_df <- circuits_df %>%
 #View(circuits_df)
 
 circuits_us_df <- circuits_df %>%
-  filter(country == "United States")
+  filter(country == "United States" | country == "America" | country == "USA")
 
 datatable(circuits_df,
   class = 'cell-border stripe',
@@ -66,17 +67,21 @@ us_circuits <- geojsonio::geojson_read('circuits/us-2012.geojson',
 #class(us_circuits)
 #names(us_circuits)
 
-avg_lat <- mean(circuits_df$lat)
-avg_long <- mean(circuits_df$lng)
+avg_lat <- mean(circuits_us_df$lat) #circuits_df$lat)
+avg_long <- mean(circuits_us_df$lng) #circuits_df$lng)
 
 leaflet() %>%
-  setView(lng = avg_long, lat = avg_lat, zoom = 2) %>%
+  setView(lng = avg_long, lat = avg_lat, zoom = 4) %>%
   addTiles() %>%
-  addCircles(data = circuits_df,
+  #addCircles(data = circuits_df,
+  #  lat = ~lat, lng = ~lng,
+  #  weight = 10, radius = 7, color = "blue") %>%
+  addMarkers(data = circuits_us_df, #circuits_df,
     lat = ~lat, lng = ~lng,
-    weight = 10, radius = 7, color = "blue") %>%
-  addMarkers(data = circuits_df,
-    lat = ~lat, lng = ~lng,
+    icon = list(
+      iconUrl = 'track-icon-19.png',
+      iconSize = c(25, 25)
+    ),
     popup = ~paste(name)) #%>%
   #addPolygons(data = us_circuits, weight = 1, color = "light gray")
   #addGeoJSON(racing_circuits) #us_circuits)
