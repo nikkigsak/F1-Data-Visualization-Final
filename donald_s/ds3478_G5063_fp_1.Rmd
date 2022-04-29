@@ -1,0 +1,247 @@
+---
+title: "Final Project - Partials"
+author: "Donald Stephens (ds3478)"
+date: "4/2/2022"
+always_allow_html: yes
+output: 
+  html_document:
+    keep_md: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(htmltools)
+library(ggplot2)
+library(ggthemes)
+library(DT)
+library(leaflet)
+library(leaflet.extras)
+library(sf)
+library(rgdal) # for reading shape files into R
+library(rgeos)
+library(maps)
+```
+
+## Cleaned Data and Statistics
+
+### Circuits
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+circuits_df <- read_csv("../raw_data/circuits.csv")
+circuits_df <- circuits_df %>%
+  mutate(information = paste("<a target='_blank' href='", url,"'>link</a>")) %>%
+  dplyr::select(circuitId, name, location, country, lat, lng, alt, information) %>%
+  arrange(country, location, name)
+#View(circuits_df)
+
+circuits_us_df <- circuits_df %>%
+  filter(country == "United States")
+
+datatable(circuits_df,
+  class = 'cell-border stripe',
+  #colnames = c("Name", "Location", "Country"),
+  caption = 'Table 1: Circuits',
+  options = list(
+    pageLength = 5,
+    columnDefs = list(list(visible=FALSE, targets=c("circuitId", "lat", "lng", "alt")))
+  ),
+  escape = FALSE
+)
+```
+
+#### Circuit Locations
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE}
+racing_circuits <- geojsonio::geojson_read('f1-circuits.geojson',
+  what = "sp")
+#class(racing_circuits)
+#names(racing_circuits)
+
+us_circuits <- geojsonio::geojson_read('circuits/us-2012.geojson',
+  what = "sp")
+#class(us_circuits)
+#names(us_circuits)
+
+avg_lat <- mean(circuits_df$lat)
+avg_long <- mean(circuits_df$lng)
+
+leaflet() %>%
+  setView(lng = avg_long, lat = avg_lat, zoom = 2) %>%
+  addTiles() %>%
+  addCircles(data = circuits_df,
+    lat = ~lat, lng = ~lng,
+    weight = 10, radius = 7, color = "blue") %>%
+  addMarkers(data = circuits_df,
+    lat = ~lat, lng = ~lng,
+    popup = ~paste(name)) #%>%
+  #addPolygons(data = us_circuits, weight = 1, color = "light gray")
+  #addGeoJSON(racing_circuits) #us_circuits)
+```
+
+<hr />
+
+### Constructors
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+constructors_df <- read_csv("../raw_data/constructors.csv")
+constructors_df <- constructors_df %>%
+  mutate(information = paste("<a target='_blank' href='", url,"'>link</a>")) %>%
+  dplyr::select(constructorId, name, nationality, information) %>%
+  arrange(nationality, name)
+#View(constructors_df)
+
+datatable(constructors_df,
+  class = 'cell-border stripe',
+  #colnames = c("name", "nationality"),
+  caption = 'Table 2: Constructors',
+  options = list(
+    pageLength = 5,
+    columnDefs = list(list(visible=FALSE, targets=c("constructorId")))
+  ),
+  escape = FALSE
+)
+```
+
+<hr />
+
+### Races
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+races_df <- read_csv("../raw_data/races.csv")
+races_df <- races_df %>%
+  dplyr::select(raceId, name, year, date, round, time, circuitId) %>%
+  arrange(desc(year), desc(date), desc(round), time)
+#View(races_df)
+
+races_circuits_df <- races_df %>%
+  left_join(circuits_df, by = "circuitId") %>%
+  select(raceId, name.x, year, date, round, time, circuitId, name.y, location, country) %>%
+  rename(race_name = name.x, circuit_name = name.y, circuit_location = location, circuit_country = country)
+#View(races_circuits_df)
+
+datatable(races_circuits_df,
+  class = 'cell-border stripe',
+  #colnames = c("name", "nationality"),
+  caption = 'Races',
+  options = list(
+    pageLength = 5,
+    columnDefs = list(list(visible=FALSE, targets=c("raceId", "circuitId")))
+  )
+)
+```
+
+<hr />
+
+### Drivers
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+drivers_df <- read_csv("../raw_data/drivers.csv")
+
+drivers_df$number <-
+  ifelse(drivers_df$number == "\\N", "", drivers_df$number)
+
+drivers_df$code <-
+  ifelse(drivers_df$code == "\\N", "", drivers_df$code)
+
+drivers_df <- drivers_df %>%
+  mutate(information = paste("<a target='_blank' href='", url,"'>link</a>")) %>%
+  mutate(driver_number = number, driver_code = code) %>%
+  mutate(firstname = forename, lastname = surname, birth_date = dob) %>%
+  dplyr::select(driverId, firstname, lastname, birth_date,
+    driver_number, driver_code, nationality, information
+  ) %>%
+  arrange(nationality, lastname, firstname, birth_date, driver_number)
+
+#View(drivers_df)
+
+datatable(drivers_df,
+  class = 'cell-border stripe',
+  #colnames = c("name", "nationality"),
+  caption = 'Table 3: Drivers',
+  options = list(
+    pageLength = 5,
+    columnDefs = list(list(visible=FALSE, targets=c("driverId")))
+  ),
+  escape = FALSE
+)
+```
+
+#### Driver Standings
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+# May need Server-side processing
+#  You may consider server-side processing: https://rstudio.github.io/DT/server.html
+
+driver_standings_df <- read_csv("../raw_data/driver_standings.csv")
+driver_standings_df <- driver_standings_df %>%
+  arrange(desc(raceId), position)
+#View(driver_standings_df)
+
+driver_standings_race_df <- driver_standings_df %>%
+  left_join(drivers_df, by = "driverId") %>%
+  left_join(races_df, by = "raceId") #%>%
+#  #select(driverStandingsId, raceId, driverId, name.z, points, poisition, wins)
+
+datatable(driver_standings_race_df,
+  class = 'cell-border stripe',
+  #colnames = c("name", "nationality"),
+  caption = 'Driver Standings',
+  options = list(
+    pageLength = 5#,
+    #columnDefs = list(list(visible=FALSE, targets=c("driverStandingsId, raceId")))
+  )
+)
+```
+
+<hr />
+
+### Status Types
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+status_df <- read_csv("../raw_data/status.csv")
+status_df <- status_df %>%
+  dplyr::select(statusId, status) %>%
+  arrange(status)
+#View(status_df)
+
+datatable(status_df,
+  class = 'cell-border stripe',
+  #colnames = c("name", "nationality"),
+  caption = '(Unique) Status Types',
+  options = list(
+    pageLength = 5,
+    columnDefs = list(list(visible=FALSE, targets=c("statusId")))
+  )
+)
+```
+
+<hr />
+
+### Results
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+results_df <- read_csv("../raw_data/results.csv")
+results_df <- results_df %>%
+  dplyr::select(resultId, raceId, driverId, constructorId, rank,
+    positionOrder, points, laps, time, statusId,
+    fastestLap, fastestLapTime, fastestLapSpeed
+  )
+#View(results_df)
+
+datatable(results_df,
+  class = 'cell-border stripe',
+  #colnames = c("name", "nationality"),
+  caption = 'Results',
+  options = list(pageLength = 5)
+)
+```
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+#results_merged_df <- results_df %>%
+#  left_join(races_df, by = "raceId") %>%
+#  rename(race_name = name)
+#View(results_merged_df)
+```
