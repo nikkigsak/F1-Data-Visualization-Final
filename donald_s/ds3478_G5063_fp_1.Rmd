@@ -21,6 +21,7 @@ library(DT)
 library(leaflet)
 library(leaflet.extras)
 library(sf)
+#install.packages('rgdal')
 library(rgdal) # for reading shape files into R
 library(rgeos)
 library(maps)
@@ -37,10 +38,17 @@ circuits_df <- circuits_df %>%
   mutate(information = paste("<a target='_blank' href='", url,"'>link</a>")) %>%
   dplyr::select(circuitId, name, location, country, lat, lng, alt, information) %>%
   arrange(country, location, name)
+
+circuits_df$country <-
+  ifelse(circuits_df$country == "America", "United States", circuits_df$country)
+
+circuits_df$country <-
+  ifelse(circuits_df$country == "USA", "United States", circuits_df$country)
+
 #View(circuits_df)
 
 circuits_us_df <- circuits_df %>%
-  filter(country == "United States" | country == "America" | country == "USA")
+  filter(country == "United States") # | country == "America" | country == "USA")
 
 datatable(circuits_df,
   class = 'cell-border stripe',
@@ -52,6 +60,36 @@ datatable(circuits_df,
   ),
   escape = FALSE
 )
+```
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+circuits_country_group_df <- circuits_df %>%
+  group_by(country) %>%
+  arrange(country)  %>%
+  dplyr::summarize(num_circuits = n())
+#View(circuits_country_group_df)
+```
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+theme_set(theme_bw(16))
+
+ggplot(data = circuits_country_group_df) + 
+  geom_bar(
+    mapping = aes(x = factor(country), y = num_circuits, fill = country),
+    stat = "identity",
+    position = "dodge",
+    show.legend = FALSE #TRUE
+  ) +
+  scale_y_continuous(labels = scales::comma) + 
+  ggtitle("Circuits by Country") +
+  xlab("Country") +
+  ylab("Number of Circuits") +
+  #scale_fill_manual("legend", values = c("failed" = "dark red", "successful" = "dark green")) +
+  theme(
+    plot.title=element_text(hjust = 0.5),
+    axis.text.x=element_text(angle = 90, vjust = 0.5),
+    #legend.title = element_blank()
+  )
 ```
 
 #### Circuit Locations
@@ -109,6 +147,14 @@ datatable(constructors_df,
   ),
   escape = FALSE
 )
+```
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+circuits_country_group_df <- circuits_df %>%
+  group_by(country) %>%
+  arrange(country)  %>%
+  dplyr::summarize(num_circuits = n())
+#View(circuits_country_group_df)
 ```
 
 <hr />
