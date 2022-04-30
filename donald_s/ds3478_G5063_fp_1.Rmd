@@ -26,6 +26,14 @@ library(rgdal) # for reading shape files into R
 library(rgeos)
 library(maps)
 library(crosstalk)
+library(vembedr)
+```
+## Formula 1 Racing
+
+### Background Info on Formula 1
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+embed_url("https://www.youtube.com/watch?v=wtJPe1ksS6E")
 ```
 
 ## Cleaned Data and Statistics
