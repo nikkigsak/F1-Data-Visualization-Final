@@ -37,7 +37,7 @@ df <- left_join(df, races, by = "raceId")
 
 ## first subset 
 df <- subset(df, select= c(constructorId, constructorRef, name.x, constructorStandingsId,
-                           raceId, points, position, year, circuitId, name.y))
+                           raceId, points, position, year, circuitId, name.y, wins))
 ## subset results
 ##results <- subset(results, select = c(constructorId, statusId))
 ## merge again with results to get standingId
@@ -71,15 +71,7 @@ top_win_plot <- ggplot(top_c_wins, aes(x = name.x, y = totalwins, fill = name.x)
 ggplotly(top_win_plot)
 ```
 
-```{r}
-## top 10 constructor wins over time
-ggplot(winner_sex, aes(x=Year, y=Athletes, group=Sex, color=Sex)) +
-  geom_point(size=2) +
-  geom_line()  +
-  scale_color_manual(values=c("blue","red")) +
-  labs(x = "Year", y = "Athletes", 
-       title="Male vs. Female Winter Gold Medalists Over time")
-```
+
 
 ```{r}
 total_points <- df %>%
@@ -154,10 +146,13 @@ winnings_19 <- season_19 %>%
   filter(totalwins != 0)
 
 win_19_plot <- ggplot(winnings_19, aes(x = name.x, y = totalwins, fill = name.x)) +
-  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
-  labs (x = "Constructors", y = "Number of Wins",
+  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) + 
+  scale_fill_manual(values = c("Ferrari" = "#ED1C24",
+                               "Mercedes" = "#6CD3BF",
+                               "Red Bull" = "#1E5BC6")) +
+  labs (x = "Constructors", y = "Number of Wins", fill = "Constructor Names",
         title = "2019 Wins by Constructor")
-ggplotly(win_2019_plot)
+ggplotly(win_19_plot)
 ```
 ```{r}
 winnings_21 <- season_21 %>%
@@ -166,11 +161,15 @@ winnings_21 <- season_21 %>%
   arrange(desc(totalwins)) %>%
   filter(totalwins != 0)
 
-win_2021_plot <- ggplot(winnings_21, aes(x = name.x, y = totalwins, fill = name.x)) +
-  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
-  labs (x = "Constructors", y = "Number of Wins",
+win_21_plot <- ggplot(winnings_21, aes(x = name.x, y = totalwins, fill = name.x)) +
+  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) + 
+  scale_fill_manual(values = c("Apline F1 Team" = "#2293D1",
+                               "McLaren" = "#F58020",
+                               "Mercedes" = "#6CD3BF",
+                               "Red Bull" = "#1E5BC6")) +
+    labs (x = "Constructors", y = "Number of Wins", fill = "Constructor Names",
         title = "2021 Wins by Constructor")
-ggplotly(win_2021_plot)
+ggplotly(win_21_plot)
 ```
 
 ```{r}
@@ -184,21 +183,43 @@ avg_points_19 <- season_19 %>%
   summarize(avg_points = mean(points)) %>%
   arrange(desc(avg_points))
 ```
+
 ```{r}
 points_19_plot <- ggplot(points_19, aes(x = name.x, y = totalpoints, fill = name.x)) +
   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
-  labs (x = "Constructors", y = "Total Points",
+   scale_fill_manual(values = c("Alfa Romeo" = "#B12039",
+                                "Ferrari" = "#ED1C24",
+                                "Haas F1 Team" = "#B6BABD",
+                               "McLaren" = "#F58020",
+                               "Mercedes" = "#6CD3BF",
+                               "Racing Point" = "#F596C8",
+                               "Red Bull" = "#1E5BC6",
+                               "Renault" = "#FFF500",
+                               "Toro Rosso" = "#469BFF",
+                               "Williams" = "#37BEDD")) +
+  labs (x = "Constructors", y = "Total Points", fill = "Constructor Names",
         title = "Total Points Earned by Constructors in 2019")
 ggplotly(points_19_plot)
 ```
 
 ```{r}
 avg_points_19_plot <- ggplot(avg_points_19, aes(x = name.x, y = avg_points, fill = name.x)) +
-  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
-  labs (x = "Constructors", y = "Average Points",
+  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) + 
+  scale_fill_manual(values = c("Alfa Romeo" = "#B12039",
+                                "Ferrari" = "#ED1C24",
+                                "Haas F1 Team" = "#B6BABD",
+                               "McLaren" = "#F58020",
+                               "Mercedes" = "#6CD3BF",
+                               "Racing Point" = "#F596C8",
+                               "Red Bull" = "#1E5BC6",
+                               "Renault" = "#FFF500",
+                               "Toro Rosso" = "#469BFF",
+                               "Williams" = "#37BEDD")) +
+  labs (x = "Constructors", y = "Average Points", fill = "Constructor Names",
         title = "Average Points Earned by Constructors in 2019")
 ggplotly(avg_points_19_plot)
 ```
+
 ```{r}
 points_21 <- season_21 %>%
   group_by(constructorId, name.x) %>%
@@ -212,10 +233,20 @@ avg_points_21 <- season_21 %>%
   arrange(desc(avg_points)) %>%
   filter(avg_points != 0)
 ```
+
 ```{r}
 points_21_plot <- ggplot(points_21, aes(x = name.x, y = totalpoints, fill = name.x)) +
   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
-  labs (x = "Constructors", y = "Total Points",
+  scale_fill_manual(values = c("Alfa Romeo" = "#B12039",
+                               "AlphaTauri" = "#4E7C9B",
+                               "Alpine F1 Team" = "#2293D1",
+                               "Aston Martin" = "#2D826D",
+                               "Ferrari" = "#ED1C24",
+                               "McLaren" = "#F58020",
+                               "Mercedes" = "#6CD3BF",
+                               "Red Bull" = "#1E5BC6",
+                               "Williams" = "#37BEDD")) +
+  labs (x = "Constructors", y = "Total Points", fill = "Constructor Names",
         title = "Total Points Earned by Constructors in 2021")
 ggplotly(points_21_plot)
 ```
@@ -223,7 +254,16 @@ ggplotly(points_21_plot)
 ```{r}
 avg_points_21_plot <- ggplot(avg_points_21, aes(x = name.x, y = avg_points, fill = name.x)) +
   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
-  labs (x = "Constructors", y = "Average Points",
+  scale_fill_manual(values = c("Alfa Romeo" = "#B12039",
+                               "AlphaTauri" = "#4E7C9B",
+                               "Alpine F1 Team" = "#2293D1",
+                               "Aston Martin" = "#2D826D",
+                               "Ferrari" = "#ED1C24",
+                               "McLaren" = "#F58020",
+                               "Mercedes" = "#6CD3BF",
+                               "Red Bull" = "#1E5BC6",
+                               "Williams" = "#37BEDD")) +
+  labs (x = "Constructors", y = "Average Points", fill = "Constructor Names",
         title = "Average Points Earned by Constructors in 2021")
 ggplotly(avg_points_21_plot)
 ```
@@ -241,12 +281,12 @@ df2 <- subset(df2, select = c(resultId, raceId, driverId, constructorId,
 ```
 
 ```{r}
-status_2019 <- df2 %>% 
+status_19 <- df2 %>% 
   filter(year == 2019) %>%
   group_by(name.x, status) %>%
   summarize(status_count = n()) 
 
-status_count_2019 <- df2 %>%
+status_count_19 <- df2 %>%
   filter(year == 2019) %>%
   group_by(name.x, status) %>%
   summarize(status_count = n()) %>%
@@ -254,16 +294,23 @@ status_count_2019 <- df2 %>%
     names_from = status,
     values_from = status_count
   )
-status_count_2019
+status_count_19
 ```
+
 ```{r}
 ## plot constructor status for 2019
-status_2019_plot <- ggplot(status_2019, aes(x = name.x, y = status_count, fill = status)) +
+status_19_plot <- ggplot(status_19, aes(x = name.x, y = status_count, fill = status)) +
   geom_col() +
   coord_flip() +
+  scale_fill_manual(values = c("Accident" = "#000000",
+                               "Car Failure" = "#47ABFF",
+                               "Collision" = "#FF0000",
+                               "Disqualified" = "#505050",
+                               "DNF" = "#ADADAD",
+                               "Finished" = "#1BBC00")) +
   labs(x = "CConstructor", y = "Status Count", 
-       title="2019 Constructor Status")
-ggplotly(status_2019_plot)
+       title ="2019 Constructor Status")
+ggplotly(status_19_plot)
 ```
 
 ```{r}
@@ -288,6 +335,7 @@ ferrari_status_2019 <- ferrari_status_2019 %>%
   ## labs(title="Ferrari 2019 Statuses")
 ## ferrari_2019_pie
 ```
+
 ```{r}
 ## red bull
 rb_status_2019 <- df2 %>% 
@@ -332,10 +380,22 @@ mcl_status_2019 <- mcl_status_2019 %>%
 ```{r}
 pie19 <- plot_ly(labels = ~status, values = ~prop,
                 textposition = 'inside',textinfo = 'label+percent') %>% 
-  add_pie(data = ferrari_status_2019, name = "Ferrari", domain = list(row = 0, column = 0)) %>%
-  add_pie(data = rb_status_2019, name = "Red Bull", domain = list(row = 0, column = 1))%>%
-  add_pie(data = merc_status_2019, name = "Mercedes", domain = list(row = 1, column = 0))%>%
-  add_pie(data = mcl_status_2019, name = "McLaren", domain = list(row = 1, column = 1))%>% 
+  add_pie(data = ferrari_status_2019, name = "Ferrari", marker = list(colors = c("#1BBC00", "#FF0000",
+                                                                                 "#ADADAD", "#47ABFF",
+                                                                                 "#000000", "#505050")),
+          domain = list(row = 0, column = 0)) %>%
+  add_pie(data = rb_status_2019, name = "Red Bull",marker = list(colors = c("#1BBC00", "#ADADAD",
+                                                                                 "#47ABFF", "#000000",
+                                                                                 "#FF0000")),
+          domain = list(row = 0, column = 1))%>%
+  add_pie(data = merc_status_2019, name = "Mercedes", marker = list(colors = c("#1BBC00", "#000000",
+                                                                                 "#47ABFF",
+                                                                                 "#ADADAD")),
+          domain = list(row = 1, column = 0))%>%
+  add_pie(data = mcl_status_2019, name = "McLaren", marker = list(colors = c("#1BBC00", "#ADADAD",
+                                                                             "#47ABFF", "#FF0000",
+                                                                              "#505050")),
+          domain = list(row = 1, column = 1))%>% 
   layout(title = '2019 Constructor Statuses', showlegend = T, grid=list(rows=2, columns=2),
          xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
@@ -367,11 +427,18 @@ status_count_2021 <- df2 %>%
   )
 status_count_2021
 ```
+
 ```{r}
 ## plot constructor status for 2021
 status_2021_plot <- ggplot(status_2021, aes(x = name.x, y = status_count, fill = status)) +
   geom_col() +
-  coord_flip() +
+  coord_flip() + 
+  scale_fill_manual(values = c("Accident" = "#000000",
+                               "Car Failure" = "#47ABFF",
+                               "Collision" = "#FF0000",
+                               "Disqualified" = "#505050",
+                               "DNF" = "#ADADAD",
+                               "Finished" = "#1BBC00")) +
   labs(x = "CConstructor", y = "Status Count", 
        title="2021 Constructor Status")
 ggplotly(status_2021_plot)
@@ -433,10 +500,19 @@ mcl_status_2021 <- mcl_status_2021 %>%
 ```{r}
 pie21 <- plot_ly(labels = ~status, values = ~prop,
                 textposition = 'inside',textinfo = 'label+percent') %>% 
-  add_pie(data = ferrari_status_2021, name = "Ferrari", domain = list(row = 0, column = 0)) %>%
-  add_pie(data = rb_status_2021, name = "Red Bull", domain = list(row = 0, column = 1))%>%
-  add_pie(data = merc_status_2021, name = "Mercedes", domain = list(row = 1, column = 0))%>%
-  add_pie(data = mcl_status_2021, name = "McLaren", domain = list(row = 1, column = 1))%>% 
+  add_pie(data = ferrari_status_2021, name = "Ferrari", marker = list(colors = c("#1BBC00", "#ADADAD",
+                                                                                 "#47ABFF", "#FF0000")),
+          domain = list(row = 0, column = 0)) %>%
+  add_pie(data = rb_status_2021, name = "Red Bull", marker = list(colors = c("#1BBC00", "#FF0000",
+                                                                            "#ADADAD", "#000000",
+                                                                             "#47ABFF")),
+          domain = list(row = 0, column = 1))%>%
+  add_pie(data = merc_status_2021, name = "Mercedes", marker = list(colors = c("#1BBC00", "#FF0000",
+                                                                                 "#47ABFF", "#ADADAD")),
+          domain = list(row = 1, column = 0))%>%
+  add_pie(data = mcl_status_2021, name = "McLaren", marker = list(colors = c("#1BBC00", "#ADADAD",
+                                                                             "#47ABFF","#FF0000")),
+          domain = list(row = 1, column = 1)) %>% 
   layout(title = '2021 Constructor Statuses', showlegend = T, grid=list(rows=2, columns=2),
          xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
@@ -450,9 +526,3 @@ pie21 <- plot_ly(labels = ~status, values = ~prop,
          )
 pie21
 ```
-
-x = date of race
-y = prop
-group by race, circuit
-
-bottom 
