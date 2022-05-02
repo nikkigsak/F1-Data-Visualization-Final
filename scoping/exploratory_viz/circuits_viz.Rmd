@@ -386,58 +386,60 @@ incidents_by_circuit <-
   select(date, raceId, race_name, driverId, constructorId, statusId, status) %>%
   left_join(xover, by = ("constructorId")) %>%
   group_by(year, date, raceId, race_name, constructor_name, status) %>%
-  summarise(n = n()) %>%
-  filter(status == "Collision" | status == "Accident")
+  filter(status == "Collision" | status == "Accident") %>%
+  select(year, date, race_name, full_name, constructor_name, status)
 
 incidents_by_circuit$date <- lubridate::ymd(incidents_by_circuit$date)
+```
 
-
-
+2019 breakdown of incidents by constructor
+```{r}
 incidents_by_circuit %>%
   filter(year == 2019) %>%
+  group_by(constructor_name) %>%
+  summarise(n = n()) %>%
   plot_ly(type = "bar",
           x = ~constructor_name, 
           y = ~n,
-          marker = list(color =c("#B12039", # Antonio Giovinazzi (Alfa Romeo)
-                            "#ED1C24", # LeClerc; Ferrari
-                            "#2293D1", # Ocon, Alpine 2021
-                            "#6CD3BF", # George Russell mercedes 2021
-                            "#B12039", # Kimi at Alfa Romeo
-                            "#2D826D", # Stroll; Racing Point 2019; AM 2021
-                            "#F58020", # Norris, McLaren
-                            "#6CD3BF", # Lewis Hamilton; Mercedes
-                            "#1E5BC6", # Max Verstappen; Red Bull
-                            "#B6BABD", # Mick Schumacher; Haas
-                            "#1E5BC6", # Perez, Racing Point 2019, RB 2021
-                            "#6CD3BF", # Bottas Merc 
-                            "#4E7C9B" # Yuki!! Tsonoda! Alpha Tauri
-                            )),
+          marker = list(color =  c("#9B0000", # Alfa Romeo
+                                  "#DC0000", # Ferrari
+                                  "#F0D787", # Haas
+                                  "#FF8700", # McLaren
+                                  "#00D2BE", # Mercedes
+                                  "#F596C8", # Racing Point
+                                  "#1E41FF", # Red Bull
+                                  "#FFF500", # Renault
+                                  "#469BFF", # Toro Rosso
+                                  "#FFFFFF" # Williams
+                                  )),
           # text = ~constructor_name,
           hovertemplate = paste('<b>Team</b>: %{x}<br>', 
                                  'Number of Accidents or Collisions</b>: %{y}<br>')) %>%
   layout(title = 'Incidents by Constructor in 2019',
          xaxis = list(title = 'Constructor'), 
          yaxis = list(title = 'Count of Accidents or Collisions'))
+```
 
+2021 breakdown of incidents by constructor
+```{r}
 incidents_by_circuit %>%
   filter(year == 2021) %>%
+  group_by(constructor_name) %>%
+  summarise(n = n()) %>%
   plot_ly(type = "bar",
           x = ~constructor_name, 
           y = ~n,
-          marker = list(color =c("#B12039", # Antonio Giovinazzi (Alfa Romeo)
-                            "#ED1C24", # LeClerc; Ferrari
-                            "#2293D1", # Ocon, Alpine 2021
-                            "#6CD3BF", # George Russell mercedes 2021
-                            "#B12039", # Kimi at Alfa Romeo
-                            "#2D826D", # Stroll; Racing Point 2019; AM 2021
-                            "#F58020", # Norris, McLaren
-                            "#6CD3BF", # Lewis Hamilton; Mercedes
-                            "#1E5BC6", # Max Verstappen; Red Bull
-                            "#B6BABD", # Mick Schumacher; Haas
-                            "#1E5BC6", # Perez, Racing Point 2019, RB 2021
-                            "#6CD3BF", # Bottas Merc 
-                            "#4E7C9B" # Yuki!! Tsonoda! Alpha Tauri
-                            )),
+          marker = list(color =  c("#B12039", # Alfa Romeo
+                                   "#4E7C9B", # Alpha Tauri
+                                   "#2293D1", # Alpine
+                                   "#2D826D", # Aston Martin
+                                   "#ED1C24", # Ferrari
+                                   "#B6BABD", # Haas
+                                   "#F58020", # McLaren
+                                   "#6CD3BF", # Mercedes
+                                   "#1E5BC6", # Red Bull
+                                   "#37BEDD" # Williams
+                                  )),
           # text = ~constructor_name,
           hovertemplate = paste('<b>Team</b>: %{x}<br>', 
                                  'Number of Accidents or Collisions</b>: %{y}<br>')) %>%
