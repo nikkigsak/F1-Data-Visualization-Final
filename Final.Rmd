@@ -240,7 +240,7 @@ ggplot(races2019, aes(x=date,y=points,group=full_name,color=full_name, linetype=
   scale_linetype_manual(values=xover_2019$line_type, name="full_name") + 
   scale_color_manual(values=xover_2019$colorcol, name="full_name") + theme_classic() + 
   labs (x = "Date", y = "Total Points") +
-  guides(linetype=guide_legend(ncol=2, byrow=TRUE))
+  guides(linetype=guide_legend(ncol=2, byrow=FALSE))
 
 ```
 
