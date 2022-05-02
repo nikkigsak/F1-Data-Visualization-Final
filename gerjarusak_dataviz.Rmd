@@ -92,7 +92,7 @@ df <- subset(df, select= c(constructorId, constructorRef, name.x, constructorSta
 #   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
 #   labs (x = "Constructors", y = "Total Points",
 #         title = "All Time Total Points Earned by Constructor")
-ggplotly(total_plot)
+#ggplotly(total_plot)
 ```
 
 ```{r}
