@@ -2,7 +2,7 @@
 title: "f1_exploratory"
 author: "Christa Chiao"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
-output: pdf_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -35,35 +35,190 @@ rm(list = ls())
 
 ```
 
+## Sankey Diagram
+
+```{r}
+library(dplyr)
+# install.packages("networkD3")
+# Let's get data into the format we need. We need two dfs, one of nodes that has
+# all of the options, which is 0-20, which is the positions you can start in and 
+# the positions you can end in. and of links, which gives you the start and end
+# positions, the count of times a driver has ended up in those positions, and
+# the driver name
+
+# shoudl also do this for constructor, maybe let's do that one first.
+
+nodes <- c("0","1","2","3","4","5","6","7","8","9","10",
+"11","12","13","14","15","16","17","18","19","20",
+"21","22","23","24","25","26","27","28","29","30",
+"31","32","33","34","35","36","37","38","39","40"
+          )
+
+nodes <- as.data.frame(nodes)
+
+library(tidyr)
+links_driver <- 
+  results %>%
+  left_join(races, by = "raceId") %>%
+  filter(year == 2019 | year == 2021) %>%
+  left_join(drivers, by = "driverId") %>%
+  unite("full_name", forename:surname, sep= " ", remove = FALSE) %>%
+  select(raceId, driverId, full_name, positionOrder) %>%
+  rename(race_position = positionOrder) %>%
+  left_join(qualifying, by = c("raceId" = "raceId", 
+                               "driverId" = "driverId"
+                               )) %>%
+  select(raceId, full_name, race_position, position) %>%
+  rename(quali_position = position) %>%
+  mutate(quali_position = as.integer(quali_position)) %>%
+  mutate(race_position = if_else(race_position == "\\N", 0, as.numeric(race_position)),
+         quali_position = if_else(is.na(quali_position), 0, as.numeric(quali_position))) %>%
+  group_by(full_name, race_position, quali_position) %>%
+  summarise(n = n()) %>%
+  rename(target = race_position,
+         source = quali_position,
+         value = n) %>%
+  mutate(source = source,
+         target =  target + 20) %>%
+    mutate(target = as.integer(target),
+         source = as.integer(source))
+
+links_driver_lh <- links_driver %>% filter(full_name == "Lewis Hamilton")
+links_driver_lh <- as.data.frame(links_driver_lh)
+
+
+links_driver_mv <- links_driver %>% filter(full_name == "Max Verstappen")
+links_driver_mv <- as.data.frame(links_driver_mv)
+
+
+links_driver_lhmv <- links_driver %>% filter(full_name == "Lewis Hamilton" | 
+                                               full_name == "Max Verstappen")
+links_driver_lhmv <- as.data.frame(links_driver_lhmv)
+
+
+library(networkD3)
+
+# Colour links
+my_color_0 <- 
+  'd3.scaleOrdinal() .domain(["Lewis Hamilton"]) .range(["#6CD3BF"])'
+
+my_color_1 <- 
+  'd3.scaleOrdinal() .domain(["Max Verstappen"]) .range(["#1E41FF"])'
+
+my_color <- 
+  'd3.scaleOrdinal() .domain(["Lewis Hamilton", "Max Verstappen"]) .range(["#6CD3BF", "#1E41FF"])'
+
+sankeyNetwork(Links = links_driver_mv, Nodes = nodes, Source = "source",
+              Target = "target", Value = "value", 
+              NodeID = "nodes", colourScale=my_color_1, LinkGroup = "full_name",
+              NodeGroup = NULL)
+
+sankeyNetwork(Links = links_driver_lh, Nodes = nodes, Source = "source",
+              Target = "target", Value = "value", 
+              NodeID = "nodes", colourScale=my_color_0, LinkGroup = "full_name",
+              NodeGroup = NULL)
+
+sankeyNetwork(Links = links_driver_lhmv, Nodes = nodes, Source = "source",
+              Target = "target", Value = "value", 
+              NodeID = "nodes", fontSize= 15, nodeWidth = 20, margin = list(left = 100),
+              colourScale=my_color, LinkGroup = "full_name",
+              NodeGroup = NULL)
+
+# save the widget
+# library(htmlwidgets)
+# saveWidget(p, file=paste0( getwd(), "/HtmlWidget/sankeyColor3.html"))
+
+```
+```{r}
+
+sankeyNetwork(Links = links_driver_lh, Nodes = nodes, Source = "source",
+              Target = "target", Value = "value", 
+              NodeID = "nodes", colourScale=my_color_0, LinkGroup = "full_name",
+              NodeGroup = NULL)
+
+```
+
+```{r}
+
+links_const <- 
+  results %>%
+  left_join(races, by = "raceId") %>%
+  filter(year == 2019 | year == 2021) %>%
+  left_join(constructors, by = "constructorId") %>%
+  rename(const_name = name.y) %>%
+  select(raceId, constructorId, const_name, position) %>%
+  rename(race_position = position) %>%
+  left_join(qualifying, by = c("raceId" = "raceId", 
+                               "constructorId" = "constructorId"
+                               )) %>%
+  select(raceId, const_name, race_position, position) %>%
+  rename(quali_position = position) %>%
+  mutate(quali_position = as.integer(quali_position)) %>%
+  mutate(race_position = if_else(race_position == "\\N", 0, as.numeric(race_position)),
+         quali_position = if_else(is.na(quali_position), 0, as.numeric(quali_position))) %>%
+  group_by(const_name, race_position, quali_position) %>%
+  summarise(n = n()) %>%
+  rename(target = race_position,
+         source = quali_position,
+         value = n) %>%
+  mutate(source = source,
+         target =  target + 20) %>%
+    mutate(target = as.integer(target),
+         source = as.integer(source))
+
+
+links_const_merc <- links_const %>% filter(const_name == "Mercedes")
+links_const_merc <- as.data.frame(links_const_merc)
+
+
+links_const_rb <- links_const %>% filter(const_name == "Red Bull")
+links_const_rb <- as.data.frame(links_const_rb)
+
+library(networkD3)
+
+# Colour links
+my_color_0 <- 
+  'd3.scaleOrdinal() .domain(["Mercedes"]) .range(["#6CD3BF"])'
+
+my_color_1 <- 
+  'd3.scaleOrdinal() .domain(["Red Bull"]) .range(["#1E5BC6"])'
+
+my_color <- 
+  'd3.scaleOrdinal() .domain(["Alfa Romeo", "Alpha Tauri", "Alpine F1 Team", "Aston Martin", "Ferrari", "Haas F1 Team", "McLaren", "Mercedes", "Racing Point", "Red Bull", "Renault", "Toro Rosso", "Williams"]) .range(["#B12039", "#4E7C9B", "#2293D1", "#2D826D", "#ED1C24", "#B6BABD", "#F58020", "#6CD3BF", "#F596C8", "#1E41FF", "#FFF500", "#469BFF", "#FFFFFF"])'
+
+sankeyNetwork(Links = links_const_merc, Nodes = nodes, Source = "source",
+              Target = "target", Value = "value", 
+              NodeID = "nodes", colourScale=my_color_0, LinkGroup = "const_name",
+              NodeGroup = NULL)
+
+sankeyNetwork(Links = links_const_rb, Nodes = nodes, Source = "source",
+              Target = "target", Value = "value", 
+              NodeID = "nodes", colourScale=my_color_1, LinkGroup = "const_name",
+              NodeGroup = NULL)
+
+sankeyNetwork(Links = links_const, Nodes = nodes, Source = "source",
+              Target = "target", Value = "value", 
+              NodeID = "nodes", fontSize= 15, nodeWidth = 20, margin = list(left = 100),
+              colourScale=my_color, LinkGroup = "const_name",
+              NodeGroup = NULL)
+```
+
 
 ##Let's investigate: Circuit-specific stats
 
-- Purpose-built circuits v closed public roads (performance/timings)
+
 - Which circuits have the most incidents or accidents? Specific parts of the circuit?
 - What's the fastest circuit?
-- Is there a circuit that has correlation with tire burnout rate?
 - Historic lap times
 
-##### Let's take a look
-```{r}
-head(circuits)
 
-head(lap_times)
-
-head(races)
-
-head(results)
-```
-
-##### `Circuits.csv`
+### Helper Tables
 ```{r}
 library(dplyr)
 
 circuits_joined <- circuits %>%
                   left_join(circuit_type) %>%
                   rename(circuit_name = name)
-
-head(circuits_joined)
 
 circuits_by_year <- races %>%
   select(raceId, year, circuitId, name) %>%
@@ -77,64 +232,118 @@ circuits_by_year <- races %>%
          ) %>%
   select(year, circuitId, circuit_name, circuit_type)
 
-head(circuits_by_year)
-
-library(ggplot2)
-
-# this graph is fucked up. need to fix.
-ggplot(data = circuits_by_year, 
-       aes(x = year, fill = circuit_type)) +
-       geom_histogram()
-  
-circuits_by_year %>%
-  group_by(year) %>%
-  summarise (n = n())
-```
-This is a weird looking histogram, but basically we're looking at road circuits being phased out in the first 15 years of F1 (1950-65). The majority of races are on purpose-built race circuits with street circuits making up a small percent of races. Most notably, the top 5 street circuits in use over the course of F1 are: the 
-```{r}
-circuits_by_year %>%
-  filter(circuit_type == "street") %>%
-  group_by(circuitId, circuit_name, race_name) %>%
-  summarise(n = n()) %>%
-  arrange(desc(n)) %>%
-  head(5)
-```
-
-Let's take a look at the average fastest Lap Time, in milliseconds, by circuit type and plot that on a scatter plot.
-```{r}
 skinny_races_circuits <- races %>%
   rename(race_name = name) %>%
   select(raceId, circuitId, race_name, year)
 
-lap_times_by_circuit <- lap_times %>%
-  group_by(raceId) %>%
+xover <- 
+  results %>%
+  left_join(races, by = ("raceId")) %>%
+  filter(year == 2019 | year == 2021) %>%
+  select(driverId, constructorId, year) %>%
+  left_join(drivers, by = ("driverId")) %>%
+  left_join(constructors, by = ("constructorId")) %>%
+  mutate(full_name = paste(forename, surname)) %>%
+  rename(constructor_name = name) %>%
+  select(driverId, full_name, constructorId, constructor_name, year) %>%
+  group_by(driverId, full_name, constructorId, constructor_name, year) %>% 
+  slice(1)
+```
+
+
+Each 
+```{r}
+lap_times_by_driver_2021 <- 
+  lap_times %>%
+  left_join(skinny_races_circuits, by = ("raceId")) %>%
+  left_join(xover, by = "driverId","year") %>%
+  group_by(year.x, raceId, driverId, full_name, constructor_name) %>%
   summarise(max(milliseconds)) %>%
   rename(fastestLap = "max(milliseconds)") %>%
-  left_join(skinny_races_circuits, by = ("raceId")) %>%
-  left_join(circuits_joined, by = ("circuitId")) %>%
-  mutate(circuit_type = 
-           case_when(street_circuit == 1 ~ "street",
-                     road_circuit == 1 ~ "road",
-                     race_circuit == 1 ~ "race",
-                     )
-         ) %>%
-  group_by(circuitId, circuit_name, circuit_type, year) %>%
-  summarise(mean(fastestLap)) %>%
-  filter(circuitId != 7 & year != 2011) %>%
-  rename(average_fast_Laps = "mean(fastestLap)") %>%
-  mutate(average_fast_Laps = average_fast_Laps/1000)
+  filter(year.x == 2019) %>%
+  mutate(fastestLap = fastestLap/1000) %>%
+  group_by(raceId) %>%
+  mutate(rank = rank(fastestLap)) %>%
+  filter(rank == 1) %>%
+  group_by(full_name, constructor_name) %>%
+  summarise(count_of_fastest_lap = n())
 
-lap_times_by_circuit %>%
-  ggplot(aes(x = year, y = average_fast_Laps, color = circuit_type)) + 
-  geom_point(size = 2) + 
-  facet_wrap(vars(circuit_name))
+library(ggplot2)
+library(plotly)
+
+lap_times_by_driver_2019 %>%
+  plot_ly(type = "bar",
+          x = ~count_of_fastest_lap, 
+          y = ~full_name,
+          marker = list(color =c("#9B0000", # Antonio Giovinazzi (Alfa Romeo)
+                                 "#FF8700", # Carlos Sainz (2019 at McL; 2021 at RB)
+                                 "#FFF500", # Ricciardo Renault 2019, 2021 at McL
+                                 "#469BFF", # Kvyat at Toro Roso/Alpha Tauri
+                                 "#FFFFFF", # George Russell (williams 2019, mb 2021)
+                                 "#FF8700", # Norris, McLaren
+                                 "#00D2BE", # Lewis Hamilton; Mercedes
+                                 "#1E41FF", # Max Verstappen; Red Bull
+                                 "#FFF500", # Nico Hulkenberg; Renault 2019
+                                 "#469BFF", # Gasly Toro Rosso 2019/Alpha Tauri 2021
+                                 "#DC0000", # Vettel Ferrari 2019; Aston Martin 2021
+                                 "#F596C8", # Perez, Racing Point 2019, RB 2021
+                                 "#00D2BE")),
+ #         text = ~constructor_name,
+          hovertemplate = paste('<b>Team: %{text}</b>', 
+                                 '<br><b>Number of Fastest Laps</b>: %{x}<br>')) %>%
+  layout(title = 'Fastest Laps in 2021', xaxis = list(title = 'Count of Fastest Laps'), 
+         yaxis = list(title = 'Driver'))
+
 ```
-* This filters out the 2011 Canadian Grand Prix which took over four hours (with a two-hour safety car deployment). The winning speed of the Grand Prix was ~78 kmh or 46mph.
+
+
+```{r}
+
+lap_times_by_driver_2021 <- 
+  lap_times %>%
+  left_join(skinny_races_circuits, by = ("raceId")) %>%
+  left_join(xover, by = "driverId","year") %>%
+  group_by(year.x, raceId, driverId, full_name, constructor_name) %>%
+  summarise(max(milliseconds)) %>%
+  rename(fastestLap = "max(milliseconds)") %>%
+  filter(year.x == 2021) %>%
+  mutate(fastestLap = fastestLap/1000) %>%
+  group_by(raceId) %>%
+  mutate(rank = rank(fastestLap)) %>%
+  filter(rank == 1) %>%
+  group_by(full_name, constructor_name) %>%
+  summarise(count_of_fastest_lap = n())
+
+
+
+lap_times_by_driver_2021 %>%
+  plot_ly(type = "bar",
+          x = ~count_of_fastest_lap, 
+          y = ~full_name,
+          marker = list(color =c("#B12039", # Antonio Giovinazzi (Alfa Romeo)
+                            "#ED1C24", # LeClerc; Ferrari
+                            "#2293D1", # Ocon, Alpine 2021
+                            "#6CD3BF", # George Russell mercedes 2021
+                            "#B12039", # Kimi at Alfa Romeo
+                            "#2D826D", # Stroll; Racing Point 2019; AM 2021
+                            "#F58020", # Norris, McLaren
+                            "#6CD3BF", # Lewis Hamilton; Mercedes
+                            "#1E5BC6", # Max Verstappen; Red Bull
+                            "#B6BABD", # Mick Schumacher; Haas
+                            "#1E5BC6", # Perez, Racing Point 2019, RB 2021
+                            "#6CD3BF", # Bottas Merc 
+                            "#4E7C9B" # Yuki!! Tsonoda! Alpha Tauri
+                            )),
+          text = ~constructor_name,
+          hovertemplate = paste('<b>Team: %{text}</b>', 
+                                 '<br><b>Number of Fastest Laps</b>: %{x}<br>')) %>%
+  layout(title = 'Fastest Laps in 2021', xaxis = list(title = 'Count of Fastest Laps'), 
+         yaxis = list(title = 'Driver'))
+```
+
 
 Now I'm interested in seeing the average time per lap over the course of a race by circuit.
 ```{r}
-library(tidyverse)
-
 lap_time_by_lap <- lap_times %>%
   drop_na(milliseconds) %>%
   group_by(raceId, lap, time) %>%
@@ -142,15 +351,9 @@ lap_time_by_lap <- lap_times %>%
   rename(mean_lap_speed_ms = `mean(milliseconds)/1000`) %>%
   left_join(skinny_races_circuits, by = ("raceId")) %>%
   left_join(circuits_joined, by = ("circuitId")) %>%
-    mutate(circuit_type = 
-           case_when(street_circuit == 1 ~ "street",
-                     road_circuit == 1 ~ "road",
-                     race_circuit == 1 ~ "race",
-                     )
-         ) %>%
   select(raceId, lap, mean_lap_speed_ms, time, circuitId, race_name, year,
-          circuit_name, circuit_type) %>%
-    filter(circuitId != 7 & year != 2011) %>%
+          circuit_name) %>%
+    filter(year == 2019 | year == 2021) %>%
   mutate_at(c("year"), as.factor)
 
 library(RColorBrewer)
@@ -171,36 +374,82 @@ lap_time_by_lap %>%
             hoverinfo = "text", hovertext = ~time) +  facet_wrap(~circuit_name)
 
 lap_time_by_lap %>%
-  filter(year > 2010 fdf)
+  filter(year > 2010)
     group_by(circuit_name) %>%
     do(p=plot_ly(., x = ~lap, y = ~mean_lap_speed_ms, color = ~year, type = "scatter")) %>%
   subplot(nrows = 5, shareX = TRUE, shareY = TRUE)
             
-iris%>%
-  group_by(Species) %>%
-  do(p=plot_ly(., x = ~Sepal.Length, y = ~Sepal.Width, color = ~Species, type = "scatter")) %>%
-  subplot(nrows = 1, shareX = TRUE, shareY = TRUE)
 
 ```
 
 
-Now let's take a look at the fastest Qualifying laps, in milliseconds, by circuit type and put that on a scatter plot.
+I'm creating a walkover between drivers and teams by season so I can use this. 
 ```{r}
+library(lubridate)
+incidents_by_circuit <- 
+  results %>%
+  left_join(status2, by = ("statusId")) %>%
+  left_join(races, by = ("raceId")) %>%
+  rename(race_name = name) %>%
+  filter(year == 2019 | year == 2021) %>%
+  select(date, raceId, race_name, driverId, constructorId, statusId, status) %>%
+  left_join(xover, by = ("constructorId")) %>%
+  group_by(year, date, raceId, race_name, constructor_name, status) %>%
+  summarise(n = n()) %>%
+  filter(status == "Collision" | status == "Accident")
 
-```
-
-
-And finally, the number of incidents by circuit
-```{r}
-
-```
+incidents_by_circuit$date <- lubridate::ymd(incidents_by_circuit$date)
 
 
 
 
 
-##### Historic Lap Times
-The question I'm interested in answering here is who/what/when has the fastest lap time over time. 
-```{r}
+incidents_by_circuit %>%
+  filter(year == 2019) %>%
+  do(p = plot_ly(type = "bar",
+          x = ~constructor_name, 
+          y = ~n,
+          marker = list(color =c("#B12039", # Antonio Giovinazzi (Alfa Romeo)
+                            "#ED1C24", # LeClerc; Ferrari
+                            "#2293D1", # Ocon, Alpine 2021
+                            "#6CD3BF", # George Russell mercedes 2021
+                            "#B12039", # Kimi at Alfa Romeo
+                            "#2D826D", # Stroll; Racing Point 2019; AM 2021
+                            "#F58020", # Norris, McLaren
+                            "#6CD3BF", # Lewis Hamilton; Mercedes
+                            "#1E5BC6", # Max Verstappen; Red Bull
+                            "#B6BABD", # Mick Schumacher; Haas
+                            "#1E5BC6", # Perez, Racing Point 2019, RB 2021
+                            "#6CD3BF", # Bottas Merc 
+                            "#4E7C9B" # Yuki!! Tsonoda! Alpha Tauri
+                            )),
+                        hoverinfo = "text", 
+                        hovertext = ~n) %>%
+  layout(title = 'Incidents by ', xaxis = list(title = 'Count of Fastest Laps'), 
+         yaxis = list(title = 'Driver'))) %>%
+    subplot(nrows = 1, shareX = TRUE, shareY = TRUE)
+
+
+incidents_by_circuit %>%
+  filter(year == 2019) %>%
+  plot_ly(type = "bar",
+          x = ~constructor_name, 
+          y = ~n,
+          marker = list(color =c("#B12039", # Antonio Giovinazzi (Alfa Romeo)
+                            "#ED1C24", # LeClerc; Ferrari
+                            "#2293D1", # Ocon, Alpine 2021
+                            "#6CD3BF", # George Russell mercedes 2021
+                            "#B12039", # Kimi at Alfa Romeo
+                            "#2D826D", # Stroll; Racing Point 2019; AM 2021
+                            "#F58020", # Norris, McLaren
+                            "#6CD3BF", # Lewis Hamilton; Mercedes
+                            "#1E5BC6", # Max Verstappen; Red Bull
+                            "#B6BABD", # Mick Schumacher; Haas
+                            "#1E5BC6", # Perez, Racing Point 2019, RB 2021
+                            "#6CD3BF", # Bottas Merc 
+                            "#4E7C9B" # Yuki!! Tsonoda! Alpha Tauri
+                            )),
+                        hoverinfo = "text", 
+                        hovertext = ~n)
 
 ```
