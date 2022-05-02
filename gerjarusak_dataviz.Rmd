@@ -21,12 +21,13 @@ library(tidymodels)
 
 read in constructor data
 ```{r}
-constructors <- read.csv("/Users/nikkigerjarusak/desktop/DataVizProj/group_f_f1/raw_data/constructors.csv")
-standings <- read.csv("/Users/nikkigerjarusak/desktop/DataVizProj/group_f_f1/raw_data/constructor_standings.csv")
-results <- read.csv("/Users/nikkigerjarusak/desktop/DataVizProj/group_f_f1/raw_data/results.csv")
-races <- read.csv("/Users/nikkigerjarusak/desktop/DataVizProj/group_f_f1/raw_data/races.csv")
-circuits <- read.csv("/Users/nikkigerjarusak/desktop/DataVizProj/group_f_f1/raw_data/circuits.csv")
-status <- read.csv("/Users/nikkigerjarusak/desktop/DataVizProj/group_f_f1/raw_data/status2.csv")
+setwd("/Users/nikkigerjarusak/Documents/GitHub/group_f_f1")
+constructors <- read.csv("/Users/nikkigerjarusak/Documents/GitHub/group_f_f1/raw_data/constructors.csv")
+standings <- read.csv("/Users/nikkigerjarusak/Documents/GitHub/group_f_f1/raw_data/constructor_standings.csv")
+results <- read.csv("/Users/nikkigerjarusak/Documents/GitHub/group_f_f1/raw_data/results.csv")
+races <- read.csv("/Users/nikkigerjarusak/Documents/GitHub/group_f_f1/raw_data/races.csv")
+circuits <- read.csv("/Users/nikkigerjarusak/Documents/GitHub/group_f_f1/raw_data/circuits.csv")
+status <- read.csv("/Users/nikkigerjarusak/Documents/GitHub/group_f_f1/raw_data/status2.csv")
 ```
 
 
@@ -47,84 +48,84 @@ df <- subset(df, select= c(constructorId, constructorRef, name.x, constructorSta
 
 ## All Time Constructor Stats 
 ```{r}
-c_winnings <- df %>%
-  group_by(constructorId, name.x) %>%
-  summarize(totalwins = sum(wins)) %>%
-  arrange(desc(totalwins)) %>%
-  filter(totalwins != 0)
-
-win_plot <- ggplot(c_winnings, aes(x = name.x, y = totalwins, fill = name.x)) +
-  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
-  labs (x = "Constructors", y = "Number of Wins",
-        title = "All Time Wins by Constructor")
-ggplotly(win_plot)
+# c_winnings <- df %>%
+#   group_by(constructorId, name.x) %>%
+#   summarize(totalwins = sum(wins)) %>%
+#   arrange(desc(totalwins)) %>%
+#   filter(totalwins != 0)
+# 
+# win_plot <- ggplot(c_winnings, aes(x = name.x, y = totalwins, fill = name.x)) +
+#   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+#   labs (x = "Constructors", y = "Number of Wins",
+#         title = "All Time Wins by Constructor")
+# ggplotly(win_plot)
+# ```
+# ```{r}
+# top_c_wins <- c_winnings %>%
+#   ungroup %>%
+#   slice(1:10)
+# 
+# top_win_plot <- ggplot(top_c_wins, aes(x = name.x, y = totalwins, fill = name.x)) +
+#   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+#   labs (x = "Constructors", y = "Number of Wins",
+#         title = "All Time Top 10 Winningest Constructors")
+# ggplotly(top_win_plot)
 ```
-```{r}
-top_c_wins <- c_winnings %>%
-  ungroup %>%
-  slice(1:10)
-
-top_win_plot <- ggplot(top_c_wins, aes(x = name.x, y = totalwins, fill = name.x)) +
-  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
-  labs (x = "Constructors", y = "Number of Wins",
-        title = "All Time Top 10 Winningest Constructors")
-ggplotly(top_win_plot)
-```
 
 
 
 ```{r}
-total_points <- df %>%
-  group_by(constructorId, name.x) %>%
-  summarize(totalpoints = sum(points)) %>%
-  arrange(desc(totalpoints)) %>%
-  filter(totalpoints > 700)
-
-average_points <- df %>%
-  group_by(constructorId, name.x) %>%
-  summarize(avg_points = mean(points)) %>%
-  arrange(desc(avg_points)) %>%
-  filter(avg_points > 10)
-```
-```{r}
-total_plot <- ggplot(total_points, aes(x = name.x, y = totalpoints, fill = name.x)) +
-  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
-  labs (x = "Constructors", y = "Total Points",
-        title = "All Time Total Points Earned by Constructor")
+# total_points <- df %>%
+#   group_by(constructorId, name.x) %>%
+#   summarize(totalpoints = sum(points)) %>%
+#   arrange(desc(totalpoints)) %>%
+#   filter(totalpoints > 700)
+# 
+# average_points <- df %>%
+#   group_by(constructorId, name.x) %>%
+#   summarize(avg_points = mean(points)) %>%
+#   arrange(desc(avg_points)) %>%
+#   filter(avg_points > 10)
+# ```
+# ```{r}
+# total_plot <- ggplot(total_points, aes(x = name.x, y = totalpoints, fill = name.x)) +
+#   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+#   labs (x = "Constructors", y = "Total Points",
+#         title = "All Time Total Points Earned by Constructor")
 ggplotly(total_plot)
 ```
 
 ```{r}
 ## top 10 constructors by total points earned 
-top_points <- total_points %>%
-  ungroup %>%
-  slice(1:10)
-
-top_points_plot <- ggplot(top_points, aes(x = name.x, y = totalpoints, fill = name.x)) +
-  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
-  labs (x = "Constructors", y = "Total Points",
-        title = "Top 10 Constructors of All Time by Points")
-ggplotly(top_points_plot)
+# top_points <- total_points %>%
+#   ungroup %>%
+#   slice(1:10)
+# 
+# top_points_plot <- ggplot(top_points, aes(x = name.x, y = totalpoints, fill = name.x)) +
+#   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+#   labs (x = "Constructors", y = "Total Points",
+#         title = "Top 10 Constructors of All Time by Points")
+# ggplotly(top_points_plot)
 ```
 
 ```{r}
-avg_points_plot <- ggplot(average_points, aes(x = name.x, y = avg_points, fill = name.x)) +
-  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
-  labs (x = "Constructors", y = "Average Points",
-        title = "All Time Average Points Earned by Constructor")
-ggplotly(avg_points_plot)
-```
-```{r}
-## top 10 constructors by average points
-top_avg_points <- average_points %>%
-  ungroup %>%
-  slice(1:10)
-
-top_avg_plot <- ggplot(top_avg_points, aes(x = name.x, y = avg_points, fill = name.x)) +
-  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
-  labs (x = "Constructors", y = "Average Points",
-        title = "Top 10 Constructors of All Time by Average Points Earned")
-ggplotly(top_avg_plot)
+# avg_points_plot <- ggplot(average_points, aes(x = name.x, y = avg_points, fill = name.x)) +
+#   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+#   labs (x = "Constructors", y = "Average Points",
+#         title = "All Time Average Points Earned by Constructor")
+# ggplotly(avg_points_plot)
+# ```
+# ```{r}
+# ## top 10 constructors by average points
+# top_avg_points <- average_points %>%
+#   ungroup %>%
+#   slice(1:10)
+# 
+# top_avg_plot <- ggplot(top_avg_points, aes(x = name.x, y = avg_points, fill = name.x)) +
+#   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+#   labs (x = "Constructors", y = "Average Points",
+#         title = "Top 10 Constructors of All Time by Average Points Earned")
+# ggplotly(top_avg_plot)
 ```
 
 ## Constructor Stats by Season (2019 and 2021)
@@ -154,6 +155,7 @@ win_19_plot <- ggplot(winnings_19, aes(x = name.x, y = totalwins, fill = name.x)
         title = "2019 Wins by Constructor")
 ggplotly(win_19_plot)
 ```
+
 ```{r}
 winnings_21 <- season_21 %>%
   group_by(constructorId, name.x) %>%
@@ -308,7 +310,7 @@ status_19_plot <- ggplot(status_19, aes(x = name.x, y = status_count, fill = sta
                                "Disqualified" = "#505050",
                                "DNF" = "#ADADAD",
                                "Finished" = "#1BBC00")) +
-  labs(x = "CConstructor", y = "Status Count", 
+  labs(x = "Constructor", y = "Status Count", 
        title ="2019 Constructor Status")
 ggplotly(status_19_plot)
 ```
@@ -326,14 +328,6 @@ ferrari_status_2019 <- ferrari_status_2019 %>%
   mutate(prop = status_count / sum(ferrari_status_2019$status_count) *100) %>%
   mutate(ypos = cumsum(prop)- 0.5*prop )
   
-
-## ferrari_2019_pie <-  ggplot(ferrari_status_2019, aes(x="", y= prop, fill = status)) +
-  ## geom_bar(stat="identity", width=1) +
-  ## coord_polar("y", start=0) +
-  ## theme_void() +
-  ## geom_text(aes(y = ypos, label = status_count), color = "white", size = 3) +
-  ## labs(title="Ferrari 2019 Statuses")
-## ferrari_2019_pie
 ```
 
 ```{r}
@@ -439,7 +433,7 @@ status_2021_plot <- ggplot(status_2021, aes(x = name.x, y = status_count, fill =
                                "Disqualified" = "#505050",
                                "DNF" = "#ADADAD",
                                "Finished" = "#1BBC00")) +
-  labs(x = "CConstructor", y = "Status Count", 
+  labs(x = "Constructor", y = "Status Count", 
        title="2021 Constructor Status")
 ggplotly(status_2021_plot)
 ```
