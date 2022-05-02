@@ -12,26 +12,28 @@ rm(list = ls())
 ```
 
 ```{r}
-# broken thing to call files but just run the `load_files_code.R` script that is 
-# in the scoping folder. 
+# broken thing to call files but just run the `load_files_code.R` script that is
+# in the scoping folder.
 
-# library(dplyr)
-# library(stringr)
+library(dplyr)
+library(stringr)
+
+setwd("C:/Users/chris/Dropbox/2021_QMSS/Spring 2022/GR5063 Data Visualization/group_f_f1/raw_data")
 
 # if the files are in a different location than your working directory, change
 # the file path in the list.files function
-# file_names <- list.files()
+file_names <- list.files()
 
 # read all 13 csvs into a list called "all_csvs"
-# all_csvs <- lapply(file_names, read.csv)
+all_csvs <- lapply(file_names, read.csv)
 
 # Set the name of each list element to its respective file name.
-# names(all_csvs) <- gsub(".csv","",
-#                        list.files(full.names = FALSE),
-#                        fixed = TRUE)
+names(all_csvs) <- gsub(".csv","",
+                      list.files(full.names = FALSE),
+                      fixed = TRUE)
 
 # break list out into separate dfs
-# list2env(all_csvs, envir=.GlobalEnv)
+list2env(all_csvs, envir=.GlobalEnv)
 
 ```
 
@@ -350,6 +352,10 @@ xover <-
   select(driverId, full_name, constructorId, constructor_name, year) %>%
   group_by(driverId, full_name, constructorId, constructor_name, year) %>% 
   slice(1)
+
+
+xover$full_name <- iconv(xover$full_name, from="UTF-8", to="LATIN1")
+
 ```
 
 
