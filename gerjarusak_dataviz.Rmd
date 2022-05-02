@@ -146,14 +146,18 @@ winnings_19 <- season_19 %>%
   arrange(desc(totalwins)) %>%
   filter(totalwins != 0)
 
-win_19_plot <- ggplot(winnings_19, aes(x = name.x, y = totalwins, fill = name.x)) +
+win_19_plot <- ggplot(winnings_19, aes(x = name.x, y = totalwins, fill = name.x,
+                                       text = paste("<b>Constructor</b>:", winnings_19$name.x, "<br>",
+                                 "<b>Number of Wins</b>:", winnings_19$totalwins, "<br>"))) +
   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) + 
   scale_fill_manual(values = c("Ferrari" = "#ED1C24",
                                "Mercedes" = "#6CD3BF",
                                "Red Bull" = "#1E5BC6")) +
   labs (x = "Constructors", y = "Number of Wins", fill = "Constructor Names",
-        title = "2019 Wins by Constructor")
+        title = "2019 Wins by Constructor") 
+
 ggplotly(win_19_plot)
+
 ```
 
 ```{r}
