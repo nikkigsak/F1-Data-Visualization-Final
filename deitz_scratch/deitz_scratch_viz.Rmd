@@ -22,6 +22,7 @@ standings <- read.csv("../raw_data/driver_standings.csv")
 races <- read.csv("../raw_data/races.csv")
 results <- read.csv("../raw_data/results.csv")
 constructors <- read.csv("../raw_data/constructors.csv")
+qualifying <- read.csv("../raw_data/qualifying")
 
 ```
 

@@ -1,0 +1,520 @@
+---
+title: "F1 Final"
+author: "Lauren Deitz"
+date: "5/4/2022"
+output: html_document
+---
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(magrittr)
+library(tidyverse)
+library(htmltools)
+library(ggplot2)
+library(ggthemes)
+library(DT)
+library(leaflet)
+library(leaflet.extras)
+library(sf)
+library(rgdal) # for reading shape files into R
+library(rgeos)
+library(maps)
+library(crosstalk)
+library(vembedr)
+library(tidyr)
+library(networkD3)
+library(plotly)
+
+```
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+# read in data
+drivers <- read.csv("raw_data/drivers.csv")
+qps <- read.csv("raw_data/qualifying.csv")
+pitstops <- read.csv("raw_data/pit_stops.csv")
+standings <- read.csv("raw_data/driver_standings.csv")
+races <- read.csv("raw_data/races.csv")
+results <- read.csv("raw_data/results.csv")
+constructors <- read.csv("raw_data/constructors.csv")
+qualifying <- read.csv("raw_data/qualifying.csv")
+circuits <- read.csv("raw_data/circuits.csv")
+circuit_type <- read.csv("raw_data/circuit_type.csv")
+lap_times <- read.csv("raw_data/lap_times.csv")
+status2 <- read.csv("raw_data/status2.csv")
+cstandings <- read.csv("raw_data/constructor_standings.csv")
+
+```
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+#helper tables
+
+xover <- 
+  results %>%
+  left_join(races, by = ("raceId")) %>%
+  filter(year == 2019 | year == 2021) %>%
+  select(driverId, constructorId, year) %>%
+  left_join(drivers, by = ("driverId")) %>%
+  left_join(constructors, by = ("constructorId")) %>%
+  mutate(full_name = paste(forename, surname)) %>%
+  rename(constructor_name = name) %>%
+  select(driverId, full_name, constructorId, constructor_name, year) %>%
+  group_by(driverId, full_name, constructorId, constructor_name, year) %>% 
+  slice(1)
+
+xover$full_name <- iconv(xover$full_name, from="UTF-8", to="LATIN1")
+
+xover_total <- xover %>% 
+  arrange(year,constructor_name,driverId) %>% 
+  group_by(year,constructor_name) %>% 
+  mutate(rn=row_number()) %>% 
+  ungroup() %>% 
+  mutate(line_type=case_when(
+    rn==1 ~ 'solid',
+    rn==2 ~ 'dotted',
+    rn==3 ~ 'dashed')) %>% 
+  mutate(colorcol=case_when(
+    constructor_name=='Alfa Romeo' ~ '#B12039',
+    constructor_name=='AlphaTauri' ~ '#4E7C9B',
+    constructor_name=='Alpine F1 Team' ~ '#2293D1',
+    constructor_name=='Aston Martin' ~ '#2D826D',
+    constructor_name=='Ferrari' ~ '#ED1C24',
+    constructor_name=='McLaren' ~ '#F58020',
+    constructor_name=='Mercedes' ~ '#6CD3BF',
+    constructor_name=='Red Bull' ~ '#1E5BC6',
+    constructor_name=='Williams' ~ '#37BEDD',
+    constructor_name=='Haas F1 Team' ~ '#B6BABD',
+    constructor_name=='Racing Point' ~ '#F596C8',
+    constructor_name=='Renault' ~ '#FFF500',
+    constructor_name=='Toro Rosso' ~ '#469BFF'
+))
+
+circuits_joined <- circuits %>%
+                  left_join(circuit_type) %>%
+                  rename(circuit_name = name)
+
+circuits_by_year <- races %>%
+  select(raceId, year, circuitId, name) %>%
+  rename(race_name = name) %>%
+  left_join(circuits_joined, by = c("circuitId")) %>%
+  mutate(circuit_type = 
+           case_when(street_circuit == 1 ~ "street",
+                     road_circuit == 1 ~ "street",
+                     race_circuit == 1 ~ "race",
+                     )
+         ) %>%
+  select(year, circuitId, circuit_name, circuit_type)
+
+skinny_races_circuits <- races %>%
+  rename(race_name = name) %>%
+  select(raceId, circuitId, race_name, year)
+```
+
+## Circuits Map
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+circuits_type_df <- circuit_type %>%
+  mutate(circuit_type =
+    case_when(
+      street_circuit == 1 ~ "street",
+      road_circuit == 1 ~ "road",
+      race_circuit == 1 ~ "race"
+    )
+  ) %>%
+  dplyr::select(circuitId, circuit_type) %>%
+  arrange(circuitId)
+
+
+circuits_df <- circuits %>%
+  mutate(information = paste("<a target='_blank' href='", url,"'>link</a>")) %>%
+  dplyr::select(circuitId, name, location, country, lat, lng, alt, information) %>%
+  arrange(country, location, name)
+
+circuits_df$country <-
+  ifelse(circuits_df$country == "America", "United States", circuits_df$country)
+
+circuits_df$country <-
+  ifelse(circuits_df$country == "USA", "United States", circuits_df$country)
+
+circuits_df <- circuits_df %>%
+  left_join(circuits_type_df, by = "circuitId") %>%
+  dplyr::select(
+    circuitId, name, location, country,
+    circuit_type, lat, lng, alt, information
+  ) %>%
+  arrange(country, location, name)
+
+country_sd <- crosstalk::SharedData$new(circuits_df)
+
+map <- leaflet() %>%
+  addProviderTiles(providers$CartoDB.Voyager) %>% 
+  addMarkers(data = country_sd,
+    lat = ~lat, lng = ~lng,
+    icon = list(
+      iconUrl = 'track-icon-19.png',
+      iconSize = c(25, 25)
+    ),
+    popup = ~paste("<b>", name, "</b><br/><i>Type</i>: ", circuit_type, "<br/><i>Location</i>: ", location, ", ", country, "<br/><i>GPS</i>: (", lat, ",", lng, ",", alt, ")", sep = ""))
+
+bscols(map)
+
+bscols(
+  filter_select("CountrySelector", "Country Circuit Selector:", country_sd, ~country)
+)
+
+```
+
+## Driver Data Table
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+
+drivers_df <- drivers
+drivers_df$number <-
+  ifelse(drivers_df$number == "\\N", "", drivers_df$number)
+
+drivers_df$code <-
+  ifelse(drivers_df$code == "\\N", "", drivers_df$code)
+
+drivers_df <- drivers_df %>%
+  mutate(information = paste("<a target='_blank' href='", url,"'>link</a>")) %>%
+  mutate(driver_number = number, driver_code = code) %>%
+  mutate(firstname = forename, lastname = surname, birth_date = dob) %>%
+  dplyr::select(driverId, firstname, lastname, birth_date,
+    driver_number, driver_code, nationality, information
+  ) %>%
+  arrange(nationality, lastname, firstname, birth_date, driver_number)
+
+#View(drivers_df)
+
+datatable(drivers_df,
+  class = 'cell-border stripe',
+  #colnames = c("name", "nationality"),
+  caption = 'Table 3: Drivers',
+  options = list(
+    pageLength = 5,
+    columnDefs = list(list(visible=FALSE, targets=c("driverId")))
+  ),
+  escape = FALSE
+)
+
+```
+
+## Winners by Position and Year
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+race_standings <- left_join(standings, races, by="raceId")
+driver_race_standings <- left_join(race_standings, drivers, by="driverId")
+standings_over_time <- left_join(driver_race_standings, xover_total, by='driverId')
+standings_over_time <- rename(standings_over_time, year = year.x)
+
+races2021 <- standings_over_time %>% filter(year==2021)
+races2019 <- standings_over_time %>% filter(year==2019)
+
+ggplot(races2021, aes(x=date,y=position,group=full_name, color=full_name, lientype = factor(rn))) + geom_line() + 
+  scale_linetype_manual(values=races2021$line_type) + coord_flip() + ggtitle("2021") + theme_gray()
+ggplot(races2019, aes(x=date,y=position,group=full_name, color=full_name)) + geom_line() + coord_flip() + ggtitle("2019") + theme_gray()
+
+```
+
+## Winners by Point Totals and Year
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+
+ggplot(races2021, aes(x=date,y=points,group=full_name,color=full_name)) + geom_point() + geom_smooth(se=FALSE) + coord_flip() + ggtitle("2021") + theme_gray()
+ggplot(races2019, aes(x=date,y=points,group=full_name,color=full_name)) + geom_point() + geom_smooth(se=FALSE) + coord_flip() + ggtitle("2019") + theme_gray()
+
+```
+
+## Sankey Diagrams
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+## Helper tables/variables
+
+nodes <- c("0","1","2","3","4","5","6","7","8","9","10",
+"11","12","13","14","15","16","17","18","19","20",
+"21","22","23","24","25","26","27","28","29","30",
+"31","32","33","34","35","36","37","38","39","40"
+          )
+
+nodes <- as.data.frame(nodes)
+
+library(tidyr)
+links_driver_2019 <- 
+  results %>%
+  left_join(races, by = "raceId") %>%
+  filter(year == 2019) %>%
+  left_join(drivers, by = "driverId") %>%
+  unite("full_name", forename:surname, sep= " ", remove = FALSE) %>%
+  select(raceId, driverId, full_name, positionOrder) %>%
+  rename(race_position = positionOrder) %>%
+  left_join(qualifying, by = c("raceId" = "raceId", 
+                               "driverId" = "driverId"
+                               )) %>%
+  select(raceId, full_name, race_position, position) %>%
+  rename(quali_position = position) %>%
+  mutate(quali_position = as.integer(quali_position)) %>%
+  mutate(race_position = if_else(race_position == "\\N", 0, as.numeric(race_position)),
+         quali_position = if_else(is.na(quali_position), 0, as.numeric(quali_position))) %>%
+  group_by(full_name, race_position, quali_position) %>%
+  summarise(n = n()) %>%
+  rename(target = race_position,
+         source = quali_position,
+         value = n) %>%
+  mutate(source = source,
+         target =  target + 20) %>%
+    mutate(target = as.integer(target),
+         source = as.integer(source))
+
+links_driver_2021 <- 
+  results %>%
+  left_join(races, by = "raceId") %>%
+  filter(year == 2021) %>%
+  left_join(drivers, by = "driverId") %>%
+  unite("full_name", forename:surname, sep= " ", remove = FALSE) %>%
+  select(raceId, driverId, full_name, positionOrder) %>%
+  rename(race_position = positionOrder) %>%
+  left_join(qualifying, by = c("raceId" = "raceId", 
+                               "driverId" = "driverId"
+                               )) %>%
+  select(raceId, full_name, race_position, position) %>%
+  rename(quali_position = position) %>%
+  mutate(quali_position = as.integer(quali_position)) %>%
+  mutate(race_position = if_else(race_position == "\\N", 0, as.numeric(race_position)),
+         quali_position = if_else(is.na(quali_position), 0, as.numeric(quali_position))) %>%
+  group_by(full_name, race_position, quali_position) %>%
+  summarise(n = n()) %>%
+  rename(target = race_position,
+         source = quali_position,
+         value = n) %>%
+  mutate(source = source,
+         target =  target + 20) %>%
+    mutate(target = as.integer(target),
+         source = as.integer(source))
+
+links_const_2019 <- 
+  results %>%
+  left_join(races, by = "raceId") %>%
+  filter(year == 2019) %>%
+  left_join(constructors, by = "constructorId") %>%
+  rename(const_name = name.y) %>%
+  select(raceId, constructorId, const_name, position) %>%
+  rename(race_position = position) %>%
+  left_join(qualifying, by = c("raceId" = "raceId", 
+                               "constructorId" = "constructorId"
+                               )) %>%
+  select(raceId, const_name, race_position, position) %>%
+  rename(quali_position = position) %>%
+  mutate(quali_position = as.integer(quali_position)) %>%
+  mutate(race_position = if_else(race_position == "\\N", 0, as.numeric(race_position)),
+         quali_position = if_else(is.na(quali_position), 0, as.numeric(quali_position))) %>%
+  group_by(const_name, race_position, quali_position) %>%
+  summarise(n = n()) %>%
+  rename(target = race_position,
+         source = quali_position,
+         value = n) %>%
+  mutate(source = source,
+         target =  target + 20) %>%
+    mutate(target = as.integer(target),
+         source = as.integer(source))
+
+links_const_2021 <- 
+  results %>%
+  left_join(races, by = "raceId") %>%
+  filter(year == 2021) %>%
+  left_join(constructors, by = "constructorId") %>%
+  rename(const_name = name.y) %>%
+  select(raceId, constructorId, const_name, position) %>%
+  rename(race_position = position) %>%
+  left_join(qualifying, by = c("raceId" = "raceId", 
+                               "constructorId" = "constructorId"
+                               )) %>%
+  select(raceId, const_name, race_position, position) %>%
+  rename(quali_position = position) %>%
+  mutate(quali_position = as.integer(quali_position)) %>%
+  mutate(race_position = if_else(race_position == "\\N", 0, as.numeric(race_position)),
+         quali_position = if_else(is.na(quali_position), 0, as.numeric(quali_position))) %>%
+  group_by(const_name, race_position, quali_position) %>%
+  summarise(n = n()) %>%
+  rename(target = race_position,
+         source = quali_position,
+         value = n) %>%
+  mutate(source = source,
+         target =  target + 20) %>%
+    mutate(target = as.integer(target),
+         source = as.integer(source))
+
+links_driver_mv_19 <- links_driver_2019 %>% filter(full_name == "Max Verstappen")
+links_driver_mv_19 <- as.data.frame(links_driver_mv_19)
+
+```
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+# Max Verstappen
+my_color_1 <- 
+  'd3.scaleOrdinal() .domain(["Max Verstappen"]) .range(["#1E41FF"])'
+
+# 2019 Max Verstappen
+sankeyNetwork(Links = links_driver_mv_19, Nodes = nodes, Source = "source",
+              Target = "target", Value = "value", 
+              NodeID = "nodes", colourScale=my_color_1, LinkGroup = "full_name",
+              NodeGroup = NULL)
+
+links_driver_mv_21 <- links_driver_2021 %>% filter(full_name == "Max Verstappen")
+links_driver_mv_21 <- as.data.frame(links_driver_mv_21)
+
+# 2021 Max Verstappen
+sankeyNetwork(Links = links_driver_mv_21, Nodes = nodes, Source = "source",
+              Target = "target", Value = "value", 
+              NodeID = "nodes", colourScale=my_color_1, LinkGroup = "full_name",
+              NodeGroup = NULL)
+
+```
+
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+
+links_driver_lh_19 <- links_driver_2019 %>% filter(full_name == "Lewis Hamilton")
+links_driver_lh_19 <- as.data.frame(links_driver_lh_19)
+
+
+my_color_0 <- 
+  'd3.scaleOrdinal() .domain(["Lewis Hamilton"]) .range(["#6CD3BF"])'
+
+# 2019 Lewis Hamilton
+sankeyNetwork(Links = links_driver_lh_19, Nodes = nodes, Source = "source",
+              Target = "target", Value = "value", 
+              NodeID = "nodes", colourScale=my_color_0, LinkGroup = "full_name",
+              NodeGroup = NULL)
+
+links_driver_lh_21 <- links_driver_2021 %>% filter(full_name == "Lewis Hamilton")
+links_driver_lh_21 <- as.data.frame(links_driver_lh_21)
+
+# 2021 Lewis Hamilton
+sankeyNetwork(Links = links_driver_lh_21, Nodes = nodes, Source = "source",
+              Target = "target", Value = "value", 
+              NodeID = "nodes", colourScale=my_color_0, LinkGroup = "full_name",
+              NodeGroup = NULL)
+
+```
+
+
+## Constructor comparisons
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+## preparing data
+
+df <- left_join(constructors, cstandings, by = "constructorId")
+df <- left_join(df, races, by = "raceId")
+
+## first subset 
+df <- subset(df, select= c(constructorId, constructorRef, name.x, constructorStandingsId,
+                           raceId, points, position, year, circuitId, name.y, wins))
+
+## 2019 season 
+season_19 <- df %>%
+  filter (year == 2019)
+
+## 2021 season
+season_21 <- df %>%
+  filter(year == 2021)
+
+## 2019 total points
+points_19 <- season_19 %>%
+  group_by(constructorId, name.x) %>%
+  summarize(totalpoints = sum(points)) %>%
+  arrange(desc(totalpoints)) %>%
+  rename('name'=name.x)
+
+## 2021 total points
+points_21 <- season_21 %>%
+  group_by(constructorId, name.x) %>%
+  summarize(totalpoints = sum(points)) %>%
+  arrange(desc(totalpoints)) %>%
+  filter(totalpoints != 0)
+
+
+points_19_plot <- ggplot(points_19, aes(x = name, y = totalpoints, fill = name)) +
+  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+   scale_fill_manual(values = c("Alfa Romeo" = "#B12039",
+                                "Ferrari" = "#ED1C24",
+                                "Haas F1 Team" = "#B6BABD",
+                               "McLaren" = "#F58020",
+                               "Mercedes" = "#6CD3BF",
+                               "Racing Point" = "#F596C8",
+                               "Red Bull" = "#1E5BC6",
+                               "Renault" = "#FFF500",
+                               "Toro Rosso" = "#469BFF",
+                               "Williams" = "#37BEDD")) +
+  labs (x = "Constructors", y = "Total Points", fill = "Constructor Names",
+        title = "Total Points Earned by Constructors in 2019")
+ggplotly(points_19_plot)
+
+points_21_plot <- ggplot(points_21, aes(x = name.x, y = totalpoints, fill = name.x)) +
+  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+  scale_fill_manual(values = c("Alfa Romeo" = "#B12039",
+                               "AlphaTauri" = "#4E7C9B",
+                               "Alpine F1 Team" = "#2293D1",
+                               "Aston Martin" = "#2D826D",
+                               "Ferrari" = "#ED1C24",
+                               "McLaren" = "#F58020",
+                               "Mercedes" = "#6CD3BF",
+                               "Red Bull" = "#1E5BC6",
+                               "Williams" = "#37BEDD")) +
+  labs (x = "Constructors", y = "Total Points", fill = "Constructor Names",
+        title = "Total Points Earned by Constructors in 2021")
+ggplotly(points_21_plot)
+
+```
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+df2 <- left_join(results, status2, by = "statusId")
+df2 <- left_join(df2, constructors, by = "constructorId")
+df2 <- left_join(df2, races, by = "raceId")
+
+## subset
+df2 <- subset(df2, select = c(resultId, raceId, driverId, constructorId,
+                              position, points, statusId, status, constructorRef, name.x, 
+                              year, circuitId, name.y))
+
+
+## 2019 status
+status_19 <- df2 %>% 
+  filter(year == 2019) %>%
+  group_by(name.x, status) %>%
+  summarize(status_count = n()) 
+
+## 2021 status
+status_2021 <- df2 %>% 
+  filter(year == 2021) %>%
+  group_by(name.x, status) %>%
+  summarize(status_count = n()) 
+
+
+status_19_plot <- ggplot(status_19, aes(x = name.x, y = status_count, fill = status)) +
+  geom_col() +
+  coord_flip() +
+  scale_fill_manual(values = c("Accident" = "#000000",
+                               "Car Failure" = "#47ABFF",
+                               "Collision" = "#FF0000",
+                               "Disqualified" = "#505050",
+                               "DNF" = "#ADADAD",
+                               "Finished" = "#1BBC00")) +
+  labs(x = "CConstructor", y = "Status Count", 
+       title ="2019 Constructor Status")
+ggplotly(status_19_plot)
+
+status_2021_plot <- ggplot(status_2021, aes(x = name.x, y = status_count, fill = status)) +
+  geom_col() +
+  coord_flip() + 
+  scale_fill_manual(values = c("Accident" = "#000000",
+                               "Car Failure" = "#47ABFF",
+                               "Collision" = "#FF0000",
+                               "Disqualified" = "#505050",
+                               "DNF" = "#ADADAD",
+                               "Finished" = "#1BBC00")) +
+  labs(x = "CConstructor", y = "Status Count", 
+       title="2021 Constructor Status")
+ggplotly(status_2021_plot)
+
+```
