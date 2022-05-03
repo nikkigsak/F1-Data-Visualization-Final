@@ -142,7 +142,7 @@ season_21 <- df %>%
 ```{r}
 winnings_19 <- season_19 %>%
   group_by(constructorId, name.x) %>%
-  summarize(totalwins = sum(wins)) %>%
+  summarize(totalwins = max(wins)) %>%
   arrange(desc(totalwins)) %>%
   filter(totalwins != 0)
 
@@ -163,7 +163,7 @@ ggplotly(win_19_plot, tooltip = "text")
 ```{r}
 winnings_21 <- season_21 %>%
   group_by(constructorId, name.x) %>%
-  summarize(totalwins = sum(wins)) %>%
+  summarize(totalwins = max(wins)) %>%
   arrange(desc(totalwins)) %>%
   filter(totalwins != 0)
 
@@ -183,7 +183,7 @@ ggplotly(win_21_plot, tooltip = "text")
 ```{r}
 points_19 <- season_19 %>%
   group_by(constructorId, name.x) %>%
-  summarize(totalpoints = sum(points)) %>%
+  summarize(totalpoints = max(points)) %>%
   arrange(desc(totalpoints)) 
 
 avg_points_19 <- season_19 %>%
@@ -236,7 +236,7 @@ ggplotly(avg_points_19_plot, tooltip = "text")
 ```{r}
 points_21 <- season_21 %>%
   group_by(constructorId, name.x) %>%
-  summarize(totalpoints = sum(points)) %>%
+  summarize(totalpoints = max(points)) %>%
   arrange(desc(totalpoints)) %>%
   filter(totalpoints != 0)
 
