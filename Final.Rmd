@@ -1,7 +1,7 @@
 ---
-title: "Group F: Comparing the 2019 and the 2021 Formula One Seasons"
+title: "Comparing the 2019 and the 2021 Formula One Seasons"
 subtitle: "GR5063: Data Visualization Final Project"
-author: "Lauren Deitz, Donald Stephens, Nikki Gerjarusak, Christa Chiao"
+author: "Group F: Lauren Deitz, Donald Stephens, Nikki Gerjarusak, Christa Chiao"
 date: "5/10/2022"
 output: html_document
 ---
@@ -274,7 +274,7 @@ The aim of Formula One drivers and teams are to compete at the highest level and
 
 Formula One is perhaps best explained by the drivers in the sport:
 
-<Embed Video>
+##### Embed Video
 
 
 
@@ -836,7 +836,7 @@ incidents_by_circuit %>%
 
 
 
-<Caption Needed>
+*Caption Needed*
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 # Max Verstappen
 my_color_1 <- 
@@ -859,7 +859,7 @@ sankeyNetwork(Links = links_driver_mv_21, Nodes = nodes, Source = "source",
 
 ```
 
-<Caption Needed>
+*Caption Needed*
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 
 links_driver_lh_19 <- links_driver_2019 %>% filter(full_name == "Lewis Hamilton")
@@ -891,7 +891,7 @@ sankeyNetwork(Links = links_driver_lh_21, Nodes = nodes, Source = "source",
 This plot_ly graph shows how many times drivers have gotten the "Fastest Lap" designation. The "Fastest Lap" designation gives the driver and the constructor extra points and monetary bonuses. 
 
 
-<Caption Needed>
+*Caption Needed*
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 lap_times_by_driver_2019 <- 
   lap_times %>%
@@ -933,7 +933,7 @@ lap_times_by_driver_2019 %>%
 ```
 
 
-<Caption Needed>
+*Caption Needed*
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 
 lap_times_by_driver_2021 <- 
@@ -976,4 +976,4 @@ lap_times_by_driver_2021 %>%
 
 
 ## Conclusion
-<More Text>
+*Conclusion Needed*
