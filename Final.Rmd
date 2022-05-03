@@ -189,10 +189,13 @@ drivers_df <- drivers_df %>%
 datatable(drivers_df,
   class = 'cell-border stripe',
   #colnames = c("name", "nationality"),
+  caption = '',
+  extensions = 'Buttons',
   options = list(
     pageLength = 5,
     columnDefs = list(list(visible=FALSE, targets=c("driverId"))),
-    buttons = c('csv')
+    dom = 'Bfrtrip',
+    buttons = c('csv') # 'copy', 
   ),
   escape = FALSE
 )
