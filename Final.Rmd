@@ -795,7 +795,7 @@ incidents_by_circuit %>%
                                   )),
           # text = ~constructor_name,
           hovertemplate = paste('<b>Team</b>: %{x}<br>', 
-                                 'Number of Accidents or Collisions</b>: %{y}<br>')) %>%
+                                 'Number of Accidents or Collisions</b>: %{y}<br><extra></extra>')) %>%
   layout(title = 'Incidents by Constructor in 2019',
          xaxis = list(title = 'Constructor'), 
          yaxis = list(title = 'Count of Accidents or Collisions'))
@@ -824,7 +824,7 @@ incidents_by_circuit %>%
                                   )),
           # text = ~constructor_name,
           hovertemplate = paste('<b>Team</b>: %{x}<br>', 
-                                 'Number of Accidents or Collisions</b>: %{y}<br>')) %>%
+                                 'Number of Accidents or Collisions</b>: %{y}<br><extra></extra>')) %>%
   layout(title = 'Incidents by Constructor in 2021',
          xaxis = list(title = 'Constructor'), 
          yaxis = list(title = 'Count of Accidents or Collisions'))
