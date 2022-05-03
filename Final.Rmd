@@ -1,11 +1,12 @@
 ---
-title: "F1 Final"
-author: "Lauren Deitz"
-date: "5/4/2022"
+title: "Group F: Comparing the 2019 and the 2021 Formula One Seasons"
+subtitle: "GR5063: Data Visualization"
+author: "Lauren Deitz, Donald Stephens, Nikki Gerjarusak, Christa Chiao"
+date: "5/10/2022"
 output: html_document
 ---
 
-```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache=FALSE}
 library(tidyverse)
 library(stringr)
 #library(ggplot2)
@@ -62,7 +63,13 @@ xover <-
   group_by(driverId, full_name, constructorId, constructor_name, year) %>% 
   slice(1)
 
-xover$full_name <- iconv(xover$full_name, from="UTF-8", to="LATIN1")
+xover <- 
+  xover %>%
+  mutate(full_name = if_else(full_name == "Kimi RÃ¤ikkÃ¶nen", "Kimi Raikkonen", full_name),
+         full_name = if_else(full_name == "Nico HÃ¼lkenberg", "Nico Hulkenberg", full_name),
+         full_name = if_else(full_name == "Sergio PÃ©rez", "Sergio Perez", full_name))
+
+# xover$full_name <- iconv(xover$full_name, from="UTF-8", to="LATIN1")
 
 xover_total <- xover %>% 
   arrange(year,constructor_name,driverId) %>% 
