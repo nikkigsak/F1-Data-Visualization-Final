@@ -395,19 +395,27 @@ pie19 <- plot_ly(labels = ~status, values = ~prop,
   add_pie(data = ferrari_status_2019, name = "Ferrari", marker = list(colors = c("#1BBC00", "#FF0000",
                                                                                  "#ADADAD", "#47ABFF",
                                                                                  "#000000", "#505050")),
-          domain = list(row = 0, column = 0)) %>%
+          domain = list(row = 0, column = 0), 
+          hovertemplate = paste("<b>Status</b>:", ferrari_status_2019$status, "<br>",
+                                "<b>Status Percentage</b>:", ferrari_status_2019$prop, "<br>")) %>%
   add_pie(data = rb_status_2019, name = "Red Bull",marker = list(colors = c("#1BBC00", "#ADADAD",
                                                                                  "#47ABFF", "#000000",
                                                                                  "#FF0000")),
-          domain = list(row = 0, column = 1))%>%
+          domain = list(row = 0, column = 1),
+          hovertemplate = paste("<b>Status</b>:", rb_status_2019$status, "<br>",
+                                "<b>Status Percentage</b>:", rb_status_2019$prop, "<br>"))%>%
   add_pie(data = merc_status_2019, name = "Mercedes", marker = list(colors = c("#1BBC00", "#000000",
                                                                                  "#47ABFF",
                                                                                  "#ADADAD")),
-          domain = list(row = 1, column = 0))%>%
+          domain = list(row = 1, column = 0),
+          hovertemplate = paste("<b>Status</b>:", merc_status_2019$status, "<br>",
+                                "<b>Status Percentage</b>:", merc_status_2019$prop, "<br>"))%>%
   add_pie(data = mcl_status_2019, name = "McLaren", marker = list(colors = c("#1BBC00", "#ADADAD",
                                                                              "#47ABFF", "#FF0000",
                                                                               "#505050")),
-          domain = list(row = 1, column = 1))%>% 
+          domain = list(row = 1, column = 1),
+          hovertemplate = paste("<b>Status</b>:", mcl_status_2019$status, "<br>",
+                                "<b>Status Percentage</b>:", mcl_status_2019$prop, "<br>"))%>% 
   layout(title = '2019 Constructor Statuses', showlegend = T, grid=list(rows=2, columns=2),
          xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
@@ -442,7 +450,7 @@ status_count_21
 
 ```{r}
 ## plot constructor status for 2021
-status_21_plot <- ggplot(status_2021, aes(x = name.x, y = status_count, fill = status,
+status_21_plot <- ggplot(status_21, aes(x = name.x, y = status_count, fill = status,
                                             text = paste("<b>Constructor</b>:", status_21$name.x, "<br>",
                                  "<b>Status Count</b>:", status_21$status_count, "<br>",
                                  "<b>Status</b>:", status_21$status, "<br>"))) +
@@ -517,17 +525,25 @@ pie21 <- plot_ly(labels = ~status, values = ~prop,
                 textposition = 'inside',textinfo = 'label+percent') %>% 
   add_pie(data = ferrari_status_2021, name = "Ferrari", marker = list(colors = c("#1BBC00", "#ADADAD",
                                                                                  "#47ABFF", "#FF0000")),
-          domain = list(row = 0, column = 0)) %>%
+          domain = list(row = 0, column = 0),
+          hovertemplate = paste("<b>Status</b>:", ferrari_status_2021$status, "<br>",
+                                "<b>Status Percentage</b>:", ferrari_status_2021$prop, "<br>")) %>%
   add_pie(data = rb_status_2021, name = "Red Bull", marker = list(colors = c("#1BBC00", "#FF0000",
                                                                             "#ADADAD", "#000000",
                                                                              "#47ABFF")),
-          domain = list(row = 0, column = 1))%>%
+          domain = list(row = 0, column = 1),
+          hovertemplate = paste("<b>Status</b>:", rb_status_2021$status, "<br>",
+                                "<b>Status Percentage</b>:", rb_status_2021$prop, "<br>"))%>%
   add_pie(data = merc_status_2021, name = "Mercedes", marker = list(colors = c("#1BBC00", "#FF0000",
                                                                                  "#47ABFF", "#ADADAD")),
-          domain = list(row = 1, column = 0))%>%
+          domain = list(row = 1, column = 0),
+          hovertemplate = paste("<b>Status</b>:", merc_status_2021$status, "<br>",
+                                "<b>Status Percentage</b>:", merc_status_2021$prop, "<br>"))%>%
   add_pie(data = mcl_status_2021, name = "McLaren", marker = list(colors = c("#1BBC00", "#ADADAD",
                                                                              "#47ABFF","#FF0000")),
-          domain = list(row = 1, column = 1)) %>% 
+          domain = list(row = 1, column = 1),
+          hovertemplate = paste("<b>Status</b>:", mcl_status_2021$status, "<br>",
+                                "<b>Status Percentage</b>:", mcl_status_2021$prop, "<br>")) %>% 
   layout(title = '2021 Constructor Statuses', showlegend = T, grid=list(rows=2, columns=2),
          xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
