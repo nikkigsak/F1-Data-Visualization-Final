@@ -797,7 +797,7 @@ incidents_by_circuit %>%
           y = ~n,
           marker = list(color =  c("#9B0000", # Alfa Romeo
                                   "#DC0000", # Ferrari
-                                  "#F0D787", # Haas
+                                  "#B6BABD", # Haas
                                   "#FF8700", # McLaren
                                   "#00D2BE", # Mercedes
                                   "#F596C8", # Racing Point
