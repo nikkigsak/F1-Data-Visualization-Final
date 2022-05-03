@@ -6,11 +6,10 @@ output: html_document
 ---
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
-library(dplyr)
+library(tidyverse)
 library(stringr)
 library(ggplot2)
 library(magrittr)
-library(tidyverse)
 library(htmltools)
 library(ggplot2)
 library(ggthemes)
@@ -190,10 +189,10 @@ drivers_df <- drivers_df %>%
 datatable(drivers_df,
   class = 'cell-border stripe',
   #colnames = c("name", "nationality"),
-  caption = 'Table 3: Drivers',
   options = list(
     pageLength = 5,
-    columnDefs = list(list(visible=FALSE, targets=c("driverId")))
+    columnDefs = list(list(visible=FALSE, targets=c("driverId"))),
+    buttons = c('csv')
   ),
   escape = FALSE
 )
@@ -217,11 +216,15 @@ xover_2019 <- xover_2019 %>% filter(driverId %in% races2019$driverId)
 races2021 <- left_join(races2021, xover_2021, by="driverId")
 races2019 <- left_join(races2019, xover_2019, by="driverId")
 
-ggplot(races2021) + 
-  geom_line(aes(x=date,y=position,group=full_name,color=full_name,linetype=full_name)) + scale_color_manual(values=xover_2021$colorcol)+ scale_linetype_manual(values=xover_2021$line_type) + coord_flip() + ggtitle("2021") + theme_classic() + labs(x = "Date", y = "Position")
+wins_2021 <- ggplot(races2021) + 
+  geom_line(aes(x=date,y=position,group=full_name,color=full_name,linetype=full_name,text=paste("<b>Driver: </b>",full_name,"<br><b>Team: ",constructor_name))) + scale_color_manual(values=xover_2021$colorcol)+ scale_linetype_manual(values=xover_2021$line_type) + coord_flip() + ggtitle("2021") + theme_classic() + labs(x = "Date", y = "Position")
 
-ggplot(races2019) + 
-  geom_line(aes(x=date,y=position,group=full_name,color=full_name,linetype=full_name)) + scale_color_manual(values=xover_2019$colorcol)+ scale_linetype_manual(values=xover_2019$line_type) + coord_flip() + ggtitle("2019") + theme_classic() + labs(x = "Date", y = "Position") + guides(color=guide_legend(ncol=2))
+ggplotly(wins_2021, tooltip = "text")
+
+wins_2019 <- ggplot(races2019) + 
+  geom_line(aes(x=date,y=position,group=full_name,color=full_name,linetype=full_name,text=paste("<b>Driver: </b>",full_name,"<br><b>Team: ",constructor_name))) + scale_color_manual(values=xover_2019$colorcol)+ scale_linetype_manual(values=xover_2019$line_type) + coord_flip() + ggtitle("2019") + theme_classic() + labs(x = "Date", y = "Position") + guides(color=guide_legend(ncol=2))
+
+ggplotly(wins_2019)
 
 ```
 
@@ -229,18 +232,22 @@ ggplot(races2019) +
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 
-ggplot(races2021, aes(x=date,y=points,group=full_name,color=full_name, linetype=full_name)) + geom_point() + geom_smooth(se=FALSE) + coord_flip() + 
+points_2021 <- ggplot(races2021, aes(x=date,y=points,group=full_name,color=full_name, linetype=full_name, text=paste("<b>Driver:</b> ",full_name,"<br><b>Team: </b>",constructor_name,"<br><b>Points: ",points))) + geom_point() + geom_smooth(se=FALSE) + coord_flip() + 
   ggtitle("2021") + 
   scale_linetype_manual(values=xover_2021$line_type, name="full_name") + 
   scale_color_manual(values=xover_2021$colorcol, name="full_name") + 
   theme_classic()
 
-ggplot(races2019, aes(x=date,y=points,group=full_name,color=full_name, linetype=full_name)) + geom_point() + geom_smooth(se=FALSE) + coord_flip() + 
+ggplotly(points_2021, tooltip="text")
+
+points_2019 <- ggplot(races2019, aes(x=date,y=points,group=full_name,color=full_name, linetype=full_name,text=paste("<b>Driver:</b> ",full_name,"<br><b>Team: </b>",constructor_name,"<br><b>Points: ",points))) + geom_point() + geom_smooth(se=FALSE) + coord_flip() + 
   ggtitle("2019") + 
   scale_linetype_manual(values=xover_2019$line_type, name="full_name") + 
   scale_color_manual(values=xover_2019$colorcol, name="full_name") + theme_classic() + 
   labs (x = "Date", y = "Total Points") +
   guides(linetype=guide_legend(ncol=2, byrow=FALSE))
+
+ggplotly(points_2019, tooltip="text")
 
 ```
 
