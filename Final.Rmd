@@ -8,7 +8,7 @@ output: html_document
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 library(tidyverse)
 library(stringr)
-library(ggplot2)
+#library(ggplot2)
 library(magrittr)
 library(htmltools)
 library(ggplot2)
