@@ -232,16 +232,66 @@ datatable(drivers_df,
 
 ## The 2019 Formula 1 Season versus the 2021 Formula 1 Season
 
-This section shows how the 2019 and the 2021 seasons came to be: the points totals by drivers and constructors, the overall 
+This section shows how the 2019 and the 2021 seasons came to be: the points earned by drivers and constructors over the course of the seasons, the overall point totals by constructors, and more. 
 
 The 2019 Formula 1 Season saw Lewis Hamilton of Mercedes win his sixth Driver's Championship and Mercedes win their sixth Constructor's Championship in a row, a remarkable feat for the driver and the constructor. 
 
 
-The 2021 Formula 1 Season saw Max Verstappen of Red Bull win his first Driver's Championship, with Red Bull missing out on the Constructor's Championship to Mercedes by 27 points. 
+The 2021 Formula 1 Season saw Max Verstappen of Red Bull win his first Driver's Championship, with Red Bull missing out on the Constructor's Championship to Mercedes by 27 points. Max Verstappen and Lewis Hamilton were head to head in an intense competition for the Driver's Championship throughout the season, with Verstappen clinching the win in the final race of the 2021 season. Verstappen's win was controversial and caused an outcry in the paddock, but ultimately held to give driver his first championship. 
 
 
-### Points Totals
-#### 
+### Winners by Point Totals and Year
+
+As mentioned above, and by the Formula 1 video, drivers earn points throughout the course of a season in accordance with their race performance. The top ten finishers in a race earn points according to this breakdown:
+* First Place = 25 points
+* Second Place = 18 points
+* Third Place = 15 points
+* Fourth Place = 12 points
+* Fifth Place = 10 points
+* Sixth Place = 8 points
+* Seventh Place = 6 points
+* Eighth Place = 4 points
+* Ninth Place = 2 points
+* Tenth Place = 1 point
+
+In the 2019 season, Lewis Hamilton (solid teal line), driving in his sixth year with Mercedes, was the runaway points leader, with his teammate, Valteri Bottas (dashed teal line), the only other driver coming close to Hamilton's performance. This was a dominant year for Hamilton and Mercedes. The next three drivers, Max Verstappen of Red Bull, and Sebastian Vettel and Charles LeClerc, both of Ferrari fell in the middle of the pack. 
+
+In the 2021 Season, Hamilton's dominance was matched and eventually surpassed by young driver, Max Verstappen of Red Bull. The two drivers immediately set themselves as the best of the best, earning enough points to isolate themselves from the rest of the drivers almost immediately as the season began. Valteri Bottas of Mercedes and Sergio "Checo" Perez of Red Bull are the third and fourth-place finishers in the Driver's Championship, estblishing the dominance of Mercedes and Red Bull during the 2021 F1 season. 
+
+Double click on each driver's legend entry to isolate their points accumulation over the course of each season. Double-click to set the graph back to its default. 
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+
+points_2021 <- ggplot(races2021, aes(x=date,y=points,group=full_name,color=full_name, linetype=full_name, text=paste("<b>Driver:</b> ",full_name,"<br><b>Team: </b>",constructor_name,"<br><b>Points: ",points))) + geom_point() + geom_smooth(se=FALSE) + coord_flip() + 
+  ggtitle("2021") + 
+  scale_linetype_manual(values=xover_2021$line_type, name="full_name") + 
+  scale_color_manual(values=xover_2021$colorcol, name="full_name") + 
+  theme_classic()
+
+ggplotly(points_2021, tooltip="text")
+
+points_2019 <- ggplot(races2019, aes(x=date,y=points,group=full_name,color=full_name, linetype=full_name,text=paste("<b>Driver:</b> ",full_name,"<br><b>Team: </b>",constructor_name,"<br><b>Points: ",points))) + geom_point() + geom_smooth(se=FALSE) + coord_flip() + 
+  ggtitle("2019") + 
+  scale_linetype_manual(values=xover_2019$line_type, name="full_name") + 
+  scale_color_manual(values=xover_2019$colorcol, name="full_name") + theme_classic() + 
+  labs (x = "Date", y = "Total Points") +
+  guides(linetype=guide_legend(ncol=2, byrow=FALSE))
+
+ggplotly(points_2019, tooltip="text")
+
+```
+
+
+### Drivers by Standing during the Season
+
+Drivers standings' reflect their points accumulation over the course of the season relative to other drivers on the grid. 
+
+The mid-tier teams, or "middle of the pack" teams in 2019 included: Racing Point, Alfa Romeo Racing, McLaren, Renault, and Toro Rosso. The drivers on these teams moved around the middle of the standings throughout the season, with Carlos Sainz of McLaren eventually earning sixth place in the Driver's Championship and Pierre Gasley earning seventh place. These top of the middle tier standings are often referred to as the "best of the rest". 
+
+The 2021 Season saw significantly less movement in the middle of the pack, with McLaren keeping their momentum as one of the "best of the rest", and the new Alpine F1 team fighting their way to the top of the middle places. The leader of the Driver's Championship changed hands five times, with Lewis Hamilton and Max Verstappen both consistently earning high points finishes and remaining competitive with each other. This championship leader change of hands almost doubled the number of times the championship leader changed hands during the 2019 season, where Lewis Hamliton briefly tussled with his teammate Valteri Bottas for the number one spot. 
+
+Double click on each driver's legend entry to isolate their standings over the course of each season. Double-click to set the graph back to its default. 
+
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 race_standings <- left_join(standings, races, by="raceId")
@@ -270,203 +320,57 @@ ggplotly(wins_2019)
 
 ```
 
-## Winners by Point Totals and Year
 
+
+
+## Constructor Wins and Points
+
+Constructors or "teams" are the makers of the F1 cars. These constructors are sometimes well known auto makers or in the case of Red Bull, energy drink manufacturers. These constructors spend the entire F1 off-season-- typically between the fall and spring-- building what they hope to be the fastest car on the grid. These constructors employ thousands of mechanics, engineers, physicists, and experts in their field to create these cars. 
+
+The Constructor's championship rewards not only the driver, but seeks to recognize the entire team that builds and maintains the car.
+
+### Constructor Points Earnings 
+
+Constructors earn points in the same cadence as drivers, with the first place Constructor earning 25 points, the second place Constructo earning 18 points, and so on and so forth. 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+points_19_plot <- ggplot(points_19, aes(x = name, y = totalpoints, fill = name)) +
+  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+   scale_fill_manual(values = c("Alfa Romeo" = "#B12039",
+                                "Ferrari" = "#ED1C24",
+                                "Haas F1 Team" = "#B6BABD",
+                               "McLaren" = "#F58020",
+                               "Mercedes" = "#6CD3BF",
+                               "Racing Point" = "#F596C8",
+                               "Red Bull" = "#1E5BC6",
+                               "Renault" = "#FFF500",
+                               "Toro Rosso" = "#469BFF",
+                               "Williams" = "#37BEDD")) +
+  labs (x = "Constructors", y = "Total Points", fill = "Constructor Names",
+        title = "Total Points Earned by Constructors in 2019")
+ggplotly(points_19_plot)
 
-points_2021 <- ggplot(races2021, aes(x=date,y=points,group=full_name,color=full_name, linetype=full_name, text=paste("<b>Driver:</b> ",full_name,"<br><b>Team: </b>",constructor_name,"<br><b>Points: ",points))) + geom_point() + geom_smooth(se=FALSE) + coord_flip() + 
-  ggtitle("2021") + 
-  scale_linetype_manual(values=xover_2021$line_type, name="full_name") + 
-  scale_color_manual(values=xover_2021$colorcol, name="full_name") + 
-  theme_classic()
-
-ggplotly(points_2021, tooltip="text")
-
-points_2019 <- ggplot(races2019, aes(x=date,y=points,group=full_name,color=full_name, linetype=full_name,text=paste("<b>Driver:</b> ",full_name,"<br><b>Team: </b>",constructor_name,"<br><b>Points: ",points))) + geom_point() + geom_smooth(se=FALSE) + coord_flip() + 
-  ggtitle("2019") + 
-  scale_linetype_manual(values=xover_2019$line_type, name="full_name") + 
-  scale_color_manual(values=xover_2019$colorcol, name="full_name") + theme_classic() + 
-  labs (x = "Date", y = "Total Points") +
-  guides(linetype=guide_legend(ncol=2, byrow=FALSE))
-
-ggplotly(points_2019, tooltip="text")
+points_21_plot <- ggplot(points_21, aes(x = name.x, y = totalpoints, fill = name.x)) +
+  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+  scale_fill_manual(values = c("Alfa Romeo" = "#B12039",
+                               "AlphaTauri" = "#4E7C9B",
+                               "Alpine F1 Team" = "#2293D1",
+                               "Aston Martin" = "#2D826D",
+                               "Ferrari" = "#ED1C24",
+                               "McLaren" = "#F58020",
+                               "Mercedes" = "#6CD3BF",
+                               "Red Bull" = "#1E5BC6",
+                               "Williams" = "#37BEDD")) +
+  labs (x = "Constructors", y = "Total Points", fill = "Constructor Names",
+        title = "Total Points Earned by Constructors in 2021")
+ggplotly(points_21_plot)
 
 ```
 
-## Sankey Diagrams
+### Constructor Race Wins
 
-```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
-## Helper tables/variables
+These constructors wins show a similar story as the driver's visualizations do, although a new name emerges: Ferrari. In 2019, Mercedes dominated the field, winning 14 of the 20 races. Red Bull Racing won three races in Austria, Germany, and Brazil. Ferrari won three races as well, in Belgium, Italy, and Singapore. Ferrari is one of the best, if not the best known constructor in the sport. The 2019 Ferrari team showed a dismal performance with three wins, while this does further emphasize Mercedes's dominance this season. 
 
-nodes <- c("0","1","2","3","4","5","6","7","8","9","10",
-"11","12","13","14","15","16","17","18","19","20",
-"21","22","23","24","25","26","27","28","29","30",
-"31","32","33","34","35","36","37","38","39","40"
-          )
-
-nodes <- as.data.frame(nodes)
-
-library(tidyr)
-links_driver_2019 <- 
-  results %>%
-  left_join(races, by = "raceId") %>%
-  filter(year == 2019) %>%
-  left_join(drivers, by = "driverId") %>%
-  unite("full_name", forename:surname, sep= " ", remove = FALSE) %>%
-  select(raceId, driverId, full_name, positionOrder) %>%
-  rename(race_position = positionOrder) %>%
-  left_join(qualifying, by = c("raceId" = "raceId", 
-                               "driverId" = "driverId"
-                               )) %>%
-  select(raceId, full_name, race_position, position) %>%
-  rename(quali_position = position) %>%
-  mutate(quali_position = as.integer(quali_position)) %>%
-  mutate(race_position = if_else(race_position == "\\N", 0, as.numeric(race_position)),
-         quali_position = if_else(is.na(quali_position), 0, as.numeric(quali_position))) %>%
-  group_by(full_name, race_position, quali_position) %>%
-  summarise(n = n()) %>%
-  rename(target = race_position,
-         source = quali_position,
-         value = n) %>%
-  mutate(source = source,
-         target =  target + 20) %>%
-    mutate(target = as.integer(target),
-         source = as.integer(source))
-
-links_driver_2021 <- 
-  results %>%
-  left_join(races, by = "raceId") %>%
-  filter(year == 2021) %>%
-  left_join(drivers, by = "driverId") %>%
-  unite("full_name", forename:surname, sep= " ", remove = FALSE) %>%
-  select(raceId, driverId, full_name, positionOrder) %>%
-  rename(race_position = positionOrder) %>%
-  left_join(qualifying, by = c("raceId" = "raceId", 
-                               "driverId" = "driverId"
-                               )) %>%
-  select(raceId, full_name, race_position, position) %>%
-  rename(quali_position = position) %>%
-  mutate(quali_position = as.integer(quali_position)) %>%
-  mutate(race_position = if_else(race_position == "\\N", 0, as.numeric(race_position)),
-         quali_position = if_else(is.na(quali_position), 0, as.numeric(quali_position))) %>%
-  group_by(full_name, race_position, quali_position) %>%
-  summarise(n = n()) %>%
-  rename(target = race_position,
-         source = quali_position,
-         value = n) %>%
-  mutate(source = source,
-         target =  target + 20) %>%
-    mutate(target = as.integer(target),
-         source = as.integer(source))
-
-links_const_2019 <- 
-  results %>%
-  left_join(races, by = "raceId") %>%
-  filter(year == 2019) %>%
-  left_join(constructors, by = "constructorId") %>%
-  rename(const_name = name.y) %>%
-  select(raceId, constructorId, const_name, position) %>%
-  rename(race_position = position) %>%
-  left_join(qualifying, by = c("raceId" = "raceId", 
-                               "constructorId" = "constructorId"
-                               )) %>%
-  select(raceId, const_name, race_position, position) %>%
-  rename(quali_position = position) %>%
-  mutate(quali_position = as.integer(quali_position)) %>%
-  mutate(race_position = if_else(race_position == "\\N", 0, as.numeric(race_position)),
-         quali_position = if_else(is.na(quali_position), 0, as.numeric(quali_position))) %>%
-  group_by(const_name, race_position, quali_position) %>%
-  summarise(n = n()) %>%
-  rename(target = race_position,
-         source = quali_position,
-         value = n) %>%
-  mutate(source = source,
-         target =  target + 20) %>%
-    mutate(target = as.integer(target),
-         source = as.integer(source))
-
-links_const_2021 <- 
-  results %>%
-  left_join(races, by = "raceId") %>%
-  filter(year == 2021) %>%
-  left_join(constructors, by = "constructorId") %>%
-  rename(const_name = name.y) %>%
-  select(raceId, constructorId, const_name, position) %>%
-  rename(race_position = position) %>%
-  left_join(qualifying, by = c("raceId" = "raceId", 
-                               "constructorId" = "constructorId"
-                               )) %>%
-  select(raceId, const_name, race_position, position) %>%
-  rename(quali_position = position) %>%
-  mutate(quali_position = as.integer(quali_position)) %>%
-  mutate(race_position = if_else(race_position == "\\N", 0, as.numeric(race_position)),
-         quali_position = if_else(is.na(quali_position), 0, as.numeric(quali_position))) %>%
-  group_by(const_name, race_position, quali_position) %>%
-  summarise(n = n()) %>%
-  rename(target = race_position,
-         source = quali_position,
-         value = n) %>%
-  mutate(source = source,
-         target =  target + 20) %>%
-    mutate(target = as.integer(target),
-         source = as.integer(source))
-
-links_driver_mv_19 <- links_driver_2019 %>% filter(full_name == "Max Verstappen")
-links_driver_mv_19 <- as.data.frame(links_driver_mv_19)
-
-```
-
-```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
-# Max Verstappen
-my_color_1 <- 
-  'd3.scaleOrdinal() .domain(["Max Verstappen"]) .range(["#1E41FF"])'
-
-# 2019 Max Verstappen
-sankeyNetwork(Links = links_driver_mv_19, Nodes = nodes, Source = "source",
-              Target = "target", Value = "value", 
-              NodeID = "nodes", colourScale=my_color_1, LinkGroup = "full_name",
-              NodeGroup = NULL)
-
-links_driver_mv_21 <- links_driver_2021 %>% filter(full_name == "Max Verstappen")
-links_driver_mv_21 <- as.data.frame(links_driver_mv_21)
-
-# 2021 Max Verstappen
-sankeyNetwork(Links = links_driver_mv_21, Nodes = nodes, Source = "source",
-              Target = "target", Value = "value", 
-              NodeID = "nodes", colourScale=my_color_1, LinkGroup = "full_name",
-              NodeGroup = NULL)
-
-```
-
-
-```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
-
-links_driver_lh_19 <- links_driver_2019 %>% filter(full_name == "Lewis Hamilton")
-links_driver_lh_19 <- as.data.frame(links_driver_lh_19)
-
-
-my_color_0 <- 
-  'd3.scaleOrdinal() .domain(["Lewis Hamilton"]) .range(["#6CD3BF"])'
-
-# 2019 Lewis Hamilton
-sankeyNetwork(Links = links_driver_lh_19, Nodes = nodes, Source = "source",
-              Target = "target", Value = "value", 
-              NodeID = "nodes", colourScale=my_color_0, LinkGroup = "full_name",
-              NodeGroup = NULL)
-
-links_driver_lh_21 <- links_driver_2021 %>% filter(full_name == "Lewis Hamilton")
-links_driver_lh_21 <- as.data.frame(links_driver_lh_21)
-
-# 2021 Lewis Hamilton
-sankeyNetwork(Links = links_driver_lh_21, Nodes = nodes, Source = "source",
-              Target = "target", Value = "value", 
-              NodeID = "nodes", colourScale=my_color_0, LinkGroup = "full_name",
-              NodeGroup = NULL)
-
-```
-
-
-## Constructor comparisons
+The 2021 season saw the rise of Red Bull, with Red Bull winning 11 of the 22 races and Mercedes winning only 9 races. This season also saw two unexpected race winners in McLaren winning the Italian Grand Prix and Alpine F1 Team winning the Hungarian Grand Prix.
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 ## preparing data
@@ -533,39 +437,7 @@ ggplotly(win_21_plot)
 
 ```
 
-```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
-points_19_plot <- ggplot(points_19, aes(x = name, y = totalpoints, fill = name)) +
-  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
-   scale_fill_manual(values = c("Alfa Romeo" = "#B12039",
-                                "Ferrari" = "#ED1C24",
-                                "Haas F1 Team" = "#B6BABD",
-                               "McLaren" = "#F58020",
-                               "Mercedes" = "#6CD3BF",
-                               "Racing Point" = "#F596C8",
-                               "Red Bull" = "#1E5BC6",
-                               "Renault" = "#FFF500",
-                               "Toro Rosso" = "#469BFF",
-                               "Williams" = "#37BEDD")) +
-  labs (x = "Constructors", y = "Total Points", fill = "Constructor Names",
-        title = "Total Points Earned by Constructors in 2019")
-ggplotly(points_19_plot)
 
-points_21_plot <- ggplot(points_21, aes(x = name.x, y = totalpoints, fill = name.x)) +
-  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
-  scale_fill_manual(values = c("Alfa Romeo" = "#B12039",
-                               "AlphaTauri" = "#4E7C9B",
-                               "Alpine F1 Team" = "#2293D1",
-                               "Aston Martin" = "#2D826D",
-                               "Ferrari" = "#ED1C24",
-                               "McLaren" = "#F58020",
-                               "Mercedes" = "#6CD3BF",
-                               "Red Bull" = "#1E5BC6",
-                               "Williams" = "#37BEDD")) +
-  labs (x = "Constructors", y = "Total Points", fill = "Constructor Names",
-        title = "Total Points Earned by Constructors in 2021")
-ggplotly(points_21_plot)
-
-```
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 df2 <- left_join(results, status2, by = "statusId")
@@ -747,4 +619,175 @@ pie21
 
 
 ### Lewis Hamilton versus Max Verstappen
+## Sankey Diagrams
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+## Helper tables/variables
+
+nodes <- c("0","1","2","3","4","5","6","7","8","9","10",
+"11","12","13","14","15","16","17","18","19","20",
+"21","22","23","24","25","26","27","28","29","30",
+"31","32","33","34","35","36","37","38","39","40"
+          )
+
+nodes <- as.data.frame(nodes)
+
+library(tidyr)
+links_driver_2019 <- 
+  results %>%
+  left_join(races, by = "raceId") %>%
+  filter(year == 2019) %>%
+  left_join(drivers, by = "driverId") %>%
+  unite("full_name", forename:surname, sep= " ", remove = FALSE) %>%
+  select(raceId, driverId, full_name, positionOrder) %>%
+  rename(race_position = positionOrder) %>%
+  left_join(qualifying, by = c("raceId" = "raceId", 
+                               "driverId" = "driverId"
+                               )) %>%
+  select(raceId, full_name, race_position, position) %>%
+  rename(quali_position = position) %>%
+  mutate(quali_position = as.integer(quali_position)) %>%
+  mutate(race_position = if_else(race_position == "\\N", 0, as.numeric(race_position)),
+         quali_position = if_else(is.na(quali_position), 0, as.numeric(quali_position))) %>%
+  group_by(full_name, race_position, quali_position) %>%
+  summarise(n = n()) %>%
+  rename(target = race_position,
+         source = quali_position,
+         value = n) %>%
+  mutate(source = source,
+         target =  target + 20) %>%
+    mutate(target = as.integer(target),
+         source = as.integer(source))
+
+links_driver_2021 <- 
+  results %>%
+  left_join(races, by = "raceId") %>%
+  filter(year == 2021) %>%
+  left_join(drivers, by = "driverId") %>%
+  unite("full_name", forename:surname, sep= " ", remove = FALSE) %>%
+  select(raceId, driverId, full_name, positionOrder) %>%
+  rename(race_position = positionOrder) %>%
+  left_join(qualifying, by = c("raceId" = "raceId", 
+                               "driverId" = "driverId"
+                               )) %>%
+  select(raceId, full_name, race_position, position) %>%
+  rename(quali_position = position) %>%
+  mutate(quali_position = as.integer(quali_position)) %>%
+  mutate(race_position = if_else(race_position == "\\N", 0, as.numeric(race_position)),
+         quali_position = if_else(is.na(quali_position), 0, as.numeric(quali_position))) %>%
+  group_by(full_name, race_position, quali_position) %>%
+  summarise(n = n()) %>%
+  rename(target = race_position,
+         source = quali_position,
+         value = n) %>%
+  mutate(source = source,
+         target =  target + 20) %>%
+    mutate(target = as.integer(target),
+         source = as.integer(source))
+
+links_const_2019 <- 
+  results %>%
+  left_join(races, by = "raceId") %>%
+  filter(year == 2019) %>%
+  left_join(constructors, by = "constructorId") %>%
+  rename(const_name = name.y) %>%
+  select(raceId, constructorId, const_name, position) %>%
+  rename(race_position = position) %>%
+  left_join(qualifying, by = c("raceId" = "raceId", 
+                               "constructorId" = "constructorId"
+                               )) %>%
+  select(raceId, const_name, race_position, position) %>%
+  rename(quali_position = position) %>%
+  mutate(quali_position = as.integer(quali_position)) %>%
+  mutate(race_position = if_else(race_position == "\\N", 0, as.numeric(race_position)),
+         quali_position = if_else(is.na(quali_position), 0, as.numeric(quali_position))) %>%
+  group_by(const_name, race_position, quali_position) %>%
+  summarise(n = n()) %>%
+  rename(target = race_position,
+         source = quali_position,
+         value = n) %>%
+  mutate(source = source,
+         target =  target + 20) %>%
+    mutate(target = as.integer(target),
+         source = as.integer(source))
+
+links_const_2021 <- 
+  results %>%
+  left_join(races, by = "raceId") %>%
+  filter(year == 2021) %>%
+  left_join(constructors, by = "constructorId") %>%
+  rename(const_name = name.y) %>%
+  select(raceId, constructorId, const_name, position) %>%
+  rename(race_position = position) %>%
+  left_join(qualifying, by = c("raceId" = "raceId", 
+                               "constructorId" = "constructorId"
+                               )) %>%
+  select(raceId, const_name, race_position, position) %>%
+  rename(quali_position = position) %>%
+  mutate(quali_position = as.integer(quali_position)) %>%
+  mutate(race_position = if_else(race_position == "\\N", 0, as.numeric(race_position)),
+         quali_position = if_else(is.na(quali_position), 0, as.numeric(quali_position))) %>%
+  group_by(const_name, race_position, quali_position) %>%
+  summarise(n = n()) %>%
+  rename(target = race_position,
+         source = quali_position,
+         value = n) %>%
+  mutate(source = source,
+         target =  target + 20) %>%
+    mutate(target = as.integer(target),
+         source = as.integer(source))
+
+links_driver_mv_19 <- links_driver_2019 %>% filter(full_name == "Max Verstappen")
+links_driver_mv_19 <- as.data.frame(links_driver_mv_19)
+
+```
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+# Max Verstappen
+my_color_1 <- 
+  'd3.scaleOrdinal() .domain(["Max Verstappen"]) .range(["#1E41FF"])'
+
+# 2019 Max Verstappen
+sankeyNetwork(Links = links_driver_mv_19, Nodes = nodes, Source = "source",
+              Target = "target", Value = "value", 
+              NodeID = "nodes", colourScale=my_color_1, LinkGroup = "full_name",
+              NodeGroup = NULL)
+
+links_driver_mv_21 <- links_driver_2021 %>% filter(full_name == "Max Verstappen")
+links_driver_mv_21 <- as.data.frame(links_driver_mv_21)
+
+# 2021 Max Verstappen
+sankeyNetwork(Links = links_driver_mv_21, Nodes = nodes, Source = "source",
+              Target = "target", Value = "value", 
+              NodeID = "nodes", colourScale=my_color_1, LinkGroup = "full_name",
+              NodeGroup = NULL)
+
+```
+
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+
+links_driver_lh_19 <- links_driver_2019 %>% filter(full_name == "Lewis Hamilton")
+links_driver_lh_19 <- as.data.frame(links_driver_lh_19)
+
+
+my_color_0 <- 
+  'd3.scaleOrdinal() .domain(["Lewis Hamilton"]) .range(["#6CD3BF"])'
+
+# 2019 Lewis Hamilton
+sankeyNetwork(Links = links_driver_lh_19, Nodes = nodes, Source = "source",
+              Target = "target", Value = "value", 
+              NodeID = "nodes", colourScale=my_color_0, LinkGroup = "full_name",
+              NodeGroup = NULL)
+
+links_driver_lh_21 <- links_driver_2021 %>% filter(full_name == "Lewis Hamilton")
+links_driver_lh_21 <- as.data.frame(links_driver_lh_21)
+
+# 2021 Lewis Hamilton
+sankeyNetwork(Links = links_driver_lh_21, Nodes = nodes, Source = "source",
+              Target = "target", Value = "value", 
+              NodeID = "nodes", colourScale=my_color_0, LinkGroup = "full_name",
+              NodeGroup = NULL)
+
+```
 
