@@ -209,21 +209,24 @@ links_driver_2021 <-
 
 ## What is Formula One? 
 
-Formula One is the highest class of single-driver racing. There are ten teams and twenty drivers that compete during a Formula One season, although, occasionally backup drivers take the place of main drivers if a driver is sick, or otherwise unavailable. Formula One drivers and teams travel all over the country to participate in Grand Prix races, which are, at minimum 190 miles. A Formula One season can consistent of up to 22 races in the same number of countries, although there are a number of historical circuits that are significant to the Formula One sport, including the Monaco Grand Prix (160 miles) and the National Motor Racetrack of Monza (190 miles). 
+Formula One is the highest class of single-driver racing. There are ten teams and twenty drivers that compete during a Formula One season, with occasional backup drivers for when a main driver is sick or otherwise unavailable. Formula One drivers and teams travel all over the world to participate in Grand Prix races, which are a minimum of 190 miles. A Formula One season can consist of up to 22 races in the same number of countries, although there are a number of historical circuits that are significant to the Formula One sport, including the Monaco Grand Prix (160 miles) and the National Motor Racetrack of Monza (190 miles). 
 
 The aim of Formula One drivers and teams are to compete at the highest level and during the course of the season, earn points towards two main trophies: the Constructor's Championship and the Driver's Championship. Points are earned according to race performance, with the top 10 placing drivers and constructors each earning 25 points for first place, 18 points for second place, 15 points for third place, and so on and so forth, all the way down to tenth place, whose driver and constructor each earn a single point. There are other miscellaneous points earnings that are given for the driver who records the fastest lap of the race (+1 point), and for Sprint Races that take place before the Grand Prix on a handful of weekends during the season.
 
 Formula One is perhaps best explained by the drivers in the sport:
 
 ##### Embed Video
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+embed_url("https://www.youtube.com/watch?v=twAlqtvVMdc")
 
+```
 
 
 ### Where do Formula One races take place? 
 
-Formula One races take place all over the world, with circuits on all continents (except Antarctica!) and in many major cities. This map shows the placement of all Formula One circuits that have been used since the beginnings of the sport in 1950. 
+Formula One races take place all over the world, with circuits on all continents (except Antarctica!) and in many major cities. This map shows the placement of all Formula One circuits that have been used since the beginning of the sport in 1950. 
 
-As you can see, the circuits are heavily concentrated in Europe, where the sport got its beginnings, although Formula One is gaining in popularity around the world and circuits are built and included in the Formula One calendar as that enthusiasm grows. 
+As you can see, the circuits are heavily concentrated in Europe, where the sport got its start. As Formula One gained popularity around the world, circuits have been built and included in the Formula One calendar. 
 
 Please use the filter to see where circuits are in specific countries. The tool is multi-select.
 
@@ -281,7 +284,7 @@ bscols(
 
 ### Who are the drivers?
 
-Formula One drivers often get their start early in life, rising in the ranks of Go-Kart ("Karting") racing. The 2021 Formula One champion, Max Verstappen, got his start karting at age four-and-a-half. This table contains *all* drivers from the inaugural 1950 season of Formula One to the most recent complete season, in 2021. The table contains a link to that driver's Wikipedia page for more biographical and performance background.
+Formula One drivers often get their start early in life, rising through the ranks of Go-Kart ("Karting") racing. The 2021 Formula One champion, Max Verstappen, got his start karting at age four-and-a-half. This table contains *all* drivers from the inaugural 1950 season of Formula One to the most recent complete season, in 2021. The table contains a link to that driver's Wikipedia page for more biographical and performance background.
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 
@@ -322,31 +325,41 @@ datatable(drivers_df,
 
 ## The 2019 Formula One Season versus the 2021 Formula One Season
 
-This section shows how the 2019 and the 2021 seasons came to be: the points earned by drivers and constructors over the course of the seasons, the overall point totals by constructors, and more. 
+This section compares the stories of the 2019 and 2021 seasons: the points earned by drivers and constructors over the course of the seasons, the overall point totals by constructors, and more. 
 
 The 2019 Formula One Season saw Lewis Hamilton of Mercedes win his sixth Driver's Championship and Mercedes win their sixth Constructor's Championship in a row, a remarkable feat for the driver and the constructor. 
 
-
-The 2021 Formula One Season saw Max Verstappen of Red Bull win his first Driver's Championship, with Red Bull missing out on the Constructor's Championship to Mercedes by 27 points. Max Verstappen and Lewis Hamilton were head to head in an intense competition for the Driver's Championship throughout the season, with Verstappen clinching the win in the final race of the 2021 season. Verstappen's win was controversial and caused an outcry in the paddock, but ultimately held to give driver his first championship. 
+The 2021 Formula One Season saw Max Verstappen of Red Bull win his first Driver's Championship, with Red Bull missing out on the Constructor's Championship to Mercedes by 27 points. Max Verstappen and Lewis Hamilton were head to head in an intense competition for the Driver's Championship throughout the season, with Verstappen clinching the win in the final race of the 2021 season. Verstappen's win was controversial and caused an outcry in the paddock, but ultimately held to give the driver his first championship. 
 
 
 ### Winners by Point Totals and Year
 
 As mentioned above, and by the Formula One video, drivers earn points throughout the course of a season in accordance with their race performance. The top ten finishers in a race earn points according to this breakdown:
+
 * First Place = 25 points
+
 * Second Place = 18 points
+
 * Third Place = 15 points
+
 * Fourth Place = 12 points
+
 * Fifth Place = 10 points
+
 * Sixth Place = 8 points
+
 * Seventh Place = 6 points
+
 * Eighth Place = 4 points
+
 * Ninth Place = 2 points
+
 * Tenth Place = 1 point
 
-In the 2019 season, Lewis Hamilton (solid teal line), driving in his sixth year with Mercedes, was the runaway points leader, with his teammate, Valteri Bottas (dashed teal line), the only other driver coming close to Hamilton's performance. This was a dominant year for Hamilton and Mercedes. The next three drivers, Max Verstappen of Red Bull, and Sebastian Vettel and Charles LeClerc, both of Ferrari fell in the middle of the pack. 
 
-In the 2021 Season, Hamilton's dominance was matched and eventually surpassed by young driver, Max Verstappen of Red Bull. The two drivers immediately set themselves as the best of the best, earning enough points to isolate themselves from the rest of the drivers almost immediately as the season began. Valteri Bottas of Mercedes and Sergio "Checo" Perez of Red Bull are the third and fourth-place finishers in the Driver's Championship, estblishing the dominance of Mercedes and Red Bull during the 2021 F1 season. 
+In the 2019 season, Lewis Hamilton (solid teal line), driving in his sixth year with Mercedes, was the runaway points leader, with his teammate Valteri Bottas (dashed teal line) the only other driver coming close to Hamilton's performance. This was a dominant year for Hamilton and Mercedes. The next three drivers, Max Verstappen of Red Bull, and Sebastian Vettel and Charles LeClerc, both driving for Ferrari, fell in the middle of the pack. 
+
+In the 2021 Season, Hamilton's dominance was matched and eventually surpassed by young driver, Max Verstappen of Red Bull. The two drivers immediately set themselves as the best of the best, earning enough points to isolate themselves from the rest of the drivers almost immediately as the season began. Valteri Bottas of Mercedes and Sergio "Checo" Perez of Red Bull are the third and fourth-place finishers in the Driver's Championship, establishing the dominance of Mercedes and Red Bull during the 2021 F1 season. 
 
 Double click on each driver's legend entry to isolate their points accumulation over the course of each season. Double-click to set the graph back to its default. 
 
@@ -358,8 +371,6 @@ points_2021 <- ggplot(races2021, aes(x=date,y=points,group=full_name,color=full_
   scale_color_manual(values=xover_2021$colorcol, name="full_name") + 
   theme_classic()
 
-ggplotly(points_2021, tooltip="text")
-
 points_2019 <- ggplot(races2019, aes(x=date,y=points,group=full_name,color=full_name, linetype=full_name,text=paste("<b>Driver:</b> ",full_name,"<br><b>Team: </b>",constructor_name,"<br><b>Points: ",points))) + geom_point() + geom_smooth(se=FALSE) + coord_flip() + 
   ggtitle("2019") + 
   scale_linetype_manual(values=xover_2019$line_type, name="full_name") + 
@@ -369,6 +380,8 @@ points_2019 <- ggplot(races2019, aes(x=date,y=points,group=full_name,color=full_
 
 ggplotly(points_2019, tooltip="text")
 
+ggplotly(points_2021, tooltip="text")
+
 ```
 
 
@@ -376,9 +389,9 @@ ggplotly(points_2019, tooltip="text")
 
 Drivers standings' reflect their points accumulation over the course of the season relative to other drivers on the grid. 
 
-The mid-tier teams, or "middle of the pack" teams in 2019 included: Racing Point, Alfa Romeo Racing, McLaren, Renault, and Toro Rosso. The drivers on these teams moved around the middle of the standings throughout the season, with Carlos Sainz of McLaren eventually earning sixth place in the Driver's Championship and Pierre Gasley earning seventh place. These top of the middle tier standings are often referred to as the "best of the rest". 
+The mid-tier teams, or "middle of the pack" teams in 2019 included Racing Point, Alfa Romeo Racing, McLaren, Renault, and Toro Rosso. The drivers on these teams moved around the middle of the standings throughout the season, with Carlos Sainz of McLaren eventually earning sixth place in the Driver's Championship and Pierre Gasley earning seventh place. These top of the middle tier standings are often referred to as the "best of the rest". 
 
-The 2021 Season saw significantly less movement in the middle of the pack, with McLaren keeping their momentum as one of the "best of the rest", and the new Alpine F1 team fighting their way to the top of the middle places. The leader of the Driver's Championship changed hands five times, with Lewis Hamilton and Max Verstappen both consistently earning high points finishes and remaining competitive with each other. This championship leader change of hands almost doubled the number of times the championship leader changed hands during the 2019 season, where Lewis Hamliton briefly tussled with his teammate Valteri Bottas for the number one spot. 
+The 2021 Season saw significantly less movement in the middle of the pack, with McLaren keeping their momentum as one of the "best of the rest", and the new Alpine F1 team fighting their way to the top of the middle places. The leader of the Driver's Championship changed hands five times, with Lewis Hamilton and Max Verstappen both consistently earning high points finishes and remaining competitive with each other. The 2021 championship leader changed hands almost twice the number of times it changed in the 2019 season, when Lewis Hamilton briefly tussled with his teammate Valteri Bottas for the number one spot. 
 
 Double click on each driver's legend entry to isolate their standings over the course of each season. Double-click to set the graph back to its default. 
 
@@ -387,12 +400,12 @@ Double click on each driver's legend entry to isolate their standings over the c
 wins_2021 <- ggplot(races2021) + 
   geom_line(aes(x=date,y=position,group=full_name,color=full_name,linetype=full_name,text=paste("<b>Driver: </b>",full_name,"<br><b>Team: ",constructor_name))) + scale_color_manual(values=xover_2021$colorcol)+ scale_linetype_manual(values=xover_2021$line_type) + coord_flip() + ggtitle("2021") + theme_classic() + labs(x = "Date", y = "Position")
 
-ggplotly(wins_2021, tooltip = "text")
-
 wins_2019 <- ggplot(races2019) + 
   geom_line(aes(x=date,y=position,group=full_name,color=full_name,linetype=full_name,text=paste("<b>Driver: </b>",full_name,"<br><b>Team: ",constructor_name))) + scale_color_manual(values=xover_2019$colorcol)+ scale_linetype_manual(values=xover_2019$line_type) + coord_flip() + ggtitle("2019") + theme_classic() + labs(x = "Date", y = "Position") + guides(color=guide_legend(ncol=2))
 
-ggplotly(wins_2019)
+ggplotly(wins_2019, tooltip = "text")
+
+ggplotly(wins_2021, tooltip = "text")
 
 ```
 
@@ -401,14 +414,14 @@ ggplotly(wins_2019)
 
 ## Constructor Wins and Points
 
-Constructors or "teams" are the makers of the F1 cars. These constructors are sometimes well known auto makers or in the case of Red Bull, energy drink manufacturers. These constructors spend the entire F1 off-season-- typically between the fall and spring-- building what they hope to be the fastest car on the grid. These constructors employ thousands of mechanics, engineers, physicists, and experts in their field to create these cars. 
+Constructors or "teams" are the makers of the F1 cars. These constructors are sometimes well known auto makers but can be other things, like Red Bull. Constructors spend the entire F1 off-season -- typically between the fall and spring -- building what they hope to be the fastest car on the grid. Each constructor employs thousands of mechanics, engineers, physicists, and experts in their field to create these cars. 
 
 The Constructor's championship rewards not only the driver, but seeks to recognize the entire team that builds and maintains the car.
 
 
 ### Constructor Race Wins
 
-These constructors wins show a similar story as the driver's visualizations do, although a new name emerges: Ferrari. In 2019, Mercedes dominated the field, winning 14 of the 20 races. Red Bull Racing won three races in Austria, Germany, and Brazil. Ferrari won three races as well, in Belgium, Italy, and Singapore. Ferrari is one of the best, if not the best known constructor in the sport. The 2019 Ferrari team showed a dismal performance with three wins, while this does further emphasize Mercedes's dominance this season. 
+These constructors wins show a similar story as the driver's visualizations do, although a new name emerges: Ferrari. In 2019, Mercedes dominated the field, winning 14 of the 20 races. Red Bull Racing won three races in Austria, Germany, and Brazil. Ferrari won three races as well, in Belgium, Italy, and Singapore. Ferrari is one of the best, if not the best, known constructor in the sport. The 2019 Ferrari team showed a dismal performance with three wins, further emphasizing Mercedes's dominance this season. 
 
 The 2021 season saw the rise of Red Bull, with Red Bull winning 11 of the 22 races and Mercedes winning only 9 races. This season also saw two unexpected race winners in McLaren winning the Italian Grand Prix and Alpine F1 Team winning the Hungarian Grand Prix.
 
@@ -433,14 +446,14 @@ season_21 <- df %>%
 ## 2019 total points
 points_19 <- season_19 %>%
   group_by(constructorId, name.x) %>%
-  summarize(totalpoints = sum(points)) %>%
+  summarize(totalpoints = max(points)) %>%
   arrange(desc(totalpoints)) %>%
   rename('name'=name.x)
 
 ## 2021 total points
 points_21 <- season_21 %>%
   group_by(constructorId, name.x) %>%
-  summarize(totalpoints = sum(points)) %>%
+  summarize(totalpoints = max(points)) %>%
   arrange(desc(totalpoints)) %>%
   filter(totalpoints != 0)
 
@@ -711,7 +724,7 @@ pie21
 
 #### Incidents
 
-Incidents are defined here as "accidents" or "collisions" which happen when drivers their hit each other or cause some other sort of accident. Due to the high speed nature of Formula One, these accidents or collisions often end the involved drivers' races. This graph includes all accidents and collsions, regardless of if they ended that driver's race. 
+Incidents are defined here as "accidents" or "collisions" which happen when drivers their hit each other or cause some other sort of accident. Due to the high speed nature of Formula One, these accidents or collisions often end the involved drivers' races. This graph includes all accidents and collisions, regardless of if they ended that driver's race. 
 
 
 In 2019, Red Bull had over 20 distinct accidents or collisions, certainly contributing to their distant second-place finish behind Mercedes. Second to Red Bull's incident count are the Haas F1 team, followed by Ferrari, both of whom had a high number of accidents or collisions, which led to Ferrari's third place finish and Haas's last place finish. 
@@ -725,7 +738,7 @@ incidents_by_circuit %>%
           y = ~n,
           marker = list(color =  c("#9B0000", # Alfa Romeo
                                   "#DC0000", # Ferrari
-                                  "#F0D787", # Haas
+                                  "#B6BABD", # Haas
                                   "#FF8700", # McLaren
                                   "#00D2BE", # Mercedes
                                   "#F596C8", # Racing Point
