@@ -156,7 +156,7 @@ win_19_plot <- ggplot(winnings_19, aes(x = name.x, y = totalwins, fill = name.x,
   labs (x = "Constructors", y = "Number of Wins", fill = "Constructor Names",
         title = "2019 Wins by Constructor") 
 
-ggplotly(win_19_plot)
+ggplotly(win_19_plot, tooltip = "text")
 
 ```
 
@@ -167,7 +167,9 @@ winnings_21 <- season_21 %>%
   arrange(desc(totalwins)) %>%
   filter(totalwins != 0)
 
-win_21_plot <- ggplot(winnings_21, aes(x = name.x, y = totalwins, fill = name.x)) +
+win_21_plot <- ggplot(winnings_21, aes(x = name.x, y = totalwins, fill = name.x,
+                                       text = paste("<b>Constructor</b>:", winnings_21$name.x, "<br>",
+                                 "<b>Number of Wins</b>:", winnings_21$totalwins, "<br>"))) +
   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) + 
   scale_fill_manual(values = c("Apline F1 Team" = "#2293D1",
                                "McLaren" = "#F58020",
@@ -175,7 +177,7 @@ win_21_plot <- ggplot(winnings_21, aes(x = name.x, y = totalwins, fill = name.x)
                                "Red Bull" = "#1E5BC6")) +
     labs (x = "Constructors", y = "Number of Wins", fill = "Constructor Names",
         title = "2021 Wins by Constructor")
-ggplotly(win_21_plot)
+ggplotly(win_21_plot, tooltip = "text")
 ```
 
 ```{r}
@@ -191,7 +193,9 @@ avg_points_19 <- season_19 %>%
 ```
 
 ```{r}
-points_19_plot <- ggplot(points_19, aes(x = name.x, y = totalpoints, fill = name.x)) +
+points_19_plot <- ggplot(points_19, aes(x = name.x, y = totalpoints, fill = name.x,
+                                        text = paste("<b>Constructor</b>:", points_19$name.x, "<br>",
+                                 "<b>Total Amount of Points</b>:", points_19$totalpoints, "<br>"))) +
   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
    scale_fill_manual(values = c("Alfa Romeo" = "#B12039",
                                 "Ferrari" = "#ED1C24",
@@ -205,11 +209,13 @@ points_19_plot <- ggplot(points_19, aes(x = name.x, y = totalpoints, fill = name
                                "Williams" = "#37BEDD")) +
   labs (x = "Constructors", y = "Total Points", fill = "Constructor Names",
         title = "Total Points Earned by Constructors in 2019")
-ggplotly(points_19_plot)
+ggplotly(points_19_plot, tooltip = "text")
 ```
 
 ```{r}
-avg_points_19_plot <- ggplot(avg_points_19, aes(x = name.x, y = avg_points, fill = name.x)) +
+avg_points_19_plot <- ggplot(avg_points_19, aes(x = name.x, y = avg_points, fill = name.x,
+                                                text = paste("<b>Constructor</b>:", avg_points_19$name.x, "<br>",
+                                 "<b>Average Amount of Points</b>:", avg_points_19$avg_points, "<br>"))) +
   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) + 
   scale_fill_manual(values = c("Alfa Romeo" = "#B12039",
                                 "Ferrari" = "#ED1C24",
@@ -223,7 +229,8 @@ avg_points_19_plot <- ggplot(avg_points_19, aes(x = name.x, y = avg_points, fill
                                "Williams" = "#37BEDD")) +
   labs (x = "Constructors", y = "Average Points", fill = "Constructor Names",
         title = "Average Points Earned by Constructors in 2019")
-ggplotly(avg_points_19_plot)
+
+ggplotly(avg_points_19_plot, tooltip = "text")
 ```
 
 ```{r}
@@ -241,7 +248,9 @@ avg_points_21 <- season_21 %>%
 ```
 
 ```{r}
-points_21_plot <- ggplot(points_21, aes(x = name.x, y = totalpoints, fill = name.x)) +
+points_21_plot <- ggplot(points_21, aes(x = name.x, y = totalpoints, fill = name.x,
+                                        text = paste("<b>Constructor</b>:", points_21$name.x, "<br>",
+                                 "<b>Total Amount of Points</b>:", points_21$totalpoints, "<br>"))) +
   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
   scale_fill_manual(values = c("Alfa Romeo" = "#B12039",
                                "AlphaTauri" = "#4E7C9B",
@@ -254,11 +263,13 @@ points_21_plot <- ggplot(points_21, aes(x = name.x, y = totalpoints, fill = name
                                "Williams" = "#37BEDD")) +
   labs (x = "Constructors", y = "Total Points", fill = "Constructor Names",
         title = "Total Points Earned by Constructors in 2021")
-ggplotly(points_21_plot)
+ggplotly(points_21_plot, tooltip = "text")
 ```
 
 ```{r}
-avg_points_21_plot <- ggplot(avg_points_21, aes(x = name.x, y = avg_points, fill = name.x)) +
+avg_points_21_plot <- ggplot(avg_points_21, aes(x = name.x, y = avg_points, fill = name.x,
+                                                text = paste("<b>Constructor</b>:", avg_points_21$name.x, "<br>",
+                                 "<b>Average Amount of Points</b>:", avg_points_21$avg_points, "<br>"))) +
   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
   scale_fill_manual(values = c("Alfa Romeo" = "#B12039",
                                "AlphaTauri" = "#4E7C9B",
@@ -271,7 +282,7 @@ avg_points_21_plot <- ggplot(avg_points_21, aes(x = name.x, y = avg_points, fill
                                "Williams" = "#37BEDD")) +
   labs (x = "Constructors", y = "Average Points", fill = "Constructor Names",
         title = "Average Points Earned by Constructors in 2021")
-ggplotly(avg_points_21_plot)
+ggplotly(avg_points_21_plot, tooltip = "text")
 ```
 
 ## Constructor Car Failures 
@@ -305,7 +316,10 @@ status_count_19
 
 ```{r}
 ## plot constructor status for 2019
-status_19_plot <- ggplot(status_19, aes(x = name.x, y = status_count, fill = status)) +
+status_19_plot <- ggplot(status_19, aes(x = name.x, y = status_count, fill = status,
+                                        text = paste("<b>Constructor</b>:", status_19$name.x, "<br>",
+                                 "<b>Status Count</b>:", status_19$status_count, "<br>",
+                                 "<b>Status</b>:", status_19$status, "<br>"))) +
   geom_col() +
   coord_flip() +
   scale_fill_manual(values = c("Accident" = "#000000",
@@ -316,7 +330,7 @@ status_19_plot <- ggplot(status_19, aes(x = name.x, y = status_count, fill = sta
                                "Finished" = "#1BBC00")) +
   labs(x = "Constructor", y = "Status Count", 
        title ="2019 Constructor Status")
-ggplotly(status_19_plot)
+ggplotly(status_19_plot, tooltip = "text")
 ```
 
 ```{r}
@@ -410,12 +424,12 @@ pie19
 
 
 ```{r}
-status_2021 <- df2 %>% 
+status_21 <- df2 %>% 
   filter(year == 2021) %>%
   group_by(name.x, status) %>%
   summarize(status_count = n()) 
 
-status_count_2021 <- df2 %>%
+status_count_21 <- df2 %>%
   filter(year == 2021) %>%
   group_by(name.x, status) %>%
   summarize(status_count = n()) %>%
@@ -423,12 +437,15 @@ status_count_2021 <- df2 %>%
     names_from = status,
     values_from = status_count
   )
-status_count_2021
+status_count_21
 ```
 
 ```{r}
 ## plot constructor status for 2021
-status_2021_plot <- ggplot(status_2021, aes(x = name.x, y = status_count, fill = status)) +
+status_21_plot <- ggplot(status_2021, aes(x = name.x, y = status_count, fill = status,
+                                            text = paste("<b>Constructor</b>:", status_21$name.x, "<br>",
+                                 "<b>Status Count</b>:", status_21$status_count, "<br>",
+                                 "<b>Status</b>:", status_21$status, "<br>"))) +
   geom_col() +
   coord_flip() + 
   scale_fill_manual(values = c("Accident" = "#000000",
@@ -439,7 +456,7 @@ status_2021_plot <- ggplot(status_2021, aes(x = name.x, y = status_count, fill =
                                "Finished" = "#1BBC00")) +
   labs(x = "Constructor", y = "Status Count", 
        title="2021 Constructor Status")
-ggplotly(status_2021_plot)
+ggplotly(status_21_plot, tooltip = "text")
 ```
 
 ```{r}
