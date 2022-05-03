@@ -149,15 +149,10 @@ races2019 <- left_join(races2019, xover_2019, by="driverId")
 
 ## Helper tables/variables
 
-nodes <- c("0","1","2","3","4","5","6","7","8","9","10",
-"11","12","13","14","15","16","17","18","19","20",
-"21","22","23","24","25","26","27","28","29","30",
-"31","32","33","34","35","36","37","38","39","40"
-          )
-
-nodes <- as.data.frame(nodes)
 
 library(tidyr)
+
+## sankey diagram helper tables
 links_driver_2019 <- 
   results %>%
   left_join(races, by = "raceId") %>%
@@ -180,7 +175,7 @@ links_driver_2019 <-
          source = quali_position,
          value = n) %>%
   mutate(source = source,
-         target =  target + 20) %>%
+         target =  target) %>%
     mutate(target = as.integer(target),
          source = as.integer(source))
 
@@ -206,64 +201,10 @@ links_driver_2021 <-
          source = quali_position,
          value = n) %>%
   mutate(source = source,
-         target =  target + 20) %>%
+         target =  target) %>%
     mutate(target = as.integer(target),
          source = as.integer(source))
 
-links_const_2019 <- 
-  results %>%
-  left_join(races, by = "raceId") %>%
-  filter(year == 2019) %>%
-  left_join(constructors, by = "constructorId") %>%
-  rename(const_name = name.y) %>%
-  select(raceId, constructorId, const_name, position) %>%
-  rename(race_position = position) %>%
-  left_join(qualifying, by = c("raceId" = "raceId", 
-                               "constructorId" = "constructorId"
-                               )) %>%
-  select(raceId, const_name, race_position, position) %>%
-  rename(quali_position = position) %>%
-  mutate(quali_position = as.integer(quali_position)) %>%
-  mutate(race_position = if_else(race_position == "\\N", 0, as.numeric(race_position)),
-         quali_position = if_else(is.na(quali_position), 0, as.numeric(quali_position))) %>%
-  group_by(const_name, race_position, quali_position) %>%
-  summarise(n = n()) %>%
-  rename(target = race_position,
-         source = quali_position,
-         value = n) %>%
-  mutate(source = source,
-         target =  target + 20) %>%
-    mutate(target = as.integer(target),
-         source = as.integer(source))
-
-links_const_2021 <- 
-  results %>%
-  left_join(races, by = "raceId") %>%
-  filter(year == 2021) %>%
-  left_join(constructors, by = "constructorId") %>%
-  rename(const_name = name.y) %>%
-  select(raceId, constructorId, const_name, position) %>%
-  rename(race_position = position) %>%
-  left_join(qualifying, by = c("raceId" = "raceId", 
-                               "constructorId" = "constructorId"
-                               )) %>%
-  select(raceId, const_name, race_position, position) %>%
-  rename(quali_position = position) %>%
-  mutate(quali_position = as.integer(quali_position)) %>%
-  mutate(race_position = if_else(race_position == "\\N", 0, as.numeric(race_position)),
-         quali_position = if_else(is.na(quali_position), 0, as.numeric(quali_position))) %>%
-  group_by(const_name, race_position, quali_position) %>%
-  summarise(n = n()) %>%
-  rename(target = race_position,
-         source = quali_position,
-         value = n) %>%
-  mutate(source = source,
-         target =  target + 20) %>%
-    mutate(target = as.integer(target),
-         source = as.integer(source))
-
-links_driver_mv_19 <- links_driver_2019 %>% filter(full_name == "Max Verstappen")
-links_driver_mv_19 <- as.data.frame(links_driver_mv_19)
 ```
 
 ## What is Formula One? 
@@ -832,66 +773,81 @@ incidents_by_circuit %>%
 ```
 
 ### Lewis Hamilton versus Max Verstappen
-####  Sankey Diagrams
+
+Prior to the 2021 season, Lewis Hamilton (or formally, Sir Lewis Carl Davidson Hamilton MBE) had won four consecutive Driver's Championships. Hamilton would have won eight consecutive Driver's Championships, if he had not been beaten by his own teammate at the time, Nico Rosberg in 2016. In 2021, Max Verstappen provided the highest level of competition that Hamilton had faced in several years, winning ten races to Hamilton's eight races. 
+
+One aspect of racing that drivers can focus on is qualifying. The qualifying round sets the starting order or "grid" of the race the next day. Drivers are given a set amount of time to drive the fastest lap possible, pushing the car to the limit. Drivers are eliminated from further qualifying rounds if they are unable to meet the standard of the qualifying round and eventually, the grid is set. When a driver qualifies first, they are said to be in "pole position" and are referred to as a "polesitter". 
 
 
 
-*Caption Needed*
+#### How often do the top two drivers convert their Qualifying positions to Wins?
+
+One way to gauge how successful the top two drivers are is how often they are able to convert their pole positions into a win. Both Hamilton and Verstappen are exceptional drivers, but in 2019 did not qualify well, Hamilton only earning five pole positions and Max Verstappen earning two pole positions. Hamilton was able to convert three of the five pole positions he earned to a race victory, securing his other eight victories outside of pole position. Max Verstappen converted only one of his two pole positions into race victories, earning two race wins outside of poll position. 
+
+This sankey diagram shows in the 2019 season, which final race position Lewis Hamilton and Max Verstappen end up in after starting in pole. The teal represents a Mercedes driver, Lewis Hamilton, while the darker blue represents a Red Bull driver, Max Verstappen. 
+
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
-# Max Verstappen
-my_color_1 <- 
-  'd3.scaleOrdinal() .domain(["Max Verstappen"]) .range(["#1E41FF"])'
+links_driver_lhmv_2019 <- 
+  links_driver_2019 %>% 
+  filter(full_name == "Lewis Hamilton" | full_name == "Max Verstappen") %>%
+  filter(source == 1)
+  
 
-# 2019 Max Verstappen
-sankeyNetwork(Links = links_driver_mv_19, Nodes = nodes, Source = "source",
-              Target = "target", Value = "value", 
-              NodeID = "nodes", colourScale=my_color_1, LinkGroup = "full_name",
-              NodeGroup = NULL)
+links_driver_lhmv_2019 <- as.data.frame(links_driver_lhmv_2019)
 
-links_driver_mv_21 <- links_driver_2021 %>% filter(full_name == "Max Verstappen")
-links_driver_mv_21 <- as.data.frame(links_driver_mv_21)
 
-# 2021 Max Verstappen
-sankeyNetwork(Links = links_driver_mv_21, Nodes = nodes, Source = "source",
-              Target = "target", Value = "value", 
-              NodeID = "nodes", colourScale=my_color_1, LinkGroup = "full_name",
-              NodeGroup = NULL)
+nodes19 <- c("0","1","2","3","4","5","6","7","8","9")
 
+nodes19 <- as.data.frame(nodes19)
+
+
+
+
+my_color <-
+  'd3.scaleOrdinal() .domain(["Lewis Hamilton", "Max Verstappen"]) .range(["#6CD3BF", "#1E41FF"])'
+
+sankeyNetwork(Links = links_driver_lhmv_2019, Nodes = nodes19, Source = "source",
+              Target = "target", Value = "value",
+              NodeID = "nodes19", fontSize= 25, nodeWidth = 20,
+              colourScale=my_color, LinkGroup="full_name",
+              NodeGroup=NULL)
 ```
 
-*Caption Needed*
+
+In the 2021 season, Max Verstappen surged in his qualifying skills, earning ten pole positions to Lewis Hamilton's five pole positions. Max was able to convert seven of his pole positions to a victory, earning three race wins outside of pole position, while Lewis Hamilton converted three of his pole positions to a victory, earning five race wins outside of pole.
+
+This sankey diagram shows  which final race position Lewis Hamilton and Max Verstappen end up in after starting in pole during the 2021 season. 
+
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 
-links_driver_lh_19 <- links_driver_2019 %>% filter(full_name == "Lewis Hamilton")
-links_driver_lh_19 <- as.data.frame(links_driver_lh_19)
+links_driver_lhmv_2021 <- 
+  links_driver_2021 %>% 
+  filter(full_name == "Lewis Hamilton" | full_name == "Max Verstappen")  %>%
+  filter(source == 1)
 
+links_driver_lhmv_2021 <- as.data.frame(links_driver_lhmv_2021)
 
-my_color_0 <- 
-  'd3.scaleOrdinal() .domain(["Lewis Hamilton"]) .range(["#6CD3BF"])'
+nodes21 <- c("0","1","2","3","4","5")
 
-# 2019 Lewis Hamilton
-sankeyNetwork(Links = links_driver_lh_19, Nodes = nodes, Source = "source",
-              Target = "target", Value = "value", 
-              NodeID = "nodes", colourScale=my_color_0, LinkGroup = "full_name",
+nodes21 <- as.data.frame(nodes21)
+
+my_color <-
+  'd3.scaleOrdinal() .domain(["Lewis Hamilton", "Max Verstappen"]) .range(["#6CD3BF", "#1E41FF"])'
+
+sankeyNetwork(Links = links_driver_lhmv_2021, Nodes = nodes21, Source = "source",
+              Target = "target", Value = "value",
+              NodeID = "nodes21", fontSize= 25, nodeWidth = 20, 
+              colourScale=my_color, LinkGroup = "full_name",
               NodeGroup = NULL)
-
-links_driver_lh_21 <- links_driver_2021 %>% filter(full_name == "Lewis Hamilton")
-links_driver_lh_21 <- as.data.frame(links_driver_lh_21)
-
-# 2021 Lewis Hamilton
-sankeyNetwork(Links = links_driver_lh_21, Nodes = nodes, Source = "source",
-              Target = "target", Value = "value", 
-              NodeID = "nodes", colourScale=my_color_0, LinkGroup = "full_name",
-              NodeGroup = NULL)
-
 ```
 
 
 #### Fastest Laps
-This plot_ly graph shows how many times drivers have gotten the "Fastest Lap" designation. The "Fastest Lap" designation gives the driver and the constructor extra points and monetary bonuses. 
 
+The "Fastest Lap" is a designation given to a driver who completes the fastest lap of all drivers during a race. The driver that wins the fastest lap designation after every race earns one (1) Championship point towards the Driver's Championship *if* that driver finishes in the top ten places. 
 
-*Caption Needed*
+In 2019, dominant Lewis Hamilton earned six fastest lap designations, earning him six extra points over the course of the season. Charles LeClerc of Ferrari earned four fastest lap designations, and Max Verstappen tied Hamilton's Mercedes teammate, Valteri Bottas, and earned three fastest lap designations.
+
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 lap_times_by_driver_2019 <- 
   lap_times %>%
@@ -932,8 +888,8 @@ lap_times_by_driver_2019 %>%
 
 ```
 
+In the 2021 season, Max Verstappen, who had risen to the level of Lewis Hamilton this season, earned eight fastest lap designations, to Lewis Hamilton's six fastest laps and Valteri Bottas's three fastest laps. This statistic, along with all the other 2021 Max Verstappen statistics shows how much the driver and the team rose in quality and competitiveness during the season.
 
-*Caption Needed*
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 
 lap_times_by_driver_2021 <- 
@@ -976,4 +932,5 @@ lap_times_by_driver_2021 %>%
 
 
 ## Conclusion
-*Conclusion Needed*
+
+The 2019 and 2021 seasons of Formula One were incredibly different and interesting seasons, with different driver characteristics and constructor details in full view. The 2019 season was in the middle of Mercedes driver Lewis Hamilton's six-championship winning streak, with Red Bull's Max Verstappen seen as an up and coming young driver. In 2021, Max Verstappen was a greater force to be reckoned with, breaking Lewis Hamilton's championship streak on the final day of the season and being Red Bull's first championship in eight years. 
