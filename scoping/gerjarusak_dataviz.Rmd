@@ -1,0 +1,559 @@
+---
+title: "gerjarusak_viz"
+author: "Nikki Gerjarusak"
+date: "4/6/2022"
+output: html_document
+---
+Constructor Ranking, Driver 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(magrittr)
+library(plotly)
+library(dplyr)
+library(tidymodels)
+```
+
+read in constructor data
+```{r}
+setwd("/Users/nikkigerjarusak/Documents/GitHub/group_f_f1")
+constructors <- read.csv("/Users/nikkigerjarusak/Documents/GitHub/group_f_f1/raw_data/constructors.csv")
+standings <- read.csv("/Users/nikkigerjarusak/Documents/GitHub/group_f_f1/raw_data/constructor_standings.csv")
+results <- read.csv("/Users/nikkigerjarusak/Documents/GitHub/group_f_f1/raw_data/results.csv")
+races <- read.csv("/Users/nikkigerjarusak/Documents/GitHub/group_f_f1/raw_data/races.csv")
+circuits <- read.csv("/Users/nikkigerjarusak/Documents/GitHub/group_f_f1/raw_data/circuits.csv")
+status <- read.csv("/Users/nikkigerjarusak/Documents/GitHub/group_f_f1/raw_data/status2.csv")
+```
+
+
+```{r}
+## merge data frames
+df <- left_join(constructors, standings, by = "constructorId")
+df <- left_join(df, races, by = "raceId")
+
+## first subset 
+df <- subset(df, select= c(constructorId, constructorRef, name.x, constructorStandingsId,
+                           raceId, points, position, year, circuitId, name.y, wins))
+## subset results
+##results <- subset(results, select = c(constructorId, statusId))
+## merge again with results to get standingId
+## df <- left_join(df, results, by = "constructorId")
+```
+
+
+## All Time Constructor Stats 
+```{r}
+# c_winnings <- df %>%
+#   group_by(constructorId, name.x) %>%
+#   summarize(totalwins = sum(wins)) %>%
+#   arrange(desc(totalwins)) %>%
+#   filter(totalwins != 0)
+# 
+# win_plot <- ggplot(c_winnings, aes(x = name.x, y = totalwins, fill = name.x)) +
+#   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+#   labs (x = "Constructors", y = "Number of Wins",
+#         title = "All Time Wins by Constructor")
+# ggplotly(win_plot)
+# ```
+# ```{r}
+# top_c_wins <- c_winnings %>%
+#   ungroup %>%
+#   slice(1:10)
+# 
+# top_win_plot <- ggplot(top_c_wins, aes(x = name.x, y = totalwins, fill = name.x)) +
+#   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+#   labs (x = "Constructors", y = "Number of Wins",
+#         title = "All Time Top 10 Winningest Constructors")
+# ggplotly(top_win_plot)
+```
+
+
+
+```{r}
+# total_points <- df %>%
+#   group_by(constructorId, name.x) %>%
+#   summarize(totalpoints = sum(points)) %>%
+#   arrange(desc(totalpoints)) %>%
+#   filter(totalpoints > 700)
+# 
+# average_points <- df %>%
+#   group_by(constructorId, name.x) %>%
+#   summarize(avg_points = mean(points)) %>%
+#   arrange(desc(avg_points)) %>%
+#   filter(avg_points > 10)
+# ```
+# ```{r}
+# total_plot <- ggplot(total_points, aes(x = name.x, y = totalpoints, fill = name.x)) +
+#   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+#   labs (x = "Constructors", y = "Total Points",
+#         title = "All Time Total Points Earned by Constructor")
+#ggplotly(total_plot)
+```
+
+```{r}
+## top 10 constructors by total points earned 
+# top_points <- total_points %>%
+#   ungroup %>%
+#   slice(1:10)
+# 
+# top_points_plot <- ggplot(top_points, aes(x = name.x, y = totalpoints, fill = name.x)) +
+#   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+#   labs (x = "Constructors", y = "Total Points",
+#         title = "Top 10 Constructors of All Time by Points")
+# ggplotly(top_points_plot)
+```
+
+```{r}
+# avg_points_plot <- ggplot(average_points, aes(x = name.x, y = avg_points, fill = name.x)) +
+#   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+#   labs (x = "Constructors", y = "Average Points",
+#         title = "All Time Average Points Earned by Constructor")
+# ggplotly(avg_points_plot)
+# ```
+# ```{r}
+# ## top 10 constructors by average points
+# top_avg_points <- average_points %>%
+#   ungroup %>%
+#   slice(1:10)
+# 
+# top_avg_plot <- ggplot(top_avg_points, aes(x = name.x, y = avg_points, fill = name.x)) +
+#   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+#   labs (x = "Constructors", y = "Average Points",
+#         title = "Top 10 Constructors of All Time by Average Points Earned")
+# ggplotly(top_avg_plot)
+```
+
+## Constructor Stats by Season (2019 and 2021)
+```{r}
+## 2019 season 
+season_19 <- df %>%
+  filter (year == 2019)
+
+## 2021 season
+season_21 <- df %>%
+  filter(year == 2021)
+```
+
+```{r}
+winnings_19 <- season_19 %>%
+  group_by(constructorId, name.x) %>%
+  summarize(totalwins = max(wins)) %>%
+  arrange(desc(totalwins)) %>%
+  filter(totalwins != 0)
+
+win_19_plot <- ggplot(winnings_19, aes(x = name.x, y = totalwins, fill = name.x,
+                                       text = paste("<b>Constructor</b>:", winnings_19$name.x, "<br>",
+                                 "<b>Number of Wins</b>:", winnings_19$totalwins, "<br>"))) +
+  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) + 
+  scale_fill_manual(values = c("Ferrari" = "#ED1C24",
+                               "Mercedes" = "#6CD3BF",
+                               "Red Bull" = "#1E5BC6")) +
+  labs (x = "Constructors", y = "Number of Wins", fill = "Constructor Names",
+        title = "2019 Wins by Constructor") 
+
+ggplotly(win_19_plot, tooltip = "text")
+
+```
+
+```{r}
+winnings_21 <- season_21 %>%
+  group_by(constructorId, name.x) %>%
+  summarize(totalwins = max(wins)) %>%
+  arrange(desc(totalwins)) %>%
+  filter(totalwins != 0)
+
+win_21_plot <- ggplot(winnings_21, aes(x = name.x, y = totalwins, fill = name.x,
+                                       text = paste("<b>Constructor</b>:", winnings_21$name.x, "<br>",
+                                 "<b>Number of Wins</b>:", winnings_21$totalwins, "<br>"))) +
+  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) + 
+  scale_fill_manual(values = c("Apline F1 Team" = "#2293D1",
+                               "McLaren" = "#F58020",
+                               "Mercedes" = "#6CD3BF",
+                               "Red Bull" = "#1E5BC6")) +
+    labs (x = "Constructors", y = "Number of Wins", fill = "Constructor Names",
+        title = "2021 Wins by Constructor")
+ggplotly(win_21_plot, tooltip = "text")
+```
+
+```{r}
+points_19 <- season_19 %>%
+  group_by(constructorId, name.x) %>%
+  summarize(totalpoints = max(points)) %>%
+  arrange(desc(totalpoints)) 
+
+avg_points_19 <- season_19 %>%
+  group_by(constructorId, name.x) %>%
+  summarize(avg_points = mean(points)) %>%
+  arrange(desc(avg_points))
+```
+
+```{r}
+points_19_plot <- ggplot(points_19, aes(x = name.x, y = totalpoints, fill = name.x,
+                                        text = paste("<b>Constructor</b>:", points_19$name.x, "<br>",
+                                 "<b>Total Amount of Points</b>:", points_19$totalpoints, "<br>"))) +
+  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+   scale_fill_manual(values = c("Alfa Romeo" = "#B12039",
+                                "Ferrari" = "#ED1C24",
+                                "Haas F1 Team" = "#B6BABD",
+                               "McLaren" = "#F58020",
+                               "Mercedes" = "#6CD3BF",
+                               "Racing Point" = "#F596C8",
+                               "Red Bull" = "#1E5BC6",
+                               "Renault" = "#FFF500",
+                               "Toro Rosso" = "#469BFF",
+                               "Williams" = "#37BEDD")) +
+  labs (x = "Constructors", y = "Total Points", fill = "Constructor Names",
+        title = "Total Points Earned by Constructors in 2019")
+ggplotly(points_19_plot, tooltip = "text")
+```
+
+```{r}
+avg_points_19_plot <- ggplot(avg_points_19, aes(x = name.x, y = avg_points, fill = name.x,
+                                                text = paste("<b>Constructor</b>:", avg_points_19$name.x, "<br>",
+                                 "<b>Average Amount of Points</b>:", avg_points_19$avg_points, "<br>"))) +
+  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) + 
+  scale_fill_manual(values = c("Alfa Romeo" = "#B12039",
+                                "Ferrari" = "#ED1C24",
+                                "Haas F1 Team" = "#B6BABD",
+                               "McLaren" = "#F58020",
+                               "Mercedes" = "#6CD3BF",
+                               "Racing Point" = "#F596C8",
+                               "Red Bull" = "#1E5BC6",
+                               "Renault" = "#FFF500",
+                               "Toro Rosso" = "#469BFF",
+                               "Williams" = "#37BEDD")) +
+  labs (x = "Constructors", y = "Average Points", fill = "Constructor Names",
+        title = "Average Points Earned by Constructors in 2019")
+
+ggplotly(avg_points_19_plot, tooltip = "text")
+```
+
+```{r}
+points_21 <- season_21 %>%
+  group_by(constructorId, name.x) %>%
+  summarize(totalpoints = max(points)) %>%
+  arrange(desc(totalpoints)) %>%
+  filter(totalpoints != 0)
+
+avg_points_21 <- season_21 %>%
+  group_by(constructorId, name.x) %>%
+  summarize(avg_points = mean(points)) %>%
+  arrange(desc(avg_points)) %>%
+  filter(avg_points != 0)
+```
+
+```{r}
+points_21_plot <- ggplot(points_21, aes(x = name.x, y = totalpoints, fill = name.x,
+                                        text = paste("<b>Constructor</b>:", points_21$name.x, "<br>",
+                                 "<b>Total Amount of Points</b>:", points_21$totalpoints, "<br>"))) +
+  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+  scale_fill_manual(values = c("Alfa Romeo" = "#B12039",
+                               "AlphaTauri" = "#4E7C9B",
+                               "Alpine F1 Team" = "#2293D1",
+                               "Aston Martin" = "#2D826D",
+                               "Ferrari" = "#ED1C24",
+                               "McLaren" = "#F58020",
+                               "Mercedes" = "#6CD3BF",
+                               "Red Bull" = "#1E5BC6",
+                               "Williams" = "#37BEDD")) +
+  labs (x = "Constructors", y = "Total Points", fill = "Constructor Names",
+        title = "Total Points Earned by Constructors in 2021")
+ggplotly(points_21_plot, tooltip = "text")
+```
+
+```{r}
+avg_points_21_plot <- ggplot(avg_points_21, aes(x = name.x, y = avg_points, fill = name.x,
+                                                text = paste("<b>Constructor</b>:", avg_points_21$name.x, "<br>",
+                                 "<b>Average Amount of Points</b>:", avg_points_21$avg_points, "<br>"))) +
+  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
+  scale_fill_manual(values = c("Alfa Romeo" = "#B12039",
+                               "AlphaTauri" = "#4E7C9B",
+                               "Alpine F1 Team" = "#2293D1",
+                               "Aston Martin" = "#2D826D",
+                               "Ferrari" = "#ED1C24",
+                               "McLaren" = "#F58020",
+                               "Mercedes" = "#6CD3BF",
+                               "Red Bull" = "#1E5BC6",
+                               "Williams" = "#37BEDD")) +
+  labs (x = "Constructors", y = "Average Points", fill = "Constructor Names",
+        title = "Average Points Earned by Constructors in 2021")
+ggplotly(avg_points_21_plot, tooltip = "text")
+```
+
+## Constructor Car Failures 
+```{r}
+df2 <- left_join(results, status, by = "statusId")
+df2 <- left_join(df2, constructors, by = "constructorId")
+df2 <- left_join(df2, races, by = "raceId")
+
+## subset
+df2 <- subset(df2, select = c(resultId, raceId, driverId, constructorId,
+                              position, points, statusId, status, constructorRef, name.x, 
+                              year, circuitId, name.y))
+```
+
+```{r}
+status_19 <- df2 %>% 
+  filter(year == 2019) %>%
+  group_by(name.x, status) %>%
+  summarize(status_count = n()) 
+
+status_count_19 <- df2 %>%
+  filter(year == 2019) %>%
+  group_by(name.x, status) %>%
+  summarize(status_count = n()) %>%
+   pivot_wider(
+    names_from = status,
+    values_from = status_count
+  )
+status_count_19
+```
+
+```{r}
+## plot constructor status for 2019
+status_19_plot <- ggplot(status_19, aes(x = name.x, y = status_count, fill = status,
+                                        text = paste("<b>Constructor</b>:", status_19$name.x, "<br>",
+                                 "<b>Status Count</b>:", status_19$status_count, "<br>",
+                                 "<b>Status</b>:", status_19$status, "<br>"))) +
+  geom_col() +
+  coord_flip() +
+  scale_fill_manual(values = c("Accident" = "#000000",
+                               "Car Failure" = "#47ABFF",
+                               "Collision" = "#FF0000",
+                               "Disqualified" = "#505050",
+                               "DNF" = "#ADADAD",
+                               "Finished" = "#1BBC00")) +
+  labs(x = "Constructor", y = "Status Count", 
+       title ="2019 Constructor Status")
+ggplotly(status_19_plot, tooltip = "text")
+```
+
+```{r}
+ferrari_status_2019 <- df2 %>% 
+  filter(name.x == "Ferrari", year == 2019) %>%
+  na.omit() %>%
+  group_by(name.x, status) %>%
+  summarize(status_count = n()) 
+
+## compute position of labels
+ferrari_status_2019 <- ferrari_status_2019 %>% 
+  arrange(desc(status_count)) %>%
+  mutate(prop = status_count / sum(ferrari_status_2019$status_count) *100) %>%
+  mutate(ypos = cumsum(prop)- 0.5*prop )
+  
+```
+
+```{r}
+## red bull
+rb_status_2019 <- df2 %>% 
+  filter(name.x == "Red Bull", year == 2019) %>%
+  na.omit() %>%
+  group_by(name.x, status) %>%
+  summarize(status_count = n()) 
+
+## compute position of labels
+rb_status_2019 <- rb_status_2019 %>% 
+  arrange(desc(status_count)) %>%
+  mutate(prop = status_count / sum(rb_status_2019$status_count) *100) %>%
+  mutate(ypos = cumsum(prop)- 0.5*prop )
+
+## mercedes
+merc_status_2019 <- df2 %>% 
+  filter(name.x == "Mercedes", year == 2019) %>%
+  na.omit() %>%
+  group_by(name.x, status) %>%
+  summarize(status_count = n()) 
+
+## compute position of labels
+merc_status_2019 <- merc_status_2019 %>% 
+  arrange(desc(status_count)) %>%
+  mutate(prop = status_count / sum(merc_status_2019$status_count) *100) %>%
+  mutate(ypos = cumsum(prop)- 0.5*prop )
+
+## mcclaren
+mcl_status_2019 <- df2 %>% 
+  filter(name.x == "McLaren", year == 2019) %>%
+  na.omit() %>%
+  group_by(name.x, status) %>%
+  summarize(status_count = n()) 
+
+## compute position of labels
+mcl_status_2019 <- mcl_status_2019 %>% 
+  arrange(desc(status_count)) %>%
+  mutate(prop = status_count / sum(mcl_status_2019$status_count) *100) %>%
+  mutate(ypos = cumsum(prop)- 0.5*prop )
+```
+
+```{r}
+pie19 <- plot_ly(labels = ~status, values = ~prop,
+                textposition = 'inside',textinfo = 'label+percent') %>% 
+  add_pie(data = ferrari_status_2019, name = "Ferrari", marker = list(colors = c("#1BBC00", "#FF0000",
+                                                                                 "#ADADAD", "#47ABFF",
+                                                                                 "#000000", "#505050")),
+          domain = list(row = 0, column = 0), 
+          hovertemplate = paste("<b>Status</b>:", ferrari_status_2019$status, "<br>",
+                                "<b>Status Percentage</b>:", ferrari_status_2019$prop, "<br>")) %>%
+  add_pie(data = rb_status_2019, name = "Red Bull",marker = list(colors = c("#1BBC00", "#ADADAD",
+                                                                                 "#47ABFF", "#000000",
+                                                                                 "#FF0000")),
+          domain = list(row = 0, column = 1),
+          hovertemplate = paste("<b>Status</b>:", rb_status_2019$status, "<br>",
+                                "<b>Status Percentage</b>:", rb_status_2019$prop, "<br>"))%>%
+  add_pie(data = merc_status_2019, name = "Mercedes", marker = list(colors = c("#1BBC00", "#000000",
+                                                                                 "#47ABFF",
+                                                                                 "#ADADAD")),
+          domain = list(row = 1, column = 0),
+          hovertemplate = paste("<b>Status</b>:", merc_status_2019$status, "<br>",
+                                "<b>Status Percentage</b>:", merc_status_2019$prop, "<br>"))%>%
+  add_pie(data = mcl_status_2019, name = "McLaren", marker = list(colors = c("#1BBC00", "#ADADAD",
+                                                                             "#47ABFF", "#FF0000",
+                                                                              "#505050")),
+          domain = list(row = 1, column = 1),
+          hovertemplate = paste("<b>Status</b>:", mcl_status_2019$status, "<br>",
+                                "<b>Status Percentage</b>:", mcl_status_2019$prop, "<br>"))%>% 
+  layout(title = '2019 Constructor Statuses', showlegend = T, grid=list(rows=2, columns=2),
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         annotations = list(x = c(.004, .55, .0002, .55),
+                            y = c(.78, .78, .22, .22),
+                            text = c("Ferrari","Red Bull","Mercedes","McLaren"),
+                            xref = "papper",
+                            yref = "papper",
+                            showarrow = F
+                          )
+         )
+pie19
+```
+
+
+```{r}
+status_21 <- df2 %>% 
+  filter(year == 2021) %>%
+  group_by(name.x, status) %>%
+  summarize(status_count = n()) 
+
+status_count_21 <- df2 %>%
+  filter(year == 2021) %>%
+  group_by(name.x, status) %>%
+  summarize(status_count = n()) %>%
+   pivot_wider(
+    names_from = status,
+    values_from = status_count
+  )
+status_count_21
+```
+
+```{r}
+## plot constructor status for 2021
+status_21_plot <- ggplot(status_21, aes(x = name.x, y = status_count, fill = status,
+                                            text = paste("<b>Constructor</b>:", status_21$name.x, "<br>",
+                                 "<b>Status Count</b>:", status_21$status_count, "<br>",
+                                 "<b>Status</b>:", status_21$status, "<br>"))) +
+  geom_col() +
+  coord_flip() + 
+  scale_fill_manual(values = c("Accident" = "#000000",
+                               "Car Failure" = "#47ABFF",
+                               "Collision" = "#FF0000",
+                               "Disqualified" = "#505050",
+                               "DNF" = "#ADADAD",
+                               "Finished" = "#1BBC00")) +
+  labs(x = "Constructor", y = "Status Count", 
+       title="2021 Constructor Status")
+ggplotly(status_21_plot, tooltip = "text")
+```
+
+```{r}
+## ferrari
+ferrari_status_2021 <- df2 %>% 
+  filter(name.x == "Ferrari", year == 2021) %>%
+  na.omit() %>%
+  group_by(name.x, status) %>%
+  summarize(status_count = n()) 
+
+## compute position of labels
+ferrari_status_2021 <- ferrari_status_2021 %>% 
+  arrange(desc(status_count)) %>%
+  mutate(prop = status_count / sum(ferrari_status_2021$status_count) *100) %>%
+  mutate(ypos = cumsum(prop)- 0.5*prop )
+
+## red bull
+rb_status_2021 <- df2 %>% 
+  filter(name.x == "Red Bull", year == 2021) %>%
+  na.omit() %>%
+  group_by(name.x, status) %>%
+  summarize(status_count = n()) 
+
+## compute position of labels
+rb_status_2021 <- rb_status_2021 %>% 
+  arrange(desc(status_count)) %>%
+  mutate(prop = status_count / sum(rb_status_2021$status_count) *100) %>%
+  mutate(ypos = cumsum(prop)- 0.5*prop )
+
+## mercedes
+merc_status_2021 <- df2 %>% 
+  filter(name.x == "Mercedes", year == 2021) %>%
+  na.omit() %>%
+  group_by(name.x, status) %>%
+  summarize(status_count = n()) 
+
+## compute position of labels
+merc_status_2021 <- merc_status_2021 %>% 
+  arrange(desc(status_count)) %>%
+  mutate(prop = status_count / sum(merc_status_2021$status_count) *100) %>%
+  mutate(ypos = cumsum(prop)- 0.5*prop )
+
+## mcclaren
+mcl_status_2021 <- df2 %>% 
+  filter(name.x == "McLaren", year == 2021) %>%
+  na.omit() %>%
+  group_by(name.x, status) %>%
+  summarize(status_count = n()) 
+
+## compute position of labels
+mcl_status_2021 <- mcl_status_2021 %>% 
+  arrange(desc(status_count)) %>%
+  mutate(prop = status_count / sum(mcl_status_2021$status_count) *100) %>%
+  mutate(ypos = cumsum(prop)- 0.5*prop )
+```
+```{r}
+pie21 <- plot_ly(labels = ~status, values = ~prop,
+                textposition = 'inside',textinfo = 'label+percent') %>% 
+  add_pie(data = ferrari_status_2021, name = "Ferrari", marker = list(colors = c("#1BBC00", "#ADADAD",
+                                                                                 "#47ABFF", "#FF0000")),
+          domain = list(row = 0, column = 0),
+          hovertemplate = paste("<b>Status</b>:", ferrari_status_2021$status, "<br>",
+                                "<b>Status Percentage</b>:", ferrari_status_2021$prop, "<br>")) %>%
+  add_pie(data = rb_status_2021, name = "Red Bull", marker = list(colors = c("#1BBC00", "#FF0000",
+                                                                            "#ADADAD", "#000000",
+                                                                             "#47ABFF")),
+          domain = list(row = 0, column = 1),
+          hovertemplate = paste("<b>Status</b>:", rb_status_2021$status, "<br>",
+                                "<b>Status Percentage</b>:", rb_status_2021$prop, "<br>"))%>%
+  add_pie(data = merc_status_2021, name = "Mercedes", marker = list(colors = c("#1BBC00", "#FF0000",
+                                                                                 "#47ABFF", "#ADADAD")),
+          domain = list(row = 1, column = 0),
+          hovertemplate = paste("<b>Status</b>:", merc_status_2021$status, "<br>",
+                                "<b>Status Percentage</b>:", merc_status_2021$prop, "<br>"))%>%
+  add_pie(data = mcl_status_2021, name = "McLaren", marker = list(colors = c("#1BBC00", "#ADADAD",
+                                                                             "#47ABFF","#FF0000")),
+          domain = list(row = 1, column = 1),
+          hovertemplate = paste("<b>Status</b>:", mcl_status_2021$status, "<br>",
+                                "<b>Status Percentage</b>:", mcl_status_2021$prop, "<br>")) %>% 
+  layout(title = '2021 Constructor Statuses', showlegend = T, grid=list(rows=2, columns=2),
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         annotations = list(x = c(.004, .55, .0002, .55),
+                            y = c(.78, .78, .22, .22),
+                            text = c("Ferrari","Red Bull","Mercedes","McLaren"),
+                            xref = "papper",
+                            yref = "papper",
+                            showarrow = F
+                          )
+         )
+pie21
+```
