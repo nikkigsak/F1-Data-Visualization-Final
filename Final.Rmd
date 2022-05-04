@@ -455,7 +455,8 @@ points_21 <- season_21 %>%
   group_by(constructorId, name.x) %>%
   summarize(totalpoints = max(points)) %>%
   arrange(desc(totalpoints)) %>%
-  filter(totalpoints != 0)
+  filter(totalpoints != 0) %>%
+  rename('name'=name.x)
 
 winnings_19 <- season_19 %>%
   group_by(constructorId, name.x) %>%
@@ -503,8 +504,8 @@ The 2019 season was Mercedes's runaway season, although Ferrari's three race win
 The 2021 season shows Ferrari's continued status as part of the best of the rest, narrowly outearning McLaren Racing, who eventually came in fourth place in the Constructor's Championship. Mercedes narrowly beat out Red Bull for the Constructor's Championship, earning their eighth consecutive championship, an unheard of feat in Formula One. Red Bull, despite Max Verstappen's win in the Driver's Championship, came in second place, with Mercedes clinching the Championship in the final race of the season. 
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
-points_19_plot <- ggplot(points_19, aes(x = name.x, y = totalpoints, fill = name.x,
-                                        text = paste("<b>Constructor</b>:", points_19$name.x, "<br>",
+points_19_plot <- ggplot(points_19, aes(x = name, y = totalpoints, fill = name,
+                                        text = paste("<b>Constructor</b>:", points_19$name, "<br>",
                                  "<b>Total Amount of Points</b>:", points_19$totalpoints, "<br>"))) +
   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
    scale_fill_manual(values = c("Alfa Romeo" = "#B12039",
@@ -521,8 +522,8 @@ points_19_plot <- ggplot(points_19, aes(x = name.x, y = totalpoints, fill = name
         title = "Total Points Earned by Constructors in 2019")
 ggplotly(points_19_plot, tooltip = "text")
 
-points_21_plot <- ggplot(points_21, aes(x = name.x, y = totalpoints, fill = name.x,
-                                        text = paste("<b>Constructor</b>:", points_21$name.x, "<br>",
+points_21_plot <- ggplot(points_21, aes(x = name, y = totalpoints, fill = name,
+                                        text = paste("<b>Constructor</b>:", points_21$name, "<br>",
                                  "<b>Total Amount of Points</b>:", points_21$totalpoints, "<br>"))) +
   geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
   scale_fill_manual(values = c("Alfa Romeo" = "#B12039",
