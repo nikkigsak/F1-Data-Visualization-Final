@@ -43,11 +43,12 @@ circuit_type <- read.csv("raw_data/circuit_type.csv")
 lap_times <- read.csv("raw_data/lap_times.csv")
 status2 <- read.csv("raw_data/status2.csv")
 cstandings <- read.csv("raw_data/constructor_standings.csv")
-
 ```
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 #helper tables
+
+
 
 xover <- 
   results %>%
@@ -289,6 +290,24 @@ bscols(
 Formula One drivers often get their start early in life, rising through the ranks of Go-Kart ("Karting") racing. The 2021 Formula One champion, Max Verstappen, got his start karting at age four-and-a-half. This table contains *all* drivers from the inaugural 1950 season of Formula One to the most recent complete season, in 2021. The table contains a link to that driver's Wikipedia page for more biographical and performance background.
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+races_df <- races %>%
+  select(raceId, year, round) %>%
+  group_by(year) %>%
+  mutate(best_round = max(round)) %>%
+  arrange(desc(year)) %>%
+  ungroup() %>%
+  filter(round == best_round) %>%
+  select(raceId, year, best_round)
+
+standings_df <- standings %>%
+  left_join(races_df, by = "raceId") %>%
+  filter(!is.na(best_round)) %>%
+  select(raceId, year, driverId, position) %>%
+  arrange(desc(year), position) %>%
+  filter(year == 2021) %>%
+  select(driverId, position)
+  
+#View(standings_df)
 
 drivers_df <- drivers
 drivers_df$number <-
@@ -298,13 +317,14 @@ drivers_df$code <-
   ifelse(drivers_df$code == "\\N", "", drivers_df$code)
 
 drivers_df <- drivers_df %>%
+  left_join(standings_df, by = "driverId") %>%
   mutate(information = paste("<a target='_blank' href='", url,"'>link</a>")) %>%
-  mutate(driver_number = number, driver_code = code) %>%
+  mutate(driver_number = number, world_ranking = position) %>%
   mutate(firstname = forename, lastname = surname, birth_date = dob) %>%
-  dplyr::select(driverId, firstname, lastname, birth_date,
-    driver_number, driver_code, nationality, information
+  dplyr::select(driverId, firstname, lastname, world_ranking, birth_date,
+    driver_number, nationality, information
   ) %>%
-  arrange(nationality, lastname, firstname, birth_date, driver_number)
+  arrange(world_ranking, nationality, lastname, firstname, birth_date, driver_number)
 
 #View(drivers_df)
 
