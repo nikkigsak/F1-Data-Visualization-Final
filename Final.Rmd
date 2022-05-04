@@ -9,7 +9,6 @@ output: html_document
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache=FALSE}
 library(tidyverse)
 library(stringr)
-#library(ggplot2)
 library(magrittr)
 library(htmltools)
 library(ggplot2)
@@ -26,7 +25,7 @@ library(vembedr)
 library(tidyr)
 library(networkD3)
 library(plotly)
-
+library(lubridate)
 ```
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
@@ -117,7 +116,7 @@ skinny_races_circuits <- races %>%
   select(raceId, circuitId, race_name, year)
 
 
-library(lubridate)
+#library(lubridate)
 incidents_by_circuit <- 
   results %>%
   left_join(status2, by = ("statusId")) %>%
@@ -150,7 +149,7 @@ races2019 <- left_join(races2019, xover_2019, by="driverId")
 ## Helper tables/variables
 
 
-library(tidyr)
+#library(tidyr)
 
 ## sankey diagram helper tables
 links_driver_2019 <- 
@@ -207,6 +206,8 @@ links_driver_2021 <-
 
 ```
 
+<br />
+
 ## What is Formula One? 
 
 Formula One is the highest class of single-driver racing. There are ten teams and twenty drivers that compete during a Formula One season, with occasional backup drivers for when a main driver is sick or otherwise unavailable. Formula One drivers and teams travel all over the world to participate in Grand Prix races, which are a minimum of 190 miles. A Formula One season can consist of up to 22 races in the same number of countries, although there are a number of historical circuits that are significant to the Formula One sport, including the Monaco Grand Prix (160 miles) and the National Motor Racetrack of Monza (190 miles). 
@@ -215,12 +216,11 @@ The aim of Formula One drivers and teams are to compete at the highest level and
 
 Formula One is perhaps best explained by the drivers in the sport:
 
-##### Embed Video
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 embed_url("https://www.youtube.com/watch?v=twAlqtvVMdc")
-
 ```
 
+<br />
 
 ### Where do Formula One races take place? 
 
@@ -282,6 +282,8 @@ bscols(
 
 ```
 
+<br />
+
 ### Who are the drivers?
 
 Formula One drivers often get their start early in life, rising through the ranks of Go-Kart ("Karting") racing. The 2021 Formula One champion, Max Verstappen, got his start karting at age four-and-a-half. This table contains *all* drivers from the inaugural 1950 season of Formula One to the most recent complete season, in 2021. The table contains a link to that driver's Wikipedia page for more biographical and performance background.
@@ -322,6 +324,7 @@ datatable(drivers_df,
 
 ```
 
+<br />
 
 ## The 2019 Formula One Season versus the 2021 Formula One Season
 
@@ -331,6 +334,7 @@ The 2019 Formula One Season saw Lewis Hamilton of Mercedes win his sixth Driver'
 
 The 2021 Formula One Season saw Max Verstappen of Red Bull win his first Driver's Championship, with Red Bull missing out on the Constructor's Championship to Mercedes by 27 points. Max Verstappen and Lewis Hamilton were head to head in an intense competition for the Driver's Championship throughout the season, with Verstappen clinching the win in the final race of the 2021 season. Verstappen's win was controversial and caused an outcry in the paddock, but ultimately held to give the driver his first championship. 
 
+<br />
 
 ### Winners by Point Totals and Year
 
@@ -384,6 +388,7 @@ ggplotly(points_2021, tooltip="text")
 
 ```
 
+<br />
 
 ### Drivers by Standing during the Season
 
@@ -409,8 +414,7 @@ ggplotly(wins_2021, tooltip = "text")
 
 ```
 
-
-
+<br />
 
 ## Constructor Wins and Points
 
@@ -418,6 +422,7 @@ Constructors or "teams" are the makers of the F1 cars. These constructors are so
 
 The Constructor's championship rewards not only the driver, but seeks to recognize the entire team that builds and maintains the car.
 
+<br />
 
 ### Constructor Race Wins
 
@@ -495,6 +500,8 @@ ggplotly(win_21_plot, tooltip = "text")
 
 ```
 
+<br />
+
 ### Constructor Points Earnings 
 
 Constructors earn points in the same cadence as drivers, with the first place Constructor earning 25 points, the second place Constructor earning 18 points, and so on and so forth. The maximum number of points that a Constructor can earn on a typical race day is 43 points, if their drivers come in first place (25 points) and second place (18 points).
@@ -541,13 +548,15 @@ ggplotly(points_21_plot, tooltip = "text")
 
 ```
 
+<br />
 
 ### Constructors Finishing Statuses
 
 Formula One drivers, on average, are driving 160 miles per hour (260 kilometers per hour). Highly competitive races and high speeds often mean that lesser capable drivers, or lesser capable cars do not finish races.
 
-
 These visualizations show the finishing percentage of the top four constructors: Mercedes, Red Bull Racing, Ferrari, and McLaren Racing. In 2019, Mercedes finished over 90% of their races and got through the entire 2019 season without a single collision. These statistics are not replicated by their top four counterparts, with McLaren experiencing a higher number of DNF ("Did Not Finish") statuses and "Car Failures". 
+
+<br />
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 df2 <- left_join(results, status2, by = "statusId")
@@ -653,6 +662,7 @@ pie19
 
 During the 2021 Season, Red Bull and McLaren increased their races finished percentages by 3.2 percentage points and 20.7 percentage points, respectively. Mercedes's races finished percentages dropped by 6.5 percentage points, and experience 6.8% of their races ending in a collision. Red Bull and Mercedes both saw an increase in the number of collisions that ended their races, often with each other. 
 
+<br />
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 
@@ -745,14 +755,17 @@ pie21 <- plot_ly(labels = ~status, values = ~prop,
 pie21
 ```
 
-
+<br />
 
 #### Incidents
 
 Incidents are defined here as "accidents" or "collisions" which happen when drivers their hit each other or cause some other sort of accident. Due to the high speed nature of Formula One, these accidents or collisions often end the involved drivers' races. This graph includes all accidents and collisions, regardless of if they ended that driver's race. 
 
 
-In 2019, Red Bull had over 20 distinct accidents or collisions, certainly contributing to their distant second-place finish behind Mercedes. Second to Red Bull's incident count are the Haas F1 team, followed by Ferrari, both of whom had a high number of accidents or collisions, which led to Ferrari's third place finish and Haas's last place finish. 
+In 2019, Red Bull had over 20 distinct accidents or collisions, certainly contributing to their distant second-place finish behind Mercedes. Second to Red Bull's incident count are the Haas F1 team, followed by Ferrari, both of whom had a high number of accidents or collisions, which led to Ferrari's third place finish and Haas's last place finish.
+
+<br />
+
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 incidents_by_circuit %>%
   filter(year == 2019) %>%
@@ -781,7 +794,10 @@ incidents_by_circuit %>%
 ```
 
 
-In 2021, Haas still led the number of incidents, followed by Red Bull, and Williams racing. Mercedes maintained their overall count of 8 accidents or collisions over the course of the season, likely contributing to their eventually winning the 2021 Constructor Championship. 
+In 2021, Haas still led the number of incidents, followed by Red Bull, and Williams racing. Mercedes maintained their overall count of 8 accidents or collisions over the course of the season, likely contributing to their eventually winning the 2021 Constructor Championship.
+
+<br />
+
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 incidents_by_circuit %>%
   filter(year == 2021) %>%
@@ -810,13 +826,15 @@ incidents_by_circuit %>%
 
 ```
 
+<br />
+
 ### Lewis Hamilton versus Max Verstappen
 
 Prior to the 2021 season, Lewis Hamilton (or formally, Sir Lewis Carl Davidson Hamilton MBE) had won four consecutive Driver's Championships. Hamilton would have won eight consecutive Driver's Championships, if he had not been beaten by his own teammate at the time, Nico Rosberg in 2016. In 2021, Max Verstappen provided the highest level of competition that Hamilton had faced in several years, winning ten races to Hamilton's eight races. 
 
 One aspect of racing that drivers can focus on is qualifying. The qualifying round sets the starting order or "grid" of the race the next day. Drivers are given a set amount of time to drive the fastest lap possible, pushing the car to the limit. Drivers are eliminated from further qualifying rounds if they are unable to meet the standard of the qualifying round and eventually, the grid is set. When a driver qualifies first, they are said to be in "pole position" and are referred to as a "polesitter". 
 
-
+<br />
 
 #### How often do the top two drivers convert their Qualifying positions to Wins?
 
@@ -879,12 +897,15 @@ sankeyNetwork(Links = links_driver_lhmv_2021, Nodes = nodes21, Source = "source"
               NodeGroup = NULL)
 ```
 
+<br />
 
 #### Fastest Laps
 
 The "Fastest Lap" is a designation given to a driver who completes the fastest lap of all drivers during a race. The driver that wins the fastest lap designation after every race earns one (1) Championship point towards the Driver's Championship *if* that driver finishes in the top ten places. 
 
 In 2019, dominant Lewis Hamilton earned six fastest lap designations, earning him six extra points over the course of the season. Charles LeClerc of Ferrari earned four fastest lap designations, and Max Verstappen tied Hamilton's Mercedes teammate, Valteri Bottas, and earned three fastest lap designations.
+
+<br />
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 lap_times_by_driver_2019 <- 
@@ -904,8 +925,8 @@ lap_times_by_driver_2019 <-
   summarise(count_of_fastest_lap = n()) %>%
   arrange()
 
-library(ggplot2)
-library(plotly)
+#library(ggplot2)
+#library(plotly)
 
 lap_times_by_driver_2019 %>%
   plot_ly(type = "bar",
@@ -927,6 +948,8 @@ lap_times_by_driver_2019 %>%
 ```
 
 In the 2021 season, Max Verstappen, who had risen to the level of Lewis Hamilton this season, earned eight fastest lap designations, to Lewis Hamilton's six fastest laps and Valteri Bottas's three fastest laps. This statistic, along with all the other 2021 Max Verstappen statistics shows how much the driver and the team rose in quality and competitiveness during the season.
+
+<br />
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 
@@ -967,8 +990,10 @@ lap_times_by_driver_2021 %>%
          yaxis = list(title = 'Driver'))
 ```
 
-
+<br />
 
 ## Conclusion
 
 The 2019 and 2021 seasons of Formula One were incredibly different and interesting seasons, with different driver characteristics and constructor details in full view. The 2019 season was in the middle of Mercedes driver Lewis Hamilton's six-championship winning streak, with Red Bull's Max Verstappen seen as an up and coming young driver. In 2021, Max Verstappen was a greater force to be reckoned with, breaking Lewis Hamilton's championship streak on the final day of the season and being Red Bull's first championship in eight years. 
+
+<br />
