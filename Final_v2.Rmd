@@ -20,6 +20,11 @@ library(sf)
 library(rgdal) # for reading shape files into R
 library(rgeos)
 library(maps)
+# Please run following command in R-Studio to target
+#  appropriate command for "crosstalk" package
+#  otherwise an "All" entry will appear in filter
+#  select dropdown
+# devtools::install_version(“crosstalk”, version = “1.1.1”)
 library(crosstalk)
 library(vembedr)
 library(tidyr)
