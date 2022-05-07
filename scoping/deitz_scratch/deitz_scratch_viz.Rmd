@@ -1,0 +1,201 @@
+---
+title: "deitz_scratch_viz"
+author: "Lauren Deitz"
+date: "3/22/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(magrittr)
+library(plotly)
+```
+
+## Reading in the Driver data
+
+```{r}
+drivers <- read.csv("../../raw_data/drivers.csv")
+qps <- read.csv("../../raw_data/qualifying.csv")
+pitstops <- read.csv("../../raw_data/pit_stops.csv")
+standings <- read.csv("../../raw_data/driver_standings.csv")
+races <- read.csv("../../raw_data/races.csv")
+results <- read.csv("../../raw_data/results.csv")
+constructors <- read.csv("../../raw_data/constructors.csv")
+qualifying <- read.csv("../../raw_data/qualifying.csv")
+
+```
+
+## viz
+
+pole position
+```{r}
+qp_drivers <- left_join(qps, drivers, by='driverId')
+
+qp_drivers %>% filter(position == 1) %>% group_by(driverRef) %>% summarise(pole_position=n()) %>% 
+  arrange(-pole_position) %>% 
+  ggplot(.,aes(x=driverRef,y=pole_position)) + geom_bar(stat='identity') + coord_flip()
+```
+qualifying positions
+
+```{r}
+library(chron)
+qp_drivers %>% group_by(driverRef) %>% mutate(avg_q1=mean(times(q1)))
+## can't figure out how to handle the timeseries data!
+
+```
+
+pit stops
+```{r}
+pt_drivers <- left_join(pitstops, drivers, by="driverId")
+pt_drivers %>% group_by(driverRef) %>% summarise(shortest=min(milliseconds)) %>% arrange(shortest)
+pt_drivers %>% group_by(driverRef) %>% summarise(avg_pt = mean(milliseconds)) %>% arrange(avg_pt)
+
+avg_shortest_pt <- pt_drivers %>% group_by(driverRef,stop) %>% summarise(avg_pt = mean(milliseconds)) %>% arrange(driverRef,avg_pt) %>% mutate(pt_rank=row_number(avg_pt)) %>% filter(pt_rank==1)
+avg_shortest_pt %>% group_by(stop) %>% summarise(stop_count=n()) %>% ggplot(.,aes(x=stop,y=stop_count)) + geom_bar(stat='identity') + ggtitle('Shortest pit stop on average by driver')
+
+avg_shortest_pt
+```
+
+standings over time
+```{r}
+race_standings <- left_join(standings, races, by="raceId")
+driver_race_standings <- left_join(race_standings, drivers, by="driverId")
+
+races2021 <- driver_race_standings %>% filter(year==2021)
+races2019 <- driver_race_standings %>% filter(year==2019)
+
+ggplot(races2021, aes(x=date,y=position,group=driverRef, color=driverRef)) + geom_line() + coord_flip() + ggtitle("2021")
+ggplot(races2019, aes(x=date,y=position,group=driverRef, color=driverRef)) + geom_line() + coord_flip() + ggtitle("2019")
+
+```
+
+points over time
+```{r}
+ggplot(races2021, aes(x=date,y=points,group=driverRef,color=driverRef)) + geom_point() + geom_smooth(se=FALSE) + coord_flip() + ggtitle("2021")
+ggplot(races2019, aes(x=date,y=points,group=driverRef,color=driverRef)) + geom_point() + geom_smooth(se=FALSE) + coord_flip() + ggtitle("2019")
+
+```
+
+pit stops over time
+```{r, fig.width=10,fig.height=20}
+pt_drivers <- left_join(pitstops, drivers, by="driverId")
+pt_driver_races <- left_join(pt_drivers, races, by="raceId")
+pt_driver_races_results <- left_join(pt_driver_races, results, by=c('raceId', 'driverId'))
+pt_const <- left_join(pt_driver_races_results, constructors, by='constructorId')
+
+pt_2021 <- pt_const %>% filter(year==2021)
+pt_2019 <- pt_const %>% filter(year==2019)
+
+pt_2021_gg <- pt_2021 %>% group_by(constructorRef,stop,date) %>% summarise(avg_pt=median(milliseconds.x)) %>% arrange(constructorRef,date) %>% filter(stop<4)
+ggplot(pt_2021_gg,aes(x=date,y=avg_pt,group=as.factor(stop),color=as.factor(stop))) + geom_line() + facet_grid(constructorRef~.) + ggtitle("2021") + theme(axis.text.x = element_text(angle = 90))
+
+
+pt_2019_gg <- pt_2019 %>% group_by(constructorRef,stop,date) %>% summarise(avg_pt=median(milliseconds.x)) %>% arrange(constructorRef,date) %>% filter(stop<4)
+ggplot(pt_2019_gg,aes(x=date,y=avg_pt,group=as.factor(stop),color=as.factor(stop))) + geom_line() + facet_grid(constructorRef~.) + ggtitle("2019")
+```
+
+
+## Setup for final viz
+
+```{r}
+xover <- 
+  results %>%
+  left_join(races, by = ("raceId")) %>%
+  filter(year == 2019 | year == 2021) %>%
+  select(driverId, constructorId, year) %>%
+  left_join(drivers, by = ("driverId")) %>%
+  left_join(constructors, by = ("constructorId")) %>%
+  mutate(full_name = paste(forename, surname)) %>%
+  rename(constructor_name = name) %>%
+  select(driverId, full_name, constructorId, constructor_name, year) %>%
+  group_by(driverId, full_name, constructorId, constructor_name, year) %>% 
+  slice(1)
+
+xover <- 
+  xover %>%
+  mutate(full_name = if_else(full_name == "Kimi RÃ¤ikkÃ¶nen", "Kimi Raikkonen", full_name),
+         full_name = if_else(full_name == "Nico HÃ¼lkenberg", "Nico Hulkenberg", full_name),
+         full_name = if_else(full_name == "Sergio PÃ©rez", "Sergio Perez", full_name))
+
+xover_total <- xover %>% 
+  arrange(year,constructor_name,driverId) %>% 
+  group_by(year,constructor_name) %>% 
+  mutate(rn=row_number()) %>% 
+  ungroup() %>% 
+  mutate(line_type=case_when(
+    rn==1 ~ 'solid',
+    rn==2 ~ 'dashed',
+    rn==3 ~ 'dotted')) %>% 
+  mutate(colorcol=case_when(
+    constructor_name=='Alfa Romeo' ~ '#B12039',
+    constructor_name=='AlphaTauri' ~ '#4E7C9B',
+    constructor_name=='Alpine F1 Team' ~ '#2293D1',
+    constructor_name=='Aston Martin' ~ '#2D826D',
+    constructor_name=='Ferrari' ~ '#ED1C24',
+    constructor_name=='McLaren' ~ '#F58020',
+    constructor_name=='Mercedes' ~ '#6CD3BF',
+    constructor_name=='Red Bull' ~ '#1E5BC6',
+    constructor_name=='Williams' ~ '#37BEDD',
+    constructor_name=='Haas F1 Team' ~ '#B6BABD',
+    constructor_name=='Racing Point' ~ '#F596C8',
+    constructor_name=='Renault' ~ '#FFF500',
+    constructor_name=='Toro Rosso' ~ '#469BFF'
+))
+
+
+race_standings <- left_join(standings, races, by="raceId")
+driver_race_standings <- left_join(race_standings, drivers, by="driverId")
+
+races2021 <- driver_race_standings %>% filter(year==2021)
+races2019 <- driver_race_standings %>% filter(year==2019)
+
+xover_2021 <- xover_total %>% filter(year==2021) %>% arrange(full_name)
+xover_2019 <- xover_total %>% filter(year==2019) %>% arrange(full_name)
+xover_2019 <- xover_2019[-c(2,16),]
+xover_2019 <- xover_2019 %>% filter(driverId %in% races2019$driverId)
+
+races2021 <- left_join(races2021, xover_2021, by="driverId")
+races2019 <- left_join(races2019, xover_2019, by="driverId")
+
+```
+
+## Final draft -- points
+
+
+```{r}
+points_2021 <- ggplot(races2021, aes(x=date,y=points,group=full_name,color=full_name, linetype=full_name, text=paste("<b>Driver:</b> ",full_name,"<br><b>Team: </b>",constructor_name,"<br><b>Points: </b>",points))) + geom_point() + geom_smooth(se=FALSE) +
+  ggtitle("2021") + 
+  scale_linetype_manual(values=xover_2021$line_type, name="full_name") + 
+  scale_color_manual(values=xover_2021$colorcol, name="full_name") + 
+  theme_classic() + xlab("Date") + ylab("Point Total") + theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1))
+
+points_2019 <- ggplot(races2019, aes(x=date,y=points,group=full_name,color=full_name, linetype=full_name,text=paste("<b>Driver:</b> ",full_name,"<br><b>Team: </b>",constructor_name,"<br><b>Points: </b>",points))) + geom_point() + geom_smooth(se=FALSE) + 
+  ggtitle("2019") + 
+  scale_linetype_manual(values=xover_2019$line_type, name="full_name") + 
+  scale_color_manual(values=xover_2019$colorcol, name="full_name") + theme_classic() + 
+  labs (x = "Date", y = "Total Points") + xlab("Date") + ylab("Point Total") + theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1))
+
+ggplotly(points_2019, tooltip="text")
+
+ggplotly(points_2021, tooltip="text")
+
+
+```
+
+## Final draft -- standings
+
+```{r}
+wins_2021 <- ggplot(races2021) + 
+  geom_line(aes(x=date,y=reorder(position,-position),group=full_name,color=full_name,linetype=full_name,text=paste("<b>Driver: </b>",full_name,"<br><b>Team:</b> ",constructor_name))) + scale_color_manual(values=xover_2021$colorcol)+ scale_linetype_manual(values=xover_2021$line_type) + ggtitle("2021") + theme_classic() + labs(x = "Date", y = "Position") +
+   theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1))
+
+wins_2019 <- ggplot(races2019) + 
+  geom_line(aes(x=date,y=reorder(position,-position),group=full_name,color=full_name,linetype=full_name,text=paste("<b>Driver: </b>",full_name,"<br><b>Team:</b> ",constructor_name))) + scale_color_manual(values=xover_2019$colorcol)+ scale_linetype_manual(values=xover_2019$line_type) + ggtitle("2019") + theme_classic() + labs(x = "Date", y = "Position") + guides(color=guide_legend(ncol=2)) + theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1))
+
+ggplotly(wins_2019, tooltip = "text")
+
+ggplotly(wins_2021, tooltip = "text")
+
+```
