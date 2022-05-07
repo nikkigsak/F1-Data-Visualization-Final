@@ -270,7 +270,7 @@ map <- leaflet() %>%
   addMarkers(data = country_sd,
     lat = ~lat, lng = ~lng,
     icon = list(
-      iconUrl = 'track-icon-19.png',
+      iconUrl = 'images/track-icon-19.png',
       iconSize = c(25, 25)
     ),
     popup = ~paste("<b>", name, "</b><br/><i>Type</i>: ", circuit_type, "<br/><i>Location</i>: ", location, ", ", country, "<br/><i>GPS</i>: (", lat, ",", lng, ",", alt, ")", sep = ""))
