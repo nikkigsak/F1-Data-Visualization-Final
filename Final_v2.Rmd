@@ -494,64 +494,57 @@ df <- left_join(df, races, by = "raceId")
 df <- subset(df, select= c(constructorId, constructorRef, name.x, constructorStandingsId,
                            raceId, points, position, year, circuitId, name.y, wins))
 
-## 2019 season 
-season_19 <- df %>%
-  filter (year == 2019)
+# ## 2019 season 
+# season_19 <- df %>%
+#   filter (year == 2019)
+# 
+# ## 2021 season
+# season_21 <- df %>%
+#   filter(year == 2021)
 
-## 2021 season
-season_21 <- df %>%
-  filter(year == 2021)
-
-## 2019 total points
-points_19 <- season_19 %>%
-  group_by(constructorId, name.x) %>%
-  summarize(totalpoints = max(points)) %>%
-  arrange(desc(totalpoints)) %>%
+## points data frame
+wins_df <- df %>%
+  filter(year == 2019 | year == 2021) %>%
   rename('name'=name.x)
 
-## 2021 total points
-points_21 <- season_21 %>%
-  group_by(constructorId, name.x) %>%
-  summarize(totalpoints = max(points)) %>%
-  arrange(desc(totalpoints)) %>%
-  filter(totalpoints != 0) %>%
-  rename('name'=name.x)
-
-winnings_19 <- season_19 %>%
-  group_by(constructorId, name.x) %>%
-  summarize(totalwins = max(wins)) %>%
-  arrange(desc(totalwins)) %>%
-  filter(totalwins != 0)
-
-win_19_plot <- ggplot(winnings_19, aes(x = name.x, y = totalwins, fill = name.x,
-                                       text = paste("<b>Constructor</b>:", winnings_19$name.x, "<br>",
-                                 "<b>Number of Wins</b>:", winnings_19$totalwins, "<br>"))) +
-  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) + 
-  scale_fill_manual(values = c("Ferrari" = "#ED1C24",
-                               "Mercedes" = "#6CD3BF",
-                               "Red Bull" = "#1E5BC6")) +
-  labs (x = "Constructors", y = "Number of Wins", fill = "Constructor Names",
-        title = "2019 Wins by Constructor") 
-ggplotly(win_19_plot, tooltip = "text")
-
-winnings_21 <- season_21 %>%
-  group_by(constructorId, name.x) %>%
-  summarize(totalwins = max(wins)) %>%
-  arrange(desc(totalwins)) %>%
-  filter(totalwins != 0)
-
-win_21_plot <- ggplot(winnings_21, aes(x = name.x, y = totalwins, fill = name.x,
-                                       text = paste("<b>Constructor</b>:", winnings_21$name.x, "<br>",
-                                 "<b>Number of Wins</b>:", winnings_21$totalwins, "<br>"))) +
-  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) + 
-  scale_fill_manual(values = c("Apline F1 Team" = "#2293D1",
-                               "McLaren" = "#F58020",
-                               "Mercedes" = "#6CD3BF",
-                               "Red Bull" = "#1E5BC6")) +
-    labs (x = "Constructors", y = "Number of Wins", fill = "Constructor Names",
-        title = "2021 Wins by Constructor")
-ggplotly(win_21_plot, tooltip = "text")
-
+wins_plotly <- wins_df %>%
+  mutate(col_sum_2019 = if_else(year == 2019, wins, as.integer(0)), 
+         col_sum_2021 = if_else(year == 2021, wins, as.integer(0))) %>%
+  group_by(name) %>%
+   summarize(year_2019 = max(col_sum_2019),
+            year_2021 = max(col_sum_2021)) %>%
+  arrange(desc(year_2019, year_2021)) %>%
+  filter(year_2019 != 0 | year_2021 != 0) %>%
+  plot_ly(type = "bar", name = '2019',
+          x = ~name, 
+          y = ~year_2019,
+          marker = list(color =  c("Mercedes" = "#6CD3BF",
+                                   "Ferrari" = "#ED1C24",
+                                   "Red Bull" = "#1E5BC6",
+                                   "Alpine F1 Team" = "#2293D1",
+                                   "McLaren" = "#F58020"
+                                  )),
+          hovertemplate = paste('<b>Team</b>: %{x}<br>',
+                                '<b>Year</b>: 2019<br>',
+                                 'Number of Wins</b>: %{y}<br>'),
+          showlegend = F) %>%
+  add_trace(y = ~year_2021, name = '2021', 
+            marker = list(color = c("Mercedes" = "#A6E4D8",
+                                    "Ferrari" = "#F4767B",
+                                    "Red Bull" = "#789CDC",
+                                    "Alpine F1 Team" = "#7ABEE3",
+                                    "Mclaren" =  "#F9B279"
+                                   )
+                          ),
+            hovertemplate = paste('<b>Team</b>: %{x}<br>',
+                                '<b>Year</b>: 2021<br>',
+                                 'Number of Wins</b>: %{y}<br>'),
+            showlegend = F) %>%
+  layout(title = 'Wins by Constructor',
+         xaxis = list(title = '<br><br><br>Constructor'), 
+         yaxis = list(title = 'Number of Wins'),
+         barmode = 'group')
+wins_plotly
 ```
 
 <br />
@@ -564,43 +557,70 @@ The 2019 season was Mercedes's runaway season, although Ferrari's three race win
 
 The 2021 season shows Ferrari's continued status as part of the best of the rest, narrowly outearning McLaren Racing, who eventually came in fourth place in the Constructor's Championship. Mercedes narrowly beat out Red Bull for the Constructor's Championship, earning their eighth consecutive championship, an unheard of feat in Formula One. Red Bull, despite Max Verstappen's win in the Driver's Championship, came in second place, with Mercedes clinching the Championship in the final race of the season. 
 
-```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
-points_19_plot <- ggplot(points_19, aes(x = name, y = totalpoints, fill = name,
-                                        text = paste("<b>Constructor</b>:", points_19$name, "<br>",
-                                 "<b>Total Amount of Points</b>:", points_19$totalpoints, "<br>"))) +
-  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
-   scale_fill_manual(values = c("Alfa Romeo" = "#B12039",
-                                "Ferrari" = "#ED1C24",
-                                "Haas F1 Team" = "#B6BABD",
-                               "McLaren" = "#F58020",
-                               "Mercedes" = "#6CD3BF",
-                               "Racing Point" = "#F596C8",
-                               "Red Bull" = "#1E5BC6",
-                               "Renault" = "#FFF500",
-                               "Toro Rosso" = "#469BFF",
-                               "Williams" = "#37BEDD")) +
-  labs (x = "Constructors", y = "Total Points", fill = "Constructor Names",
-        title = "Total Points Earned by Constructors in 2019")
-ggplotly(points_19_plot, tooltip = "text")
+```{r}
+## points data frame
+points_df <- df %>%
+  filter(year == 2019 | year == 2021) %>%
+  rename('name'=name.x)
 
-points_21_plot <- ggplot(points_21, aes(x = name, y = totalpoints, fill = name,
-                                        text = paste("<b>Constructor</b>:", points_21$name, "<br>",
-                                 "<b>Total Amount of Points</b>:", points_21$totalpoints, "<br>"))) +
-  geom_bar(position = "dodge", stat = "identity") +  theme(axis.text.x = element_text(angle = 45)) +
-  scale_fill_manual(values = c("Alfa Romeo" = "#B12039",
-                               "AlphaTauri" = "#4E7C9B",
-                               "Alpine F1 Team" = "#2293D1",
-                               "Aston Martin" = "#2D826D",
-                               "Ferrari" = "#ED1C24",
-                               "McLaren" = "#F58020",
-                               "Mercedes" = "#6CD3BF",
-                               "Red Bull" = "#1E5BC6",
-                               "Williams" = "#37BEDD")) +
-  labs (x = "Constructors", y = "Total Points", fill = "Constructor Names",
-        title = "Total Points Earned by Constructors in 2021")
-ggplotly(points_21_plot, tooltip = "text")
+## points plot
+points_plotly <- points_df %>%
+  mutate(col_sum_2019 = if_else(year == 2019, points, 0), 
+         col_sum_2021 = if_else(year == 2021, points, 0)) %>%
+  group_by(name) %>%
+   summarize(year_2019 = max(col_sum_2019),
+            year_2021 = max(col_sum_2021)) %>%
+  arrange(desc(year_2019, year_2021)) %>%
+  filter(year_2019 != 0 | year_2021 != 0) %>%
+  plot_ly(type = "bar", name = '2019',
+          x = ~name, 
+          y = ~year_2019,
+          marker = list(color =  c("Mercedes" = "#6CD3BF",
+                                   "Ferrari" = "#ED1C24",
+                                   "Red Bull" = "#1E5BC6",
+                                   "McLaren" = "#F58020",
+                                   "Renault" = "#FFF500",
+                                   "Toro Rosso" = "#469BFF",
+                                   "Racing Point" = "#F596C8",
+                                   "Alfa Romeo" = "#B12039",
+                                   "Haas F1 Team" = "#B6BABD",
+                                   "Williams" = "#37BEDD",
+                                   "AlphaTauri" = "#4E7C9B",
+                                   "Alpine F1 Team" = "#2293D1",
+                                   "Aston Martin" = "#2D826D"
+                                  )),
+          hovertemplate = paste('<b>Team</b>: %{x}<br>',
+                                '<b>Year</b>: 2019<br>',
+                                 'Total Amount of Points</b>: %{y}<br>'),
+          showlegend = F) %>%
+  add_trace(y = ~year_2021, name = '2021', 
+            marker = list(color = c("Mercedes" = "#A6E4D8",
+                                    "Ferrari" = "#F4767B",
+                                    "Red Bull" = "#789CDC",
+                                    "Mclaren" = "#F9B279",
+                                    "Renault" = "#FFF966",
+                                    "Toro Rosso" = "#90C3FF",
+                                    "Racing Point" = "#F9C0DE",
+                                    "Alfa Romeo" = "#D07988",
+                                    "Haas F1 Team" = "#D3D5D7",
+                                    "Williams" = "#87D8EA",
+                                    "AlphaTauri" = "#94B0C3",
+                                    "Alpine F1 Team" = "#7ABEE3",
+                                    "Aston Martin" = "#81B4A7"
+                                   )
+                          ),
+            hovertemplate = paste('<b>Team</b>: %{x}<br>',
+                                '<b>Year</b>: 2021<br>',
+                                 'Total Amount of Points</b>: %{y}<br>'),
+            showlegend = F) %>%
+  layout(title = 'Total Points Earned by Constructor',
+         xaxis = list(title = '<br><br><br>Constructor'), 
+         yaxis = list(title = 'Total Points'),
+         barmode = 'group')
+points_plotly
 
 ```
+
 
 <br />
 
@@ -609,6 +629,7 @@ ggplotly(points_21_plot, tooltip = "text")
 Formula One drivers, on average, are driving 160 miles per hour (260 kilometers per hour). Highly competitive races and high speeds often mean that lesser capable drivers, or lesser capable cars do not finish races.
 
 These visualizations show the finishing percentage of the top four constructors: Mercedes, Red Bull Racing, Ferrari, and McLaren Racing. In 2019, Mercedes finished over 90% of their races and got through the entire 2019 season without a single collision. These statistics are not replicated by their top four counterparts, with McLaren experiencing a higher number of DNF ("Did Not Finish") statuses and "Car Failures". 
+During the 2021 Season, Red Bull and McLaren increased their races finished percentages by 3.2 percentage points and 20.7 percentage points, respectively. Mercedes's races finished percentages dropped by 6.5 percentage points, and experience 6.8% of their races ending in a collision. Red Bull and Mercedes both saw an increase in the number of collisions that ended their races, often with each other. 
 
 <br />
 
@@ -621,194 +642,71 @@ df2 <- left_join(df2, races, by = "raceId")
 df2 <- subset(df2, select = c(resultId, raceId, driverId, constructorId,
                               position, points, statusId, status, constructorRef, name.x, 
                               year, circuitId, name.y))
-
-ferrari_status_2019 <- df2 %>% 
-  filter(name.x == "Ferrari", year == 2019) %>%
-  na.omit() %>%
+## season 19 status 
+status_19 <- df2 %>% 
+  filter(year == 2019) %>%
   group_by(name.x, status) %>%
   summarize(status_count = n()) 
 
-## compute position of labels
-ferrari_status_2019 <- ferrari_status_2019 %>% 
-  arrange(desc(status_count)) %>%
-  mutate(prop = status_count / sum(ferrari_status_2019$status_count) *100) %>%
-  mutate(ypos = cumsum(prop)- 0.5*prop )
+## plot constructor status for 2019
+status_19_plot <- ggplot(status_19, aes(x = name.x, y = status_count, fill = status,
+                                        text = paste("<b>Constructor</b>:", status_19$name.x, "<br>",
+                                 "<b>Status Count</b>:", status_19$status_count, "<br>",
+                                 "<b>Status</b>:", status_19$status, "<br>"))) +
+  geom_col() +
+  coord_flip() +
+  scale_fill_manual(values = c("Accident" = "#000000",
+                               "Car Failure" = "#47ABFF",
+                               "Collision" = "#FF0000",
+                               "Disqualified" = "#505050",
+                               "DNF" = "#ADADAD",
+                               "Finished" = "#1BBC00")) +
+  labs(x = "Constructor", y = "Status Count", 
+       title ="2019 Constructor Status")
+status_19_plotly <- ggplotly(status_19_plot, tooltip = "text")
 
-## red bull
-rb_status_2019 <- df2 %>% 
-  filter(name.x == "Red Bull", year == 2019) %>%
-  na.omit() %>%
+## season 21 status
+status_21 <- df2 %>% 
+  filter(year == 2021) %>%
   group_by(name.x, status) %>%
   summarize(status_count = n()) 
 
-## compute position of labels
-rb_status_2019 <- rb_status_2019 %>% 
-  arrange(desc(status_count)) %>%
-  mutate(prop = status_count / sum(rb_status_2019$status_count) *100) %>%
-  mutate(ypos = cumsum(prop)- 0.5*prop )
+## plot constructor status for 2021
+status_21_plot <- ggplot(status_21, aes(x = name.x, y = status_count, fill = status,
+                                            text = paste("<b>Constructor</b>:", status_21$name.x, "<br>",
+                                 "<b>Status Count</b>:", status_21$status_count, "<br>",
+                                 "<b>Status</b>:", status_21$status, "<br>"))) +
+  theme(legend.position="none") +
+  geom_col() +
+  coord_flip() + 
+  scale_fill_manual(values = c("Accident" = "#000000",
+                               "Car Failure" = "#47ABFF",
+                               "Collision" = "#FF0000",
+                               "Disqualified" = "#505050",
+                               "DNF" = "#ADADAD",
+                               "Finished" = "#1BBC00")) +
+  labs(x = element_blank(), y = "Status Count", 
+       title="2021 Constructor Status")
+status_21_plotly <- ggplotly(status_21_plot, tooltip = "text")
 
-## mercedes
-merc_status_2019 <- df2 %>% 
-  filter(name.x == "Mercedes", year == 2019) %>%
-  na.omit() %>%
-  group_by(name.x, status) %>%
-  summarize(status_count = n()) 
-
-## compute position of labels
-merc_status_2019 <- merc_status_2019 %>% 
-  arrange(desc(status_count)) %>%
-  mutate(prop = status_count / sum(merc_status_2019$status_count) *100) %>%
-  mutate(ypos = cumsum(prop)- 0.5*prop )
-
-## mcclaren
-mcl_status_2019 <- df2 %>% 
-  filter(name.x == "McLaren", year == 2019) %>%
-  na.omit() %>%
-  group_by(name.x, status) %>%
-  summarize(status_count = n()) 
-
-## compute position of labels
-mcl_status_2019 <- mcl_status_2019 %>% 
-  arrange(desc(status_count)) %>%
-  mutate(prop = status_count / sum(mcl_status_2019$status_count) *100) %>%
-  mutate(ypos = cumsum(prop)- 0.5*prop )
-
-pie19 <- plot_ly(labels = ~status, values = ~prop,
-                textposition = 'inside',textinfo = 'label+percent') %>% 
-  add_pie(data = ferrari_status_2019, name = "Ferrari", marker = list(colors = c("#1BBC00", "#FF0000",
-                                                                                 "#ADADAD", "#47ABFF",
-                                                                                 "#000000", "#505050")),
-          domain = list(row = 0, column = 0), 
-          hovertemplate = paste("<b>Status</b>:", ferrari_status_2019$status, "<br>",
-                                "<b>Status Percentage</b>:", ferrari_status_2019$prop, "<br>")) %>%
-  add_pie(data = rb_status_2019, name = "Red Bull",marker = list(colors = c("#1BBC00", "#ADADAD",
-                                                                                 "#47ABFF", "#000000",
-                                                                                 "#FF0000")),
-          domain = list(row = 0, column = 1),
-          hovertemplate = paste("<b>Status</b>:", rb_status_2019$status, "<br>",
-                                "<b>Status Percentage</b>:", rb_status_2019$prop, "<br>"))%>%
-  add_pie(data = merc_status_2019, name = "Mercedes", marker = list(colors = c("#1BBC00", "#000000",
-                                                                                 "#47ABFF",
-                                                                                 "#ADADAD")),
-          domain = list(row = 1, column = 0),
-          hovertemplate = paste("<b>Status</b>:", merc_status_2019$status, "<br>",
-                                "<b>Status Percentage</b>:", merc_status_2019$prop, "<br>"))%>%
-  add_pie(data = mcl_status_2019, name = "McLaren", marker = list(colors = c("#1BBC00", "#ADADAD",
-                                                                             "#47ABFF", "#FF0000",
-                                                                              "#505050")),
-          domain = list(row = 1, column = 1),
-          hovertemplate = paste("<b>Status</b>:", mcl_status_2019$status, "<br>",
-                                "<b>Status Percentage</b>:", mcl_status_2019$prop, "<br>"))%>% 
-  layout(title = '2019 Constructor Statuses', showlegend = T, grid=list(rows=2, columns=2),
-         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-         annotations = list(x = c(.004, .55, .0002, .55),
-                            y = c(.78, .78, .22, .22),
-                            text = c("Ferrari","Red Bull","Mercedes","McLaren"),
-                            xref = "papper",
-                            yref = "papper",
-                            showarrow = F
-                          )
-         )
-pie19
 ```
-
-
-During the 2021 Season, Red Bull and McLaren increased their races finished percentages by 3.2 percentage points and 20.7 percentage points, respectively. Mercedes's races finished percentages dropped by 6.5 percentage points, and experience 6.8% of their races ending in a collision. Red Bull and Mercedes both saw an increase in the number of collisions that ended their races, often with each other. 
-
 <br />
-
-```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
-
-## ferrari
-ferrari_status_2021 <- df2 %>% 
-  filter(name.x == "Ferrari", year == 2021) %>%
-  na.omit() %>%
-  group_by(name.x, status) %>%
-  summarize(status_count = n()) 
-
-## compute position of labels
-ferrari_status_2021 <- ferrari_status_2021 %>% 
-  arrange(desc(status_count)) %>%
-  mutate(prop = status_count / sum(ferrari_status_2021$status_count) *100) %>%
-  mutate(ypos = cumsum(prop)- 0.5*prop )
-
-## red bull
-rb_status_2021 <- df2 %>% 
-  filter(name.x == "Red Bull", year == 2021) %>%
-  na.omit() %>%
-  group_by(name.x, status) %>%
-  summarize(status_count = n()) 
-
-## compute position of labels
-rb_status_2021 <- rb_status_2021 %>% 
-  arrange(desc(status_count)) %>%
-  mutate(prop = status_count / sum(rb_status_2021$status_count) *100) %>%
-  mutate(ypos = cumsum(prop)- 0.5*prop )
-
-## mercedes
-merc_status_2021 <- df2 %>% 
-  filter(name.x == "Mercedes", year == 2021) %>%
-  na.omit() %>%
-  group_by(name.x, status) %>%
-  summarize(status_count = n()) 
-
-## compute position of labels
-merc_status_2021 <- merc_status_2021 %>% 
-  arrange(desc(status_count)) %>%
-  mutate(prop = status_count / sum(merc_status_2021$status_count) *100) %>%
-  mutate(ypos = cumsum(prop)- 0.5*prop )
-
-## mcclaren
-mcl_status_2021 <- df2 %>% 
-  filter(name.x == "McLaren", year == 2021) %>%
-  na.omit() %>%
-  group_by(name.x, status) %>%
-  summarize(status_count = n()) 
-
-## compute position of labels
-mcl_status_2021 <- mcl_status_2021 %>% 
-  arrange(desc(status_count)) %>%
-  mutate(prop = status_count / sum(mcl_status_2021$status_count) *100) %>%
-  mutate(ypos = cumsum(prop)- 0.5*prop )
-
-pie21 <- plot_ly(labels = ~status, values = ~prop,
-                textposition = 'inside',textinfo = 'label+percent') %>% 
-  add_pie(data = ferrari_status_2021, name = "Ferrari", marker = list(colors = c("#1BBC00", "#ADADAD",
-                                                                                 "#47ABFF", "#FF0000")),
-          domain = list(row = 0, column = 0),
-          hovertemplate = paste("<b>Status</b>:", ferrari_status_2021$status, "<br>",
-                                "<b>Status Percentage</b>:", ferrari_status_2021$prop, "<br>")) %>%
-  add_pie(data = rb_status_2021, name = "Red Bull", marker = list(colors = c("#1BBC00", "#FF0000",
-                                                                            "#ADADAD", "#000000",
-                                                                             "#47ABFF")),
-          domain = list(row = 0, column = 1),
-          hovertemplate = paste("<b>Status</b>:", rb_status_2021$status, "<br>",
-                                "<b>Status Percentage</b>:", rb_status_2021$prop, "<br>"))%>%
-  add_pie(data = merc_status_2021, name = "Mercedes", marker = list(colors = c("#1BBC00", "#FF0000",
-                                                                                 "#47ABFF", "#ADADAD")),
-          domain = list(row = 1, column = 0),
-          hovertemplate = paste("<b>Status</b>:", merc_status_2021$status, "<br>",
-                                "<b>Status Percentage</b>:", merc_status_2021$prop, "<br>"))%>%
-  add_pie(data = mcl_status_2021, name = "McLaren", marker = list(colors = c("#1BBC00", "#ADADAD",
-                                                                             "#47ABFF","#FF0000")),
-          domain = list(row = 1, column = 1),
-          hovertemplate = paste("<b>Status</b>:", mcl_status_2021$status, "<br>",
-                                "<b>Status Percentage</b>:", mcl_status_2021$prop, "<br>")) %>% 
-  layout(title = '2021 Constructor Statuses', showlegend = T, grid=list(rows=2, columns=2),
-         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-         annotations = list(x = c(.004, .55, .0002, .55),
-                            y = c(.78, .78, .22, .22),
-                            text = c("Ferrari","Red Bull","Mercedes","McLaren"),
-                            xref = "papper",
-                            yref = "papper",
-                            showarrow = F
-                          )
-         )
-pie21
+<div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;background-color:white;">
+  <div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;background-color:white;">
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE, fig.width=4.6, fig.height=4}
+status_19_plotly
 ```
-
+  </div>
+  <div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;width:3px;background-color:white;">
+   &nbsp;
+  </div>
+  <div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;background-color:white;">
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE, fig.width=4.6, fig.height=4}
+status_21_plotly
+```
+  </div>
+ </div>
+<div style="clear:left;"></div>
 <br />
 
 #### Incidents
