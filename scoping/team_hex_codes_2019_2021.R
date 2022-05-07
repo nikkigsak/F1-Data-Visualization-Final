@@ -1,5 +1,4 @@
 ## Original Colors
-# 2019
 
 "Alfa Romeo" = "#B12039",
 "AlphaTauri" = "#4E7C9B",
