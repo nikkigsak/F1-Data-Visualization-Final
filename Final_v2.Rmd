@@ -26,7 +26,6 @@ library(maps)
 #  select dropdown
 # devtools::install_version(“crosstalk”, version = “1.1.1”)
 library(crosstalk)
-library(vembedr)
 library(tidyr)
 library(networkD3)
 library(plotly)
@@ -224,10 +223,10 @@ The aim of Formula One drivers and teams are to compete at the highest level and
 
 Formula One is perhaps best explained by the drivers in the sport:
 
-```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
-embed_url("https://www.youtube.com/watch?v=twAlqtvVMdc")
-```
-
+<div style="display:block;float:left;border-style:solid;border-width:0px;background-color:black;width:520px;height:276px;">
+<a target="_blank" href="https://www.youtube.com/watch?v=twAlqtvVMdc"><img style="cursor:hand;" src="images/f1_drivers_sign.png" /></a>
+</div>
+<div style="clear:left;"></div>
 <br />
 
 ### Where do Formula One races take place? 
