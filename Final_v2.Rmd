@@ -31,6 +31,8 @@ library(tidyr)
 library(networkD3)
 library(plotly)
 library(lubridate)
+#knitr::opts_chunk$set(fig.width=unit(9,"cm"), fig.height=unit(11,"cm"))
+#https://sebastiansauer.github.io/figure_sizing_knitr/
 ```
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
@@ -400,29 +402,50 @@ In the 2019 season, Lewis Hamilton (solid teal line), driving in his sixth year 
 
 In the 2021 Season, Hamilton's dominance was matched and eventually surpassed by young driver, Max Verstappen of Red Bull. The two drivers immediately set themselves as the best of the best, earning enough points to isolate themselves from the rest of the drivers almost immediately as the season began. Valteri Bottas of Mercedes and Sergio "Checo" Perez of Red Bull are the third and fourth-place finishers in the Driver's Championship, establishing the dominance of Mercedes and Red Bull during the 2021 F1 season. 
 
-Double click on each driver's legend entry to isolate their points accumulation over the course of each season. Double-click to set the graph back to its default. 
+Double click on each driver's legend entry to isolate their points accumulation over the course of each season. Double-click to set the graph back to its default.
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 
-points_2021 <- ggplot(races2021, aes(x=date,y=points,group=full_name,color=full_name, linetype=full_name, text=paste("<b>Driver:</b> ",full_name,"<br><b>Team: </b>",constructor_name,"<br><b>Points: ",points))) + geom_point() + geom_smooth(se=FALSE) + coord_flip() + 
+points_2021 <- ggplot(races2021, aes(x=date,y=points,group=full_name,color=full_name, linetype=full_name, text=paste("<b>Driver:</b> ",full_name,"<br><b>Team: </b>",constructor_name,"<br><b>Points: ",points))) +
+  geom_point() +
+  geom_smooth(se=FALSE) +
+  coord_flip() + 
   ggtitle("2021") + 
   scale_linetype_manual(values=xover_2021$line_type, name="full_name") + 
   scale_color_manual(values=xover_2021$colorcol, name="full_name") + 
   theme_classic()
 
-points_2019 <- ggplot(races2019, aes(x=date,y=points,group=full_name,color=full_name, linetype=full_name,text=paste("<b>Driver:</b> ",full_name,"<br><b>Team: </b>",constructor_name,"<br><b>Points: ",points))) + geom_point() + geom_smooth(se=FALSE) + coord_flip() + 
+points_2019 <- ggplot(races2019, aes(x=date,y=points,group=full_name,color=full_name, linetype=full_name,text=paste("<b>Driver:</b> ",full_name,"<br><b>Team: </b>",constructor_name,"<br><b>Points: ",points))) +
+  geom_point() +
+  geom_smooth(se=FALSE) +
+  coord_flip() + 
   ggtitle("2019") + 
   scale_linetype_manual(values=xover_2019$line_type, name="full_name") + 
   scale_color_manual(values=xover_2019$colorcol, name="full_name") + theme_classic() + 
   labs (x = "Date", y = "Total Points") +
   guides(linetype=guide_legend(ncol=2, byrow=FALSE))
 
-ggplotly(points_2019, tooltip="text")
+points_2019_chart <- ggplotly(points_2019, tooltip="text")
 
-ggplotly(points_2021, tooltip="text")
-
+points_2021_chart <- ggplotly(points_2021, tooltip="text")
 ```
-
+<br />
+<div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;background-color:white;">
+  <div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;background-color:white;">
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE, fig.width=4.6, fig.height=4}
+points_2019_chart
+```
+  </div>
+  <div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;width:3px;background-color:white;">
+   &nbsp;
+  </div>
+  <div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;background-color:white;">
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE, fig.width=4.6, fig.height=4}
+points_2021_chart
+```
+  </div>
+ </div>
+<div style="clear:left;"></div>
 <br />
 
 ### Drivers by Standing during the Season
