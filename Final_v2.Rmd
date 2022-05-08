@@ -330,6 +330,7 @@ drivers_df <- drivers_df %>%
   dplyr::select(firstname, lastname, world_ranking, birth_date,
    driver_number, nationality, information
   ) %>%
+
   mutate(lastname = if_else(lastname == "RÃ¤ikkÃ¶nen", "Raikkonen", lastname),
     lastname = if_else(lastname == "HÃ¼lkenberg", "Hulkenberg", lastname),
     lastname = if_else(lastname == "PÃ©rez", "Sergio Perez", lastname)
