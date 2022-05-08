@@ -333,7 +333,7 @@ drivers_df <- drivers_df %>%
 
   mutate(lastname = if_else(lastname == "RÃ¤ikkÃ¶nen", "Raikkonen", lastname),
     lastname = if_else(lastname == "HÃ¼lkenberg", "Hulkenberg", lastname),
-    lastname = if_else(lastname == "PÃ©rez", "Sergio Perez", lastname)
+    lastname = if_else(lastname == "PÃ©rez", "Perez", lastname)
   ) %>%
   arrange(world_ranking, nationality, lastname, firstname,
    birth_date, driver_number
@@ -501,17 +501,33 @@ Double click on each driver's legend entry to isolate their points accumulation 
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 
-points_2021 <- ggplot(races2021, aes(x=date,y=points,group=full_name,color=full_name, linetype=full_name, text=paste("<b>Driver:</b> ",full_name,"<br><b>Team: </b>",constructor_name,"<br><b>Points: </b>",points))) + geom_point() + geom_smooth(se=FALSE) +
-  ggtitle("2021") + 
-  scale_linetype_manual(values=xover_2021$line_type, name="Full Name") + 
-  scale_color_manual(values=xover_2021$colorcol, name="Full Name") + 
-  theme_classic() + xlab("Date") + ylab("Point Total") + theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1))
+xlabs2021 <- races2021 %>% arrange(date) %>% distinct(date) %>% ungroup() %>% mutate(racenum=row_number())
+xlabs2019 <- races2019 %>% arrange(date) %>% distinct(date) %>% ungroup() %>% mutate(racenum=row_number())
 
-points_2019 <- ggplot(races2019, aes(x=date,y=points,group=full_name,color=full_name, linetype=full_name,text=paste("<b>Driver:</b> ",full_name,"<br><b>Team: </b>",constructor_name,"<br><b>Points: </b>",points))) + geom_point() + geom_smooth(se=FALSE) + 
+races2021 <- left_join(races2021, xlabs2021, by='date')
+races2019 <- left_join(races2019, xlabs2019, by='date')
+
+
+points_2021 <- ggplot(races2021, aes(x=racenum,y=points,group=full_name,color=full_name, linetype=full_name, text=paste("<b>Driver:</b> ",full_name,"<br><b>Team: </b>",constructor_name,"<br><b>Points: </b>",points,"<br><b>Race Date:</b> ",date,"<br><b>Race: </b>",name))) + geom_point() + geom_smooth(se=FALSE) +
+  ggtitle("2021") + 
+  scale_linetype_manual(values=xover_2021$line_type, name="full_name") + 
+  scale_color_manual(values=xover_2021$colorcol, name="full_name") + 
+  theme_classic() + xlab("Race Number") + ylab("Point Total") + theme(legend.title = element_blank(),
+                                                               legend.text = element_text(size=7),
+                                                               legend.margin = margin(c(0,0,0,0)),
+                                                               legend.spacing.x = unit(0, "mm"),
+                                                               legend.spacing.y = unit(0, "mm"))
+
+  
+points_2019 <- ggplot(races2019, aes(x=racenum,y=points,group=full_name,color=full_name, linetype=full_name, text=paste("<b>Driver:</b> ",full_name,"<br><b>Team: </b>",constructor_name,"<br><b>Points: </b>",points,"<br><b>Race Date:</b> ",date,"<br><b>Race: </b>",name))) + geom_point() + geom_smooth(se=FALSE) +
   ggtitle("2019") + 
-  scale_linetype_manual(values=xover_2019$line_type, name="Full Name") + 
-  scale_color_manual(values=xover_2019$colorcol, name="Full Name") + theme_classic() + 
-  labs (x = "Date", y = "Total Points") + xlab("Date") + ylab("Point Total") + theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1))
+  scale_linetype_manual(values=xover_2019$line_type, name="full_name") + 
+  scale_color_manual(values=xover_2019$colorcol, name="full_name") + 
+  theme_classic() + xlab("Race Number") + ylab("Point Total") + theme(legend.title = element_blank(),
+                                                               legend.text = element_text(size=7),
+                                                               legend.margin = margin(c(0,0,0,0)),
+                                                               legend.spacing.x = unit(0, "mm"),
+                                                               legend.spacing.y = unit(0, "mm"))
 
 points_2019_chart <- ggplotly(points_2019, tooltip="text")
 
@@ -549,11 +565,18 @@ Double click on each driver's legend entry to isolate their standings over the c
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 wins_2021 <- ggplot(races2021) + 
-  geom_line(aes(x=date,y=reorder(position,-position),group=full_name,color=full_name,linetype=full_name,text=paste("<b>Driver: </b>",full_name,"<br><b>Team:</b> ",constructor_name))) + scale_color_manual(values=xover_2021$colorcol, name = "Full Name")+ scale_linetype_manual(values=xover_2021$line_type, name = "Full Name") + ggtitle("2021") + theme_classic() + labs(x = "Date", y = "Position") +
-   theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1))
+  geom_line(aes(x=racenum,y=reorder(position,-position),group=full_name,color=full_name,linetype=full_name,text=paste("<b>Driver: </b>",full_name,"<br><b>Team:</b> ",constructor_name,"<br><b>Race Date:</b> ",date,"<br><b>Race: </b>",name))) + scale_color_manual(values=xover_2021$colorcol)+ scale_linetype_manual(values=xover_2021$line_type) + ggtitle("2021") + theme_classic() + labs(x = "Race Number", y = "Position") + theme(legend.title = element_blank(),
+         legend.text = element_text(size=7),
+         legend.margin = margin(c(0,0,0,0)),
+         legend.spacing.x = unit(0, "mm"),
+         legend.spacing.y = unit(0, "mm"))
 
 wins_2019 <- ggplot(races2019) + 
-  geom_line(aes(x=date,y=reorder(position,-position),group=full_name,color=full_name,linetype=full_name,text=paste("<b>Driver: </b>",full_name,"<br><b>Team:</b> ",constructor_name))) + scale_color_manual(values=xover_2019$colorcol, name = "Full Name")+ scale_linetype_manual(values=xover_2019$line_type, name = "Full Name") + ggtitle("2019") + theme_classic() + labs(x = "Date", y = "Position") + guides(color=guide_legend(ncol=2)) + theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1))
+  geom_line(aes(x=racenum,y=reorder(position,-position),group=full_name,color=full_name,linetype=full_name,text=paste("<b>Driver: </b>",full_name,"<br><b>Team:</b> ",constructor_name,"<br><b>Race Date:</b> ",date,"<br><b>Race: </b>",name))) + scale_color_manual(values=xover_2019$colorcol)+ scale_linetype_manual(values=xover_2019$line_type) + ggtitle("2019") + theme_classic() + labs(x = "Race Number", y = "Position") + guides(color=guide_legend(ncol=2)) + theme(legend.title = element_blank(),
+         legend.text = element_text(size=7),
+         legend.margin = margin(c(0,0,0,0)),
+         legend.spacing.x = unit(0, "mm"),
+         legend.spacing.y = unit(0, "mm"))
 
 ggplotly(wins_2019, tooltip = "text")
 
