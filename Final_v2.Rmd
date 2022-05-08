@@ -515,7 +515,7 @@ ggplot(data = age_distrib_df) +
   ) +
   annotate("text",
     x = "(30,33]", y = 0.26,
-    label="Max Verstappen (1st place, Age 33)", color = "#000000", size = 3
+    label="Max Verstappen (1st place, Age 24)", color = "#000000", size = 3
   ) +
   geom_segment(
     aes(xend = "(36,39]", yend = 0.05, x = "(30,33]", y = 0.18),
