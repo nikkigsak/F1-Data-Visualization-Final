@@ -460,6 +460,8 @@ driver_nationalities_bottom_chart
 
 This chart gives the distribution of drivers by age that are currently active. These drivers range in age, with rookies in their early twenties and veteran drivers in the late thirties or early forties. The 2021 Driver's Champion, Max Verstappen, made his Formula One debut in 2015 at age seventeen years and three days, the youngest driver debut of all time.
 
+<br/>
+
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE, fig.width=5.5, fig.height=4}
 age_distrib_df <- races2021 %>%
   select(driverId)
@@ -499,7 +501,7 @@ ggplot(data = age_distrib_df) +
     show.legend = FALSE
   ) +
   scale_y_continuous(labels = scales::percent) + 
-  ggtitle("Ages") +
+  ggtitle("Age Distribution - 2021 Active Drivers") +
   xlab("Ages") +
   ylab("Drivers (%)") +
   theme_bw(16) +
