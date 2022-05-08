@@ -889,7 +889,8 @@ incidents_by_circuit %>%
   layout(title = 'Incidents by Constructor',
          xaxis = list(title = '<br><br><br>Constructor'), 
          yaxis = list(title = 'Count of Accidents ors Collisions'),
-         barmode = 'group')
+         barmode = 'group',
+         showlegend = FALSE)
 ```
 
 
