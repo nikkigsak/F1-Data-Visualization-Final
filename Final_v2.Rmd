@@ -578,12 +578,28 @@ wins_2019 <- ggplot(races2019) +
          legend.spacing.x = unit(0, "mm"),
          legend.spacing.y = unit(0, "mm"))
 
-ggplotly(wins_2019, tooltip = "text")
+wins_2019_chart <- ggplotly(wins_2019, tooltip = "text")
 
-ggplotly(wins_2021, tooltip = "text")
+wins_2021_chart <- ggplotly(wins_2021, tooltip = "text")
 
 ```
-
+<br />
+<div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;background-color:white;">
+  <div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;background-color:white;">
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE, fig.width=4.6, fig.height=4}
+wins_2019_chart
+```
+  </div>
+  <div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;width:3px;background-color:white;">
+   &nbsp;
+  </div>
+  <div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;background-color:white;">
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE, fig.width=4.6, fig.height=4}
+wins_2021_chart
+```
+  </div>
+ </div>
+<div style="clear:left;"></div>
 <br />
 
 ## Constructor Wins and Points
