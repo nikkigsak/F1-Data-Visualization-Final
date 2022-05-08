@@ -145,33 +145,74 @@ mv_2021 <- sankeyNetwork(Links = links_driver_mv_21, Nodes = nodes1, Source = "s
 
 
 Lewis Hamilton Sankey Diagram 2019 and 2021
-```{r}
-links_driver_lh_19 <- links_driver_2019 %>% filter(full_name == "Lewis Hamilton")
-links_driver_lh_19 <- as.data.frame(links_driver_lh_19)
+
+#### How often do the top two drivers convert their Qualifying positions to Wins?
+
+One way to gauge how successful the top two drivers are is how often they are able to convert their pole positions into a win. Both Hamilton and Verstappen are exceptional drivers, but in 2019 did not qualify well, Hamilton only earning five pole positions and Max Verstappen earning two pole positions. Hamilton was able to convert three of the five pole positions he earned to a race victory, securing his other eight victories outside of pole position. Max Verstappen converted only one of his two pole positions into race victories, earning two race wins outside of poll position. 
+
+This sankey diagram shows in the 2019 season, which final race position Lewis Hamilton and Max Verstappen end up in after starting in pole. The teal represents a Mercedes driver, Lewis Hamilton, while the darker blue represents a Red Bull driver, Max Verstappen. 
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+links_driver_lhmv_2019 <- 
+  links_driver_2019 %>% 
+  filter(full_name == "Lewis Hamilton" | full_name == "Max Verstappen") %>%
+  filter(source == 1)
+  
+
+links_driver_lhmv_2019 <- as.data.frame(links_driver_lhmv_2019)
 
 
-my_color_0 <- 
-  'd3.scaleOrdinal() .domain(["Lewis Hamilton"]) .range(["#6CD3BF"])'
+nodes19 <- c("0","1","2","3","4","5","6","7","8","9")
 
-# 2019 Lewis Hamilton
-lh_2019 <- sankeyNetwork(Links = links_driver_lh_19, Nodes = nodes1, Source = "source",
-              Target = "target", Value = "value", 
-              NodeID = "nodes1", colourScale=my_color_0, LinkGroup = "full_name",
-              NodeGroup = NULL)
+nodes19 <- as.data.frame(nodes19)
 
-links_driver_lh_21 <- links_driver_2021 %>% filter(full_name == "Lewis Hamilton")
-links_driver_lh_21 <- as.data.frame(links_driver_lh_21)
 
-# 2021 Lewis Hamilton
-lh_2021 <- sankeyNetwork(Links = links_driver_lh_21, Nodes = nodes1, Source = "source",
-              Target = "target", Value = "value", 
-              NodeID = "nodes1", colourScale=my_color_0, LinkGroup = "full_name",
-              NodeGroup = NULL)
 
+
+my_color <-
+  'd3.scaleOrdinal() .domain(["Lewis Hamilton", "Max Verstappen"]) .range(["#6CD3BF", "#1E41FF"])'
+
+sankeyNetwork(Links = links_driver_lhmv_2019, Nodes = nodes19, Source = "source",
+              Target = "target", Value = "value",
+              NodeID = "nodes19", fontSize= 25, nodeWidth = 20,
+              colourScale=my_color, LinkGroup="full_name",
+              NodeGroup=NULL)
 ```
 
 
+In the 2021 season, Max Verstappen surged in his qualifying skills, earning ten pole positions to Lewis Hamilton's five pole positions. Max was able to convert seven of his pole positions to a victory, earning three race wins outside of pole position, while Lewis Hamilton converted three of his pole positions to a victory, earning five race wins outside of pole.
+
+This sankey diagram shows  which final race position Lewis Hamilton and Max Verstappen end up in after starting in pole during the 2021 season. 
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+
+links_driver_lhmv_2021 <- 
+  links_driver_2021 %>% 
+  filter(full_name == "Lewis Hamilton" | full_name == "Max Verstappen")  %>%
+  filter(source == 1)
+
+links_driver_lhmv_2021 <- as.data.frame(links_driver_lhmv_2021)
+
+nodes21 <- c("0","1","2","3","4","5")
+
+nodes21 <- as.data.frame(nodes21)
+
+my_color <-
+  'd3.scaleOrdinal() .domain(["Lewis Hamilton", "Max Verstappen"]) .range(["#6CD3BF", "#1E41FF"])'
+
+sankeyNetwork(Links = links_driver_lhmv_2021, Nodes = nodes21, Source = "source",
+              Target = "target", Value = "value",
+              NodeID = "nodes21", fontSize= 25, nodeWidth = 20, 
+              colourScale=my_color, LinkGroup = "full_name",
+              NodeGroup = NULL)
+
+
 Both Max Verstappen and Lewis Hamilton Sankey Diagram
+```
+
+
+
+
 ```{r}
 links_driver_lhmv_2019 <- 
   links_driver_2019 %>% 
