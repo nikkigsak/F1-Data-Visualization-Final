@@ -513,14 +513,14 @@ wins_plotly <- wins_df %>%
   group_by(name) %>%
    summarize(year_2019 = max(col_sum_2019),
             year_2021 = max(col_sum_2021)) %>%
-  arrange(desc(year_2019, year_2021)) %>%
+  arrange(desc(year_2019), desc(year_2021)) %>%
   filter(year_2019 != 0 | year_2021 != 0) %>%
   plot_ly(type = "bar", name = '2019',
           x = ~name, 
           y = ~year_2019,
           marker = list(color =  c("Mercedes" = "#6CD3BF",
-                                   "Ferrari" = "#ED1C24",
                                    "Red Bull" = "#1E5BC6",
+                                   "Ferrari" = "#ED1C24",
                                    "Alpine F1 Team" = "#2293D1",
                                    "McLaren" = "#F58020"
                                   )),
@@ -530,8 +530,8 @@ wins_plotly <- wins_df %>%
           showlegend = F) %>%
   add_trace(y = ~year_2021, name = '2021', 
             marker = list(color = c("Mercedes" = "#A6E4D8",
-                                    "Ferrari" = "#F4767B",
                                     "Red Bull" = "#789CDC",
+                                    "Ferrari" = "#F4767B",
                                     "Alpine F1 Team" = "#7ABEE3",
                                     "Mclaren" =  "#F9B279"
                                    )
@@ -570,7 +570,7 @@ points_plotly <- points_df %>%
   group_by(name) %>%
    summarize(year_2019 = max(col_sum_2019),
             year_2021 = max(col_sum_2021)) %>%
-  arrange(desc(year_2019, year_2021)) %>%
+  arrange(desc(year_2019), desc(year_2021)) %>%
   filter(year_2019 != 0 | year_2021 != 0) %>%
   plot_ly(type = "bar", name = '2019',
           x = ~name, 
@@ -628,8 +628,9 @@ points_plotly
 
 Formula One drivers, on average, are driving 160 miles per hour (260 kilometers per hour). Highly competitive races and high speeds often mean that lesser capable drivers, or lesser capable cars do not finish races.
 
-These visualizations show the finishing percentage of the top four constructors: Mercedes, Red Bull Racing, Ferrari, and McLaren Racing. In 2019, Mercedes finished over 90% of their races and got through the entire 2019 season without a single collision. These statistics are not replicated by their top four counterparts, with McLaren experiencing a higher number of DNF ("Did Not Finish") statuses and "Car Failures". 
-During the 2021 Season, Red Bull and McLaren increased their races finished percentages by 3.2 percentage points and 20.7 percentage points, respectively. Mercedes's races finished percentages dropped by 6.5 percentage points, and experience 6.8% of their races ending in a collision. Red Bull and Mercedes both saw an increase in the number of collisions that ended their races, often with each other. 
+These visualizations show the finishing statuses of seven constructors from both 2019 and 2021. In 2019, Mercedes finished 39 races (over 90% of their races) and got through the entire 2019 season without a single collision. These statistics are not replicated by their top four counterparts, with McLaren experiencing a higher number of DNF ("Did Not Finish") statuses and "Car Failures". 
+
+During the 2021 Season, Red Bull and McLaren increased their races finished by 3 races (33 to 36) and 10 races (18 to 28), respectively. Mercedes ended the 2021 season with 1 less finished race in comparison to 2019, and 3 of their races ending in a collision. Red Bull and Mercedes both saw an increase in the number of collisions that ended their races, often with each other. 
 
 <br />
 
@@ -645,6 +646,9 @@ df2 <- subset(df2, select = c(resultId, raceId, driverId, constructorId,
 ## season 19 status 
 status_19 <- df2 %>% 
   filter(year == 2019) %>%
+  filter(name.x != "Toro Rosso") %>%
+  filter(name.x != "Renault") %>%
+  filter(name.x != "Racing Point") %>%
   group_by(name.x, status) %>%
   summarize(status_count = n()) 
 
@@ -653,6 +657,7 @@ status_19_plot <- ggplot(status_19, aes(x = name.x, y = status_count, fill = sta
                                         text = paste("<b>Constructor</b>:", status_19$name.x, "<br>",
                                  "<b>Status Count</b>:", status_19$status_count, "<br>",
                                  "<b>Status</b>:", status_19$status, "<br>"))) +
+  theme(legend.position="none") +
   geom_col() +
   coord_flip() +
   scale_fill_manual(values = c("Accident" = "#000000",
@@ -668,6 +673,9 @@ status_19_plotly <- ggplotly(status_19_plot, tooltip = "text")
 ## season 21 status
 status_21 <- df2 %>% 
   filter(year == 2021) %>%
+  filter(name.x != "Aston Martin") %>%
+  filter(name.x != "Alpine F1 Team") %>%
+  filter(name.x != "AlphaTauri") %>%
   group_by(name.x, status) %>%
   summarize(status_count = n()) 
 
@@ -676,7 +684,6 @@ status_21_plot <- ggplot(status_21, aes(x = name.x, y = status_count, fill = sta
                                             text = paste("<b>Constructor</b>:", status_21$name.x, "<br>",
                                  "<b>Status Count</b>:", status_21$status_count, "<br>",
                                  "<b>Status</b>:", status_21$status, "<br>"))) +
-  theme(legend.position="none") +
   geom_col() +
   coord_flip() + 
   scale_fill_manual(values = c("Accident" = "#000000",
