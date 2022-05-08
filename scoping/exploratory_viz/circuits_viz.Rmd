@@ -150,66 +150,160 @@ Lewis Hamilton Sankey Diagram 2019 and 2021
 
 One way to gauge how successful the top two drivers are is how often they are able to convert their pole positions into a win. Both Hamilton and Verstappen are exceptional drivers, but in 2019 did not qualify well, Hamilton only earning five pole positions and Max Verstappen earning two pole positions. Hamilton was able to convert three of the five pole positions he earned to a race victory, securing his other eight victories outside of pole position. Max Verstappen converted only one of his two pole positions into race victories, earning two race wins outside of poll position. 
 
-This sankey diagram shows in the 2019 season, which final race position Lewis Hamilton and Max Verstappen end up in after starting in pole. The teal represents a Mercedes driver, Lewis Hamilton, while the darker blue represents a Red Bull driver, Max Verstappen. 
+These Sankey diagrams show how these two drivers have fared in qualifying (indicated by a Q) and as a result, in final race position (indicated by a P). The teal represents Mercedes driver, Lewis Hamilton, while the darker blue represents Red Bull driver, Max Verstappen. 
+
+In the 2019 season (left), Hamilton only won the final race from pole position three times, but was able to convert qualifying in second place (Q2) to a final position (P1) of five times. This increased his points winning and his ability to convert his place in qualifying to an overall race victory. Verstappen only converted a single first qualifying position (Q1) to a race victory (P1) and a single second qualifying position (Q2) to a race victory (P1). This severely impacted Verstappen's points earnings.
+
+In the 2021 season (right), Max Verstappen surged in his qualifying skills, converting seven pole positions (Q1) to race victories (P1), while Lewis Hamilton was only able to convert five pole positions (Q1) to race victories (P1). 
+
+How to use this graph:
+* The qualifying positions for drivers are indicated by a "Q" before their qualifying position. *eg. "Q1" means that the driver qualified first*  
+* The final race positions for drivers are indicated by a "P" before their final position. *e.g. "P2" means that the driver finished the race second*  
+* Hover over the grey bars to highlight the different paths the drivers took from qualifying to their final position.  
+* The numbers in the middle indicate the number of times the driver went from the qualifying position to the final position.  
+<br />
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 links_driver_lhmv_2019 <- 
   links_driver_2019 %>% 
-  filter(full_name == "Lewis Hamilton" | full_name == "Max Verstappen") %>%
-  filter(source == 1)
+  filter(full_name == "Lewis Hamilton" | full_name == "Max Verstappen")
+# %>%
+  # filter(source == 1)
   
 
 links_driver_lhmv_2019 <- as.data.frame(links_driver_lhmv_2019)
 
+# A connection data frame is a list of flows with intensity for each flow
+links_2019 <- data.frame(
+  driver=c(rep("L. Hamilton", 14), rep("M. Verstappen", 16)),
+  source=c("Q1", "Q2", "Q3", "Q4", "Q1", "Q2", "Q3", "Q5", 
+           "Q2", "Q4", "Q2", "Q2", "Q3", "Q1", "Q1", "Q2", 
+           "Q3", "Q1", "Q3", "Q3", "Q4", "Q3", "Q4", "Q5", 
+           "Q4", "Q11", "Q1", "Q20", "Q5", "Q5"),
+  target=c("P1","P1","P1","P1","P2","P2","P2","P2","P3",
+           "P3","P4","P5","P7","P9","P1","P1","P1","P2",
+           "P2","P3","P3","P4","P4","P4","P5","P5","P6",
+           "P8","P18","P20"),
+  value=c(3,5,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,1,3,2,1,1,1,1,1,1),
+  IDsource=c(0,1,2,3,0,1,2,4,1,3,1,1,2,0,0,1,2,0,2,2,3,2,3,4,3,5,0,6,4,4),
+  IDtarget=c(7,7,7,7,8,8,8,8,9,9,10,11,12,13,7,7,7,8,8,9,9,10,10,10,11,11,14,15,16,17)
+)
 
-nodes19 <- c("0","1","2","3","4","5","6","7","8","9")
+# From these flows we need to create a node data frame: it lists every entities involved in the flow
+nodes_2019 <- data.frame(
+  name = unique(c(as.character(links_2019$source), as.character(links_2019$target)))
+)
 
-nodes19 <- as.data.frame(nodes19)
-
-
-
-
-my_color <-
+my_color_2019 <-
   'd3.scaleOrdinal() .domain(["Lewis Hamilton", "Max Verstappen"]) .range(["#6CD3BF", "#1E41FF"])'
 
-sankeyNetwork(Links = links_driver_lhmv_2019, Nodes = nodes19, Source = "source",
-              Target = "target", Value = "value",
-              NodeID = "nodes19", fontSize= 25, nodeWidth = 20,
-              colourScale=my_color, LinkGroup="full_name",
-              NodeGroup=NULL)
-```
 
+# Make the Network
+p2019 <- sankeyNetwork(Links = links_2019, Nodes = nodes_2019,
+                   Source = "IDsource", Target = "IDtarget",
+                   Value = "value", NodeID = "name", fontSize = 15,
+                   nodeWidth = 20, colourScale=my_color_2019, LinkGroup="driver",
+                   NodeGroup=NULL)
 
-In the 2021 season, Max Verstappen surged in his qualifying skills, earning ten pole positions to Lewis Hamilton's five pole positions. Max was able to convert seven of his pole positions to a victory, earning three race wins outside of pole position, while Lewis Hamilton converted three of his pole positions to a victory, earning five race wins outside of pole.
-
-This sankey diagram shows  which final race position Lewis Hamilton and Max Verstappen end up in after starting in pole during the 2021 season. 
-
-```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 
 links_driver_lhmv_2021 <- 
   links_driver_2021 %>% 
-  filter(full_name == "Lewis Hamilton" | full_name == "Max Verstappen")  %>%
-  filter(source == 1)
+  filter(full_name == "Lewis Hamilton" | full_name == "Max Verstappen")
+  
 
 links_driver_lhmv_2021 <- as.data.frame(links_driver_lhmv_2021)
 
-nodes21 <- c("0","1","2","3","4","5")
+# A connection data frame is a list of flows with intensity for each flow
+links_2021 <- data.frame(
+  driver=c(rep("L. Hamilton", 12), rep("M. Verstappen", 10)),
+  source=c("Q1","Q2","Q4","Q1","Q2","Q3","Q3","Q4","Q1","Q7",
+           "Q2","Q2","Q1","Q2","Q3","Q1","Q2","Q3","Q20","Q3",
+           "Q3","Q2"),
+  target=c("P1","P1","P1","P2","P2","P2","P3","P4","P5","P7",
+           "P15","P17","P1","P1","P1","P2","P2","P2","P2",
+           "P9","P18","P20"),
+  value=c(5, 2, 1, 2, 5, 1, 1, 1, 1, 1, 1, 1, 7, 1, 2, 1, 3, 3, 1, 1, 2, 1),
+  IDsource=c(0, 1, 2, 0, 1, 3, 3, 2, 0, 4, 1, 1, 0, 1, 3, 0, 1, 3, 5, 3, 3, 1),
+  IDtarget=c(6, 6, 6, 7, 7, 7, 8, 9, 10, 11, 12, 13, 6, 6, 6, 7, 7, 7, 7, 14, 15, 16)
+)
 
-nodes21 <- as.data.frame(nodes21)
+# From these flows we need to create a node data frame: it lists every entities involved in the flow
+nodes_2021 <- data.frame(
+  name = unique(c(as.character(links_2021$source), as.character(links_2021$target)))
+)
 
-my_color <-
-  'd3.scaleOrdinal() .domain(["Lewis Hamilton", "Max Verstappen"]) .range(["#6CD3BF", "#1E41FF"])'
-
-sankeyNetwork(Links = links_driver_lhmv_2021, Nodes = nodes21, Source = "source",
-              Target = "target", Value = "value",
-              NodeID = "nodes21", fontSize= 25, nodeWidth = 20, 
-              colourScale=my_color, LinkGroup = "full_name",
-              NodeGroup = NULL)
+my_color_2021 <-
+  'd3.scaleOrdinal() .domain(["L. Hamilton", "M. Verstappen"]) .range(["#6CD3BF", "#1E41FF"])'
 
 
-Both Max Verstappen and Lewis Hamilton Sankey Diagram
+# Make the Network
+p2021 <- sankeyNetwork(Links = links_2021, Nodes = nodes_2021,
+                   Source = "IDsource", Target = "IDtarget",
+                   Value = "value", NodeID = "name", fontSize = 15,
+                   nodeWidth = 20, colourScale=my_color_2021, LinkGroup="driver",
+                   NodeGroup=NULL)
 ```
+<br />
+<div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;background-color:white;">
+  <div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;background-color:white;">
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 
+htmlwidgets::onRender(p2019, '
+  function(el) { 
+    var nodeWidth = this.sankey.nodeWidth();
+    var links = this.sankey.links();
+        
+    links.forEach((d, i) => {
+      var startX = d.source.x + nodeWidth;
+      var endX = d.target.x;
+      
+      var startY = d.source.y + d.sy + d.dy / 2;
+      var endY = d.target.y + d.ty + d.dy / 2;
+      
+      d3.select(el).select("svg g")
+        .append("text")
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "middle")
+        .attr("x", startX + ((endX - startX) / 2))
+        .attr("y", startY + ((endY - startY) / 2))
+        .text(d.value);
+    })
+  }
+')
+```
+  </div>
+  <div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;width:3px;background-color:white;">
+   &nbsp;
+  </div>
+  <div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;background-color:white;">
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+htmlwidgets::onRender(p2021, '
+  function(el) { 
+    var nodeWidth = this.sankey.nodeWidth();
+    var links = this.sankey.links();
+        
+    links.forEach((d, i) => {
+      var startX = d.source.x + nodeWidth;
+      var endX = d.target.x;
+      
+      var startY = d.source.y + d.sy + d.dy / 2;
+      var endY = d.target.y + d.ty + d.dy / 2;
+      
+      d3.select(el).select("svg g")
+        .append("text")
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "middle")
+        .attr("x", startX + ((endX - startX) / 2))
+        .attr("y", startY + ((endY - startY) / 2))
+        .text(d.value);
+    })
+  }
+')
+```
+  </div>
+ </div>
+<div style="clear:left;"></div>
+<br />
 
 
 
