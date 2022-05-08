@@ -327,13 +327,12 @@ drivers_df <- drivers_df %>%
   mutate(information = paste("<a target='_blank' href='", url,"'>link</a>")) %>%
   mutate(driver_number = number, world_ranking = position) %>%
   mutate(firstname = forename, lastname = surname, birth_date = dob) %>%
-  dplyr::select(firstname, lastname, world_ranking, birth_date,
+  dplyr::select(driverId, firstname, lastname, world_ranking, birth_date,
    driver_number, nationality, information
   ) %>%
-
   mutate(lastname = if_else(lastname == "RÃ¤ikkÃ¶nen", "Raikkonen", lastname),
     lastname = if_else(lastname == "HÃ¼lkenberg", "Hulkenberg", lastname),
-    lastname = if_else(lastname == "PÃ©rez", "Perez", lastname)
+    lastname = if_else(lastname == "PÃ©rez", "Sergio Perez", lastname)
   ) %>%
   arrange(world_ranking, nationality, lastname, firstname,
    birth_date, driver_number
@@ -342,6 +341,9 @@ drivers_df <- drivers_df %>%
 #View(drivers_df)
 
 drivers_table_df <- drivers_df %>%
+  dplyr::select(firstname, lastname, world_ranking, birth_date,
+   driver_number, nationality, information
+  ) %>%
   rename(
     "First Name" = firstname,
     "Last Name" = lastname,
@@ -395,7 +397,7 @@ driver_nationalities_bottom_df <- driver_nationalities_df %>%
 
 #View(driver_nationalities_top_df)
 
-theme_set(theme_bw(16))
+#theme_set(theme_bw(16))
 
 driver_nationalities_top_chart <- ggplot(data = driver_nationalities_top_df) +
   geom_bar(
@@ -409,6 +411,7 @@ driver_nationalities_top_chart <- ggplot(data = driver_nationalities_top_df) +
   ggtitle("Top 10 Nationalities with Most Drivers") +
   xlab(NULL) +
   ylab(NULL) +
+  theme_bw(16) +
   theme(
     plot.title=element_text(hjust = 0.5, size = 12),
     axis.text = element_text(size = 9),
@@ -427,6 +430,7 @@ driver_nationalities_bottom_chart <- ggplot(data = driver_nationalities_bottom_d
   ggtitle("Top 10 Nationalities with Least Drivers") +
   xlab(NULL) +
   ylab(NULL) +
+  theme_bw(16) +
   theme(
     plot.title=element_text(hjust = 0.5, size = 12),
     axis.text = element_text(size = 9),
@@ -452,9 +456,62 @@ driver_nationalities_bottom_chart
 <div style="clear:left;"></div>
 <br />
 
-#### Ages of Drivers
+#### Ages of 2021 Active Drivers
 
 This chart gives the distribution of drivers by age that are currently active. These drivers range in age, with rookies in their early twenties and veteran drivers in the late thirties or early forties. The 2021 Driver's Champion, Max Verstappen, made his Formula One debut in 2015 at age seventeen years and three days, the youngest driver debut of all time.
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE, fig.width=5.5, fig.height=4}
+age_distrib_df <- races2021 %>%
+  select(driverId)
+
+age_distrib_df <- age_distrib_df %>%
+  left_join(drivers_df, by = "driverId") %>%
+  mutate(age = floor(
+    as.numeric(difftime("2021-12-31", birth_date, units = "weeks")) / 52.0)
+  ) %>%
+  select(driverId, age, firstname, lastname) %>%
+  distinct() %>%
+  arrange(age)
+
+age_distrib_df <- age_distrib_df %>%
+  mutate(bins = cut(age, breaks = c(20, 22, 25, 28, 30, 33, 36, 39, 42))) %>%
+  group_by(bins) %>%
+  summarize(count = n()) %>%
+  ungroup() %>%
+  mutate(perc = count / sum(count))
+
+#View(age_distrib_df)
+
+ggplot(data = age_distrib_df) +
+  geom_bar(
+    mapping = aes(x = bins, y = perc),
+    fill = "#534B4F", # "#56483F", 
+    stat = "identity",
+    #width = 1,
+    show.legend = FALSE
+  ) +
+  geom_text(
+    mapping = aes(x = bins, y = perc, label = count),
+    color = "#FFFFFF",
+    vjust = 1.5,
+    show.legend = FALSE
+  ) +
+  scale_y_continuous(labels = scales::percent) + 
+  ggtitle("Ages") +
+  xlab("Ages") +
+  ylab("Drivers (%)") +
+  theme_bw(16) +
+  theme(
+    plot.title=element_text(hjust=0.5, size = 12),
+    axis.title=element_text(size = 11),
+    axis.text.x=element_text(angle = 90, vjust = 0.5, size = 10),
+    axis.text.y=element_text(size = 10)
+  )# +
+  #annotate("text",
+  #  x = "(22,25]", y = 0.3,
+  #  label="Brooklyn", color = "#000000", fontface = 2, size = 4
+  #)
+```
 
 <br />
 
