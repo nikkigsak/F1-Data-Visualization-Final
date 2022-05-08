@@ -960,25 +960,7 @@ incidents_by_circuit %>%
   plot_ly(type = "bar", name = '2019',
           x = ~constructor_name, 
           y = ~year_2019,
-          marker = list(color =  c("#D07988",
-                                    "#94B0C3",
-                                    "#7ABEE3",
-                                    "#81B4A7",
-                                    "#F4767B",
-                                    "#D3D5D7",
-                                    "#F9B279",
-                                    "#A6E4D8",
-                                    "#F9C0DE",
-                                    "#789CDC",
-                                    "#FFF966",
-                                    "#90C3FF",
-                                    "#87D8EA"
-                                  )),
-          hovertemplate = paste('<b>Team</b>: %{x}<br>',
-                                '<b>Year</b>: 2019<br>',
-                                 'Number of Accidents or Collisions</b>: %{y}<br>')) %>%
-  add_trace(y = ~year_2021, name = '2021', 
-            marker = list(color = c("#9B0000", # Alfa Romeo
+          marker = list(color =  c("#9B0000", # Alfa Romeo
                                    "#4E7C9B", # Alpha Tauri
                                    "#2293D1", # Alpine
                                    "#2D826D", # Aston Martin
@@ -991,6 +973,26 @@ incidents_by_circuit %>%
                                    "#FFF500", # Renault
                                    "#469BFF", # Toro Rosso
                                    "#37BEDD" # Williams
+
+                                  )),
+          hovertemplate = paste('<b>Team</b>: %{x}<br>',
+                                '<b>Year</b>: 2019<br>',
+                                 'Number of Accidents or Collisions</b>: %{y}<br>')) %>%
+  add_trace(y = ~year_2021, name = '2021', 
+            marker = list(color = c(
+                                    "#D07988",
+                                    "#94B0C3",
+                                    "#7ABEE3",
+                                    "#81B4A7",
+                                    "#F4767B",
+                                    "#D3D5D7",
+                                    "#F9B279",
+                                    "#A6E4D8",
+                                    "#F9C0DE",
+                                    "#789CDC",
+                                    "#FFF966",
+                                    "#90C3FF",
+                                    "#87D8EA"
                                    )
                           ),
             hovertemplate = paste('<b>Team</b>: %{x}<br>',
@@ -1199,16 +1201,17 @@ lap_times_by_driver %>%
           x = ~year_2019, 
           y = ~full_name,
           marker = list(color = 
-                          c("#F4767B", # Charles LeClerc
-                            "#F9B279", # Ricciardo
-                            "#D3D5D7", # K Mag (Haas)
-                            "#A6E4D8", # Lewis Hamilton; Mercedes
-                            "#F58020", # Lando
-                            "#789CDC", # Max Verstappen; Red Bull
-                            "#4E7C9B", # Gasley Alpha Tauri
-                            "#F9C0DE", # Perez for Racing Point
-                            "#F4767B", # Vettel Ferrari 2019; Aston Martin 2021
-                            "#A6E4D8"  # Bottas
+                          c(
+                            "#ED1C24", # LeClerc
+                              "#F58020", # Ricciardo Renault 2019, 2021 at McL
+                              "#B6BABD", # Haas - Magnussen
+                              "#6CD3BF", # Lewis Hamilton
+                              "#F58020", # Norris, McLaren
+                              "#1E41FF", # Max Verstappen; Red Bull
+                              "#4E7C9B", # Gasly Toro Rosso 2019/Alpha Tauri 2021
+                              "#1E5BC6", # Perez, Racing Point 2019, RB 2021
+                              "#2D826D", # Vettel but for Aston martin
+                              "#6CD3BF" # Bottas, Mercedes
                             )), 
           text = ~constructor_name,
           hovertemplate = paste('<b>Driver</b>: %{y}<br>',
@@ -1220,16 +1223,17 @@ lap_times_by_driver %>%
             x = ~year_2021, 
             y = ~full_name,
             marker = list(color = 
-                            c("#ED1C24", # LeClerc
-                              "#F58020", # Ricciardo Renault 2019, 2021 at McL
-                              "#B6BABD", # Haas - Magnussen
-                              "#6CD3BF", # Lewis Hamilton
-                              "#F58020", # Norris, McLaren
-                              "#1E41FF", # Max Verstappen; Red Bull
-                              "#4E7C9B", # Gasly Toro Rosso 2019/Alpha Tauri 2021
-                              "#1E5BC6", # Perez, Racing Point 2019, RB 2021
-                              "#2D826D", # Vettel but for Aston martin
-                              "#6CD3BF" # Bottas, Mercedes
+                            c(
+                            "#F4767B", # Charles LeClerc
+                            "#F9B279", # Ricciardo
+                            "#D3D5D7", # K Mag (Haas)
+                            "#A6E4D8", # Lewis Hamilton; Mercedes
+                            "#F58020", # Lando
+                            "#789CDC", # Max Verstappen; Red Bull
+                            "#4E7C9B", # Gasley Alpha Tauri
+                            "#F9C0DE", # Perez for Racing Point
+                            "#F4767B", # Vettel Ferrari 2019; Aston Martin 2021
+                            "#A6E4D8"  # Bottas
 
                                  )),
           text = ~constructor_name,
