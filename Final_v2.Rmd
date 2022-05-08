@@ -538,7 +538,7 @@ wins_plotly <- wins_df %>%
                           ),
             hovertemplate = paste('<b>Team</b>: %{x}<br>',
                                 '<b>Year</b>: 2021<br>',
-                                 'Number of Wins</b>: %{y}<br>'),
+                                 '<b>Number of Wins</b>: %{y}<br>'),
             showlegend = F) %>%
   layout(title = 'Wins by Constructor',
          xaxis = list(title = '<br><br><br>Constructor'), 
@@ -611,7 +611,7 @@ points_plotly <- points_df %>%
                           ),
             hovertemplate = paste('<b>Team</b>: %{x}<br>',
                                 '<b>Year</b>: 2021<br>',
-                                 'Total Amount of Points</b>: %{y}<br>'),
+                                 '<b>Total Amount of Points</b>: %{y}<br>'),
             showlegend = F) %>%
   layout(title = 'Total Points Earned by Constructor',
          xaxis = list(title = '<br><br><br>Constructor'), 
