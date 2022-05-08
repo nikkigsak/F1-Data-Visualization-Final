@@ -473,6 +473,8 @@ age_distrib_df <- age_distrib_df %>%
   distinct() %>%
   arrange(age)
 
+#View(age_distrib_df)
+
 age_distrib_df <- age_distrib_df %>%
   mutate(bins = cut(age, breaks = c(20, 22, 25, 28, 30, 33, 36, 39, 42))) %>%
   group_by(bins) %>%
@@ -506,11 +508,23 @@ ggplot(data = age_distrib_df) +
     axis.title=element_text(size = 11),
     axis.text.x=element_text(angle = 90, vjust = 0.5, size = 10),
     axis.text.y=element_text(size = 10)
-  )# +
-  #annotate("text",
-  #  x = "(22,25]", y = 0.3,
-  #  label="Brooklyn", color = "#000000", fontface = 2, size = 4
-  #)
+  ) +
+  geom_segment(
+    aes(xend = "(22,25]", yend = 0.20, x = "(25,28]", y = 0.25),
+    arrow = arrow(length = unit(0.2, "cm"))
+  ) +
+  annotate("text",
+    x = "(30,33]", y = 0.26,
+    label="Max Verstappen (1st place, Age 33)", color = "#000000", size = 3
+  ) +
+  geom_segment(
+    aes(xend = "(36,39]", yend = 0.05, x = "(30,33]", y = 0.18),
+    arrow = arrow(length = unit(0.2, "cm"))
+  ) +
+  annotate("text",
+    x = "(30,33]", y = 0.20,
+    label="Lewis Hamilton (2nd place,Age 37)", color = "#000000", size = 3
+  )
 ```
 
 <br />
