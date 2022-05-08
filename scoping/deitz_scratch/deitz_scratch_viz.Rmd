@@ -109,15 +109,19 @@ xover <-
   left_join(constructors, by = ("constructorId")) %>%
   mutate(full_name = paste(forename, surname)) %>%
   rename(constructor_name = name) %>%
-  select(driverId, full_name, constructorId, constructor_name, year) %>%
-  group_by(driverId, full_name, constructorId, constructor_name, year) %>% 
+  select(driverId, full_name, constructorId, constructor_name, year, forename, surname) %>%
+  group_by(driverId, full_name, constructorId, constructor_name, year, forename, surname) %>% 
   slice(1)
 
 xover <- 
   xover %>%
   mutate(full_name = if_else(full_name == "Kimi RÃ¤ikkÃ¶nen", "Kimi Raikkonen", full_name),
          full_name = if_else(full_name == "Nico HÃ¼lkenberg", "Nico Hulkenberg", full_name),
-         full_name = if_else(full_name == "Sergio PÃ©rez", "Sergio Perez", full_name))
+         full_name = if_else(full_name == "Sergio PÃ©rez", "Sergio Perez", full_name)) %>%
+      mutate(surname = if_else(surname == "RÃ¤ikkÃ¶nen", "Raikkonen", surname),
+         surname = if_else(surname == "HÃ¼lkenberg", "Hulkenberg", surname),
+         surname = if_else(surname == "PÃ©rez", "Perez", surname))
+
 
 xover_total <- xover %>% 
   arrange(year,constructor_name,driverId) %>% 
@@ -159,25 +163,39 @@ xover_2019 <- xover_2019 %>% filter(driverId %in% races2019$driverId)
 races2021 <- left_join(races2021, xover_2021, by="driverId")
 races2019 <- left_join(races2019, xover_2019, by="driverId")
 
+races2021 <- rename(races2021, "Surname" = surname.y)
+races2019 <- rename(races2019, "Surname" = surname.y)
+
+
 ```
 
 ## Final draft -- points
 
 
 ```{r}
-points_2021 <- ggplot(races2021, aes(x=date,y=points,group=full_name,color=full_name, linetype=full_name, text=paste("<b>Driver:</b> ",full_name,"<br><b>Team: </b>",constructor_name,"<br><b>Points: </b>",points))) + geom_point() + geom_smooth(se=FALSE) +
+points_2021 <- ggplot(races2021, aes(x=date,y=points,group=Surname,color=Surname, linetype=Surname, text=paste("<b>Driver:</b> ",Surname,"<br><b>Team: </b>",constructor_name,"<br><b>Points: </b>",points))) + geom_point() + geom_smooth(se=FALSE) +
   ggtitle("2021") + 
-  scale_linetype_manual(values=xover_2021$line_type, name="full_name") + 
-  scale_color_manual(values=xover_2021$colorcol, name="full_name") + 
-  theme_classic() + xlab("Date") + ylab("Point Total") + theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1))
+  scale_linetype_manual(values=xover_2021$line_type, name="Surname") + 
+  scale_color_manual(values=xover_2021$colorcol, name="Surname") + 
+  theme_classic() + xlab("Date") + ylab("Point Total") + theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1),
+                                                               legend.title = element_blank(),
+                                                               legend.text = element_text(size=7),
+                                                               legend.margin = margin(c(0,0,0,0)),
+                                                               legend.spacing.x = unit(0, "mm"),
+                                                               legend.spacing.y = unit(0, "mm"))
 
 points_2019 <- ggplot(races2019, aes(x=date,y=points,group=full_name,color=full_name, linetype=full_name,text=paste("<b>Driver:</b> ",full_name,"<br><b>Team: </b>",constructor_name,"<br><b>Points: </b>",points))) + geom_point() + geom_smooth(se=FALSE) + 
   ggtitle("2019") + 
   scale_linetype_manual(values=xover_2019$line_type, name="full_name") + 
   scale_color_manual(values=xover_2019$colorcol, name="full_name") + theme_classic() + 
-  labs (x = "Date", y = "Total Points") + xlab("Date") + ylab("Point Total") + theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1))
+  labs (x = "Date", y = "Total Points") + xlab("Date") + ylab("Point Total") + theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1),
+                                                               legend.title = element_blank(),
+                                                               legend.text = element_text(size=7),
+                                                               legend.margin = margin(c(0,0,0,0)),
+                                                               legend.spacing.x = unit(0, "mm"),
+                                                               legend.spacing.y = unit(0, "mm"))
 
-ggplotly(points_2019, tooltip="text")
+ggplotly(points_2019, tooltip="text") 
 
 ggplotly(points_2021, tooltip="text")
 

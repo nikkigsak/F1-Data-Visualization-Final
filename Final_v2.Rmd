@@ -332,7 +332,7 @@ drivers_df <- drivers_df %>%
   ) %>%
     mutate(lastname = if_else(lastname == "RÃ¤ikkÃ¶nen", "Raikkonen", lastname),
          lastname = if_else(lastname == "HÃ¼lkenberg", "Hulkenberg", lastname),
-         lastname = if_else(lastname == "PÃ©rez", "Sergio Perez", lastname)) %>%
+         lastname = if_else(lastname == "PÃ©rez", "Perez", lastname)) %>%
   arrange(world_ranking, nationality, lastname, firstname,
    birth_date, driver_number
   ) %>%
