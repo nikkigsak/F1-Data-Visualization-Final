@@ -41,7 +41,8 @@ list2env(all_csvs, envir=.GlobalEnv)
 
 ### Individual's Sankey Diagram
 ```{r}
-library(dplyr)
+library(tidyr)
+library(curl)
 # install.packages("networkD3")
 # Let's get data into the format we need. We need two dfs, one of nodes that has
 # all of the options, which is 0-20, which is the positions you can start in and 
@@ -117,56 +118,195 @@ Max Verstappen Sankey Diagram 2019 and 2021
 links_driver_mv_19 <- links_driver_2019 %>% filter(full_name == "Max Verstappen")
 links_driver_mv_19 <- as.data.frame(links_driver_mv_19)
 
+nodes1 <- c("0","1","2","3","4","5","6","7","8","9","10",
+"11","12","13","14","15","16","17","18","19","20")
+
+nodes1 <- as.data.frame(nodes1)
 
 my_color_1 <- 
   'd3.scaleOrdinal() .domain(["Max Verstappen"]) .range(["#1E41FF"])'
 
 # 2019 Max Verstappen
-mv_2019 <- sankeyNetwork(Links = links_driver_mv_19, Nodes = nodes, Source = "source",
+mv_2019 <- sankeyNetwork(Links = links_driver_mv_19, Nodes = nodes1, Source = "source",
               Target = "target", Value = "value", 
-              NodeID = "nodes", colourScale=my_color_1, LinkGroup = "full_name",
+              NodeID = "nodes1", colourScale=my_color_1, LinkGroup = "full_name",
               NodeGroup = NULL)
 
 links_driver_mv_21 <- links_driver_2021 %>% filter(full_name == "Max Verstappen")
 links_driver_mv_21 <- as.data.frame(links_driver_mv_21)
 
 # 2021 Max Verstappen
-mv_2021 <- sankeyNetwork(Links = links_driver_mv_21, Nodes = nodes, Source = "source",
+mv_2021 <- sankeyNetwork(Links = links_driver_mv_21, Nodes = nodes1, Source = "source",
               Target = "target", Value = "value", 
-              NodeID = "nodes", colourScale=my_color_1, LinkGroup = "full_name",
+              NodeID = "nodes1", colourScale=my_color_1, LinkGroup = "full_name",
               NodeGroup = NULL)
 
 ```
 
 
 Lewis Hamilton Sankey Diagram 2019 and 2021
-```{r}
-links_driver_lh_19 <- links_driver_2019 %>% filter(full_name == "Lewis Hamilton")
-links_driver_lh_19 <- as.data.frame(links_driver_lh_19)
+
+#### How often do the top two drivers convert their Qualifying positions to Wins?
+
+One way to gauge how successful the top two drivers are is how often they are able to convert their pole positions into a win. Both Hamilton and Verstappen are exceptional drivers, but in 2019 did not qualify well, Hamilton only earning five pole positions and Max Verstappen earning two pole positions. Hamilton was able to convert three of the five pole positions he earned to a race victory, securing his other eight victories outside of pole position. Max Verstappen converted only one of his two pole positions into race victories, earning two race wins outside of poll position. 
+
+These Sankey diagrams show how these two drivers have fared in qualifying (indicated by a Q) and as a result, in final race position (indicated by a P). The teal represents Mercedes driver, Lewis Hamilton, while the darker blue represents Red Bull driver, Max Verstappen. 
+
+In the 2019 season (left), Hamilton only won the final race from pole position three times, but was able to convert qualifying in second place (Q2) to a final position (P1) of five times. This increased his points winning and his ability to convert his place in qualifying to an overall race victory. Verstappen only converted a single first qualifying position (Q1) to a race victory (P1) and a single second qualifying position (Q2) to a race victory (P1). This severely impacted Verstappen's points earnings.
+
+In the 2021 season (right), Max Verstappen surged in his qualifying skills, converting seven pole positions (Q1) to race victories (P1), while Lewis Hamilton was only able to convert five pole positions (Q1) to race victories (P1). 
+
+How to use this graph:
+* The qualifying positions for drivers are indicated by a "Q" before their qualifying position. *eg. "Q1" means that the driver qualified first*  
+* The final race positions for drivers are indicated by a "P" before their final position. *e.g. "P2" means that the driver finished the race second*  
+* Hover over the grey bars to highlight the different paths the drivers took from qualifying to their final position.  
+* The numbers in the middle indicate the number of times the driver went from the qualifying position to the final position.  
+<br />
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+links_driver_lhmv_2019 <- 
+  links_driver_2019 %>% 
+  filter(full_name == "Lewis Hamilton" | full_name == "Max Verstappen")
+# %>%
+  # filter(source == 1)
+  
+
+links_driver_lhmv_2019 <- as.data.frame(links_driver_lhmv_2019)
+
+# A connection data frame is a list of flows with intensity for each flow
+links_2019 <- data.frame(
+  driver=c(rep("L. Hamilton", 14), rep("M. Verstappen", 16)),
+  source=c("Q1", "Q2", "Q3", "Q4", "Q1", "Q2", "Q3", "Q5", 
+           "Q2", "Q4", "Q2", "Q2", "Q3", "Q1", "Q1", "Q2", 
+           "Q3", "Q1", "Q3", "Q3", "Q4", "Q3", "Q4", "Q5", 
+           "Q4", "Q11", "Q1", "Q20", "Q5", "Q5"),
+  target=c("P1","P1","P1","P1","P2","P2","P2","P2","P3",
+           "P3","P4","P5","P7","P9","P1","P1","P1","P2",
+           "P2","P3","P3","P4","P4","P4","P5","P5","P6",
+           "P8","P18","P20"),
+  value=c(3,5,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,1,3,2,1,1,1,1,1,1),
+  IDsource=c(0,1,2,3,0,1,2,4,1,3,1,1,2,0,0,1,2,0,2,2,3,2,3,4,3,5,0,6,4,4),
+  IDtarget=c(7,7,7,7,8,8,8,8,9,9,10,11,12,13,7,7,7,8,8,9,9,10,10,10,11,11,14,15,16,17)
+)
+
+# From these flows we need to create a node data frame: it lists every entities involved in the flow
+nodes_2019 <- data.frame(
+  name = unique(c(as.character(links_2019$source), as.character(links_2019$target)))
+)
+
+my_color_2019 <-
+  'd3.scaleOrdinal() .domain(["Lewis Hamilton", "Max Verstappen"]) .range(["#6CD3BF", "#1E41FF"])'
 
 
-my_color_0 <- 
-  'd3.scaleOrdinal() .domain(["Lewis Hamilton"]) .range(["#6CD3BF"])'
+# Make the Network
+p2019 <- sankeyNetwork(Links = links_2019, Nodes = nodes_2019,
+                   Source = "IDsource", Target = "IDtarget",
+                   Value = "value", NodeID = "name", fontSize = 15,
+                   nodeWidth = 20, colourScale=my_color_2019, LinkGroup="driver",
+                   NodeGroup=NULL)
 
-# 2019 Lewis Hamilton
-lh_2019 <- sankeyNetwork(Links = links_driver_lh_19, Nodes = nodes, Source = "source",
-              Target = "target", Value = "value", 
-              NodeID = "nodes", colourScale=my_color_0, LinkGroup = "full_name",
-              NodeGroup = NULL)
 
-links_driver_lh_21 <- links_driver_2021 %>% filter(full_name == "Lewis Hamilton")
-links_driver_lh_21 <- as.data.frame(links_driver_lh_21)
+links_driver_lhmv_2021 <- 
+  links_driver_2021 %>% 
+  filter(full_name == "Lewis Hamilton" | full_name == "Max Verstappen")
+  
 
-# 2021 Lewis Hamilton
-lh_2021 <- sankeyNetwork(Links = links_driver_lh_21, Nodes = nodes, Source = "source",
-              Target = "target", Value = "value", 
-              NodeID = "nodes", colourScale=my_color_0, LinkGroup = "full_name",
-              NodeGroup = NULL)
+links_driver_lhmv_2021 <- as.data.frame(links_driver_lhmv_2021)
 
+# A connection data frame is a list of flows with intensity for each flow
+links_2021 <- data.frame(
+  driver=c(rep("L. Hamilton", 12), rep("M. Verstappen", 10)),
+  source=c("Q1","Q2","Q4","Q1","Q2","Q3","Q3","Q4","Q1","Q7",
+           "Q2","Q2","Q1","Q2","Q3","Q1","Q2","Q3","Q20","Q3",
+           "Q3","Q2"),
+  target=c("P1","P1","P1","P2","P2","P2","P3","P4","P5","P7",
+           "P15","P17","P1","P1","P1","P2","P2","P2","P2",
+           "P9","P18","P20"),
+  value=c(5, 2, 1, 2, 5, 1, 1, 1, 1, 1, 1, 1, 7, 1, 2, 1, 3, 3, 1, 1, 2, 1),
+  IDsource=c(0, 1, 2, 0, 1, 3, 3, 2, 0, 4, 1, 1, 0, 1, 3, 0, 1, 3, 5, 3, 3, 1),
+  IDtarget=c(6, 6, 6, 7, 7, 7, 8, 9, 10, 11, 12, 13, 6, 6, 6, 7, 7, 7, 7, 14, 15, 16)
+)
+
+# From these flows we need to create a node data frame: it lists every entities involved in the flow
+nodes_2021 <- data.frame(
+  name = unique(c(as.character(links_2021$source), as.character(links_2021$target)))
+)
+
+my_color_2021 <-
+  'd3.scaleOrdinal() .domain(["L. Hamilton", "M. Verstappen"]) .range(["#6CD3BF", "#1E41FF"])'
+
+
+# Make the Network
+p2021 <- sankeyNetwork(Links = links_2021, Nodes = nodes_2021,
+                   Source = "IDsource", Target = "IDtarget",
+                   Value = "value", NodeID = "name", fontSize = 15,
+                   nodeWidth = 20, colourScale=my_color_2021, LinkGroup="driver",
+                   NodeGroup=NULL)
 ```
+<br />
+<div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;background-color:white;">
+  <div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;background-color:white;">
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+
+htmlwidgets::onRender(p2019, '
+  function(el) { 
+    var nodeWidth = this.sankey.nodeWidth();
+    var links = this.sankey.links();
+        
+    links.forEach((d, i) => {
+      var startX = d.source.x + nodeWidth;
+      var endX = d.target.x;
+      
+      var startY = d.source.y + d.sy + d.dy / 2;
+      var endY = d.target.y + d.ty + d.dy / 2;
+      
+      d3.select(el).select("svg g")
+        .append("text")
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "middle")
+        .attr("x", startX + ((endX - startX) / 2))
+        .attr("y", startY + ((endY - startY) / 2))
+        .text(d.value);
+    })
+  }
+')
+```
+  </div>
+  <div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;width:3px;background-color:white;">
+   &nbsp;
+  </div>
+  <div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;background-color:white;">
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+htmlwidgets::onRender(p2021, '
+  function(el) { 
+    var nodeWidth = this.sankey.nodeWidth();
+    var links = this.sankey.links();
+        
+    links.forEach((d, i) => {
+      var startX = d.source.x + nodeWidth;
+      var endX = d.target.x;
+      
+      var startY = d.source.y + d.sy + d.dy / 2;
+      var endY = d.target.y + d.ty + d.dy / 2;
+      
+      d3.select(el).select("svg g")
+        .append("text")
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "middle")
+        .attr("x", startX + ((endX - startX) / 2))
+        .attr("y", startY + ((endY - startY) / 2))
+        .text(d.value);
+    })
+  }
+')
+```
+  </div>
+ </div>
+<div style="clear:left;"></div>
+<br />
 
 
-Both Max Verstappen and Lewis Hamilton Sankey Diagram
+
 ```{r}
 links_driver_lhmv_2019 <- 
   links_driver_2019 %>% 
@@ -240,7 +380,7 @@ links_const_2019 <-
          source = quali_position,
          value = n) %>%
   mutate(source = source,
-         target =  target + 20) %>%
+         target =  target) %>%
     mutate(target = as.integer(target),
          source = as.integer(source))
 
@@ -266,7 +406,7 @@ links_const_2021 <-
          source = quali_position,
          value = n) %>%
   mutate(source = source,
-         target =  target + 20) %>%
+         target =  target) %>%
     mutate(target = as.integer(target),
          source = as.integer(source))
 
@@ -283,18 +423,18 @@ my_color_0 <-
   'd3.scaleOrdinal() .domain(["Mercedes"]) .range(["#6CD3BF"])'
 
 merc_2019 <- 
-  sankeyNetwork(Links = links_const_merc19, Nodes = nodes, Source = "source",
+  sankeyNetwork(Links = links_const_merc19, Nodes = nodes1, Source = "source",
                 Target = "target", Value = "value",
-                NodeID = "nodes", colourScale=my_color_0, LinkGroup = "const_name",
+                NodeID = "nodes1", colourScale=my_color_0, LinkGroup = "const_name",
                 NodeGroup = NULL)
 
 links_const_merc21 <- links_const_2021 %>% filter(const_name == "Mercedes")
 links_const_merc21 <- as.data.frame(links_const_merc21)
 
 merc_2021 <- 
-  sankeyNetwork(Links = links_const_merc21, Nodes = nodes, Source = "source",
+  sankeyNetwork(Links = links_const_merc21, Nodes = nodes1, Source = "source",
                 Target = "target", Value = "value", 
-                NodeID = "nodes", colourScale=my_color_0, LinkGroup = "const_name",
+                NodeID = "nodes1", colourScale=my_color_0, LinkGroup = "const_name",
                 NodeGroup = NULL)
 ```
 
@@ -307,9 +447,9 @@ my_color_1 <-
   'd3.scaleOrdinal() .domain(["Red Bull"]) .range(["#1E5BC6"])'
 
 rb_2019 <- 
-  sankeyNetwork(Links = links_const_rb19, Nodes = nodes, Source = "source",
+  sankeyNetwork(Links = links_const_rb19, Nodes = nodes1, Source = "source",
                 Target = "target", Value = "value", 
-                NodeID = "nodes", colourScale=my_color_1, LinkGroup = "const_name",
+                NodeID = "nodes1", colourScale=my_color_1, LinkGroup = "const_name",
                 NodeGroup = NULL)
 
 
@@ -318,9 +458,9 @@ links_const_rb21 <- as.data.frame(links_const_rb21)
 
 
 rb_2021 <- 
-  sankeyNetwork(Links = links_const_rb21, Nodes = nodes, Source = "source",
+  sankeyNetwork(Links = links_const_rb21, Nodes = nodes1, Source = "source",
                 Target = "target", Value = "value", 
-                NodeID = "nodes", colourScale=my_color_1, LinkGroup = "const_name",
+                NodeID = "nodes1", colourScale=my_color_1, LinkGroup = "const_name",
                 NodeGroup = NULL)
 ```
 
@@ -330,19 +470,21 @@ my_color <-
   'd3.scaleOrdinal() .domain(["Alfa Romeo", "Alpha Tauri", "Alpine F1 Team", "Aston Martin", "Ferrari", "Haas F1 Team", "McLaren", "Mercedes", "Racing Point", "Red Bull", "Renault", "Toro Rosso", "Williams"]) .range(["#B12039", "#4E7C9B", "#2293D1", "#2D826D", "#ED1C24", "#B6BABD", "#F58020", "#6CD3BF", "#F596C8", "#1E41FF", "#FFF500", "#469BFF", "#FFFFFF"])'
 
 const_2019 <- 
-  sankeyNetwork(Links = links_const_2019, Nodes = nodes, Source = "source",
+  sankeyNetwork(Links = links_const_2019, Nodes = nodes1, Source = "source",
                 Target = "target", Value = "value", 
-                NodeID = "nodes", fontSize= 15, nodeWidth = 20, margin = list(left = 100),
+                NodeID = "nodes1", fontSize= 15, nodeWidth = 20, margin = list(left = 100),
                 colourScale=my_color, LinkGroup = "const_name",
                 NodeGroup = NULL)
 
 
 const_2021 <- 
-  sankeyNetwork(Links = links_const_2021, Nodes = nodes, Source = "source",
+  sankeyNetwork(Links = links_const_2021, Nodes = nodes1, Source = "source",
                 Target = "target", Value = "value",
-                NodeID = "nodes", fontSize= 15, nodeWidth = 20, margin = list(left = 100),
+                NodeID = "nodes1", fontSize= 15, nodeWidth = 20, margin = list(left = 100),
                 colourScale=my_color, LinkGroup = "const_name",
                 NodeGroup = NULL)
+
+const_2019
 ```
 
 
@@ -378,19 +520,100 @@ xover <-
   select(driverId, constructorId, year) %>%
   left_join(drivers, by = ("driverId")) %>%
   left_join(constructors, by = ("constructorId")) %>%
-  mutate(full_name = paste(forename, surname)) %>%
+  mutate(first_initial = paste0(substr(forename, 1, 1), ".")) %>%
+  mutate(full_name = paste(first_initial, surname)) %>%
   rename(constructor_name = name) %>%
   select(driverId, full_name, constructorId, constructor_name, year) %>%
   group_by(driverId, full_name, constructorId, constructor_name, year) %>% 
   slice(1)
 
-
-xover$full_name <- iconv(xover$full_name, from="UTF-8", to="LATIN1")
+xover <- 
+  xover %>%
+  mutate(full_name = if_else(full_name == "K. RÃ¤ikkÃ¶nen", "Kimi Raikkonen", full_name),
+         full_name = if_else(full_name == "N. HÃ¼lkenberg", "Nico Hulkenberg", full_name),
+         full_name = if_else(full_name == "S. PÃ©rez", "Sergio Perez", full_name))
 
 ```
 
 
 This plot_ly graph shows how many times drivers have gotten the "Fastest Lap" designation. The "Fastest Lap" designation gives the driver and the constructor extra points and monetary bonuses. 
+```{r}
+lap_times_by_driver <- 
+  lap_times %>%
+  left_join(skinny_races_circuits, by = ("raceId")) %>%
+  filter(year == 2019 | year == 2021) %>%
+  left_join(xover, by = c("driverId" = "driverId",
+                          "year" = "year")) %>%
+  group_by(year, raceId, driverId, full_name, constructor_name) %>%
+  summarise(min(milliseconds)) %>%
+  rename(fastestLap_ms = "min(milliseconds)") %>%
+  mutate(fastestLap_s = fastestLap_ms/1000) %>%
+  group_by(year, raceId) %>%
+  mutate(rank = rank(fastestLap_s)) %>%
+  filter(rank == 1) %>%
+  group_by(year, full_name, constructor_name) %>%
+  summarise(count_of_fastest_lap = n()) %>%
+  mutate(fast_laps_2019 = if_else(year == "2019", count_of_fastest_lap, as.integer(0)),
+         fast_laps_2021 = if_else(year == "2021", count_of_fastest_lap, as.integer(0))) %>%
+  group_by(full_name, constructor_name) %>%
+  summarise(year_2019 = sum(fast_laps_2019),
+            year_2021 = sum(fast_laps_2021))
+
+library(ggplot2)
+library(plotly)
+
+lap_times_by_driver %>%
+  plot_ly(type = "bar",
+          x = ~year_2019, 
+          y = ~full_name,
+          marker = list(color = 
+                          c("#F4767B", # Charles LeClerc
+                            "#F9B279", # Ricciardo
+                            "#D3D5D7", # K Mag (Haas)
+                            "#A6E4D8", # Lewis Hamilton; Mercedes
+                            "#F58020", # Lando
+                            "#789CDC", # Max Verstappen; Red Bull
+                            "#4E7C9B", # Gasley Alpha Tauri
+                            "#F4767B", # Vettel Ferrari 2019; Aston Martin 2021
+                            "#F9C0DE", # Perez for Racing Point
+                            "#A6E4D8"  # Bottas
+                            )), 
+          text = ~constructor_name,
+          hovertemplate = paste('<b>Driver</b>: %{y}<br>',
+                                '<b>Team</b>: %{text}<br>',
+                                '<b>Year</b>: 2019<br>', 
+                                 'Number of Fastest Laps</b>: %{x}<br><extra></extra>'),
+          name = '2019 Season') %>%
+  add_trace(type = "bar",
+            x = ~year_2021, 
+            y = ~full_name,
+            marker = list(color = 
+                            c("#ED1C24", # LeClerc
+                              "#F58020", # Ricciardo Renault 2019, 2021 at McL
+                              "#B6BABD", # Haas - Magnussen
+                              "#6CD3BF", # Lewis Hamilton
+                              "#F58020", # Norris, McLaren
+                              "#1E41FF", # Max Verstappen; Red Bull
+                              "#4E7C9B", # Gasly Toro Rosso 2019/Alpha Tauri 2021
+                              "#2D826D", # Vettel but for Aston martin
+                              "#1E5BC6", # Perez, Racing Point 2019, RB 2021
+                              "#6CD3BF" # Bottas, Mercedes
+
+                                 )),
+          text = ~constructor_name,
+          hovertemplate = paste('<b>Driver</b>: %{y}<br>',
+                                '<b>Team</b>: %{text}<br>',
+                                '<b>Year</b>: 2021<br>',
+                                'Number of Fastest Laps</b>: %{x}<br><extra></extra>'),
+          name = '2021 Season') %>%
+  layout(title = 'Fastest Laps Designation', 
+         xaxis = list(title = 'Count of Fastest Laps'),
+         yaxis = list(title = ''),
+         barmode = 'group',
+         showlegend = FALSE)
+
+```
+
 ```{r}
 lap_times_by_driver_2019 <- 
   lap_times %>%
@@ -461,7 +684,7 @@ lap_times_by_driver_2021 %>%
                                  "#1E41FF", # Max Verstappen; Red Bull
                                  "#4E7C9B", # Gasly Toro Rosso 2019/Alpha Tauri 2021
                                  "#1E5BC6", # Perez, Racing Point 2019, RB 2021
-                                 "#00D2BE" # Bottoas, Mercedes
+                                 "#00D2BE" # Bottas, Mercedes
                                  )),
           text = ~constructor_name,
           hovertemplate = paste('<b>Driver</b>: %{y}<br>',
@@ -474,40 +697,25 @@ lap_times_by_driver_2021 %>%
 
 Now I'm interested in seeing the average time per lap over the course of a race by circuit.
 ```{r}
-# lap_time_by_lap <- lap_times %>%
-#   drop_na(milliseconds) %>%
-#   group_by(raceId, lap, time) %>%
-#   summarise(mean(milliseconds)/1000) %>%
-#   rename(mean_lap_speed_ms = `mean(milliseconds)/1000`) %>%
-#   left_join(skinny_races_circuits, by = ("raceId")) %>%
-#   left_join(circuits_joined, by = ("circuitId")) %>%
-#   select(raceId, lap, mean_lap_speed_ms, time, circuitId, race_name, year,
-#           circuit_name) %>%
-#     filter(year == 2019 | year == 2021) %>%
-#   mutate_at(c("year"), as.factor)
-# 
-# library(RColorBrewer)
-# 
-# lap_time_by_lap %>%
-#   ggplot(aes(x = lap, y = mean_lap_speed_ms, color = year)) + 
-#   geom_point() + ylim(0,300) + 
-#   scale_fill_brewer(palette = "Spectral") +
-#   facet_wrap(vars(circuit_name))
-```
+lap_time_by_lap <- lap_times %>%
+  drop_na(milliseconds) %>%
+  group_by(raceId, lap, time) %>%
+  summarise(mean(milliseconds)/1000) %>%
+  rename(mean_lap_speed_ms = `mean(milliseconds)/1000`) %>%
+  left_join(skinny_races_circuits, by = ("raceId")) %>%
+  left_join(circuits_joined, by = ("circuitId")) %>%
+  select(raceId, lap, mean_lap_speed_ms, time, circuitId, race_name, year,
+          circuit_name) %>%
+    filter(year == 2019 | year == 2021) %>%
+  mutate_at(c("year"), as.factor)
 
-This looks cool, but I think it would be better as an interactive/drop down so you can really zoom in.
-```{r}
-# library(plotly)
-# 
-# lap_time_by_lap %>%
-#     plot_ly(x = ~lap, y = ~mean_lap_speed_ms, color = ~year,
-#             hoverinfo = "text", hovertext = ~time) +  facet_wrap(~circuit_name)
-# 
-# lap_time_by_lap %>%
-#   filter(year > 2010)
-#     group_by(circuit_name) %>%
-#     do(p=plot_ly(., x = ~lap, y = ~mean_lap_speed_ms, color = ~year, type = "scatter")) %>%
-#   subplot(nrows = 5, shareX = TRUE, shareY = TRUE)
+library(RColorBrewer)
+
+lap_time_by_lap %>%
+  ggplot(aes(x = lap, y = mean_lap_speed_ms, color = year)) +
+  geom_point() + ylim(0,300) +
+  scale_fill_brewer(palette = "Spectral") +
+  facet_wrap(vars(circuit_name))
 ```
 
 
@@ -528,7 +736,61 @@ incidents_by_circuit <-
 incidents_by_circuit$date <- lubridate::ymd(incidents_by_circuit$date)
 ```
 
-2019 breakdown of incidents by constructor
+2019 and 2021 breakdown of incidents by constructor
+```{r}
+incidents_by_circuit %>%
+  filter(year == 2019 | year == 2021) %>%
+  mutate(col_sum_2019 = if_else(year == 2019, 1, 0),
+         col_sum_2021 = if_else(year == 2021, 1, 0)) %>%
+  group_by(constructor_name) %>%
+  summarise(year_2019 = sum(col_sum_2019),
+            year_2021 = sum(col_sum_2021)) %>%
+  plot_ly(type = "bar", name = '2019',
+          x = ~constructor_name, 
+          y = ~year_2019,
+          marker = list(color =  c("#D07988",
+                                    "#94B0C3",
+                                    "#7ABEE3",
+                                    "#81B4A7",
+                                    "#F4767B",
+                                    "#D3D5D7",
+                                    "#F9B279",
+                                    "#A6E4D8",
+                                    "#F9C0DE",
+                                    "#789CDC",
+                                    "#FFF966",
+                                    "#90C3FF",
+                                    "#87D8EA"
+                                  )),
+          hovertemplate = paste('<b>Team</b>: %{x}<br>',
+                                '<b>Year</b>: 2019<br>',
+                                 'Number of Accidents or Collisions</b>: %{y}<br>')) %>%
+  add_trace(y = ~year_2021, name = '2021', 
+            marker = list(color = c("#9B0000", # Alfa Romeo
+                                   "#4E7C9B", # Alpha Tauri
+                                   "#2293D1", # Alpine
+                                   "#2D826D", # Aston Martin
+                                   "#ED1C24", # Ferrari
+                                   "#B6BABD", # Haas
+                                   "#F58020", # McLaren
+                                   "#00D2BE", # Mercedes
+                                   "#F596C8", # Racing Point
+                                   "#1E5BC6", # Red Bull
+                                   "#FFF500", # Renault
+                                   "#469BFF", # Toro Rosso
+                                   "#37BEDD" # Williams
+                                   )
+                          ),
+            hovertemplate = paste('<b>Team</b>: %{x}<br>',
+                                '<b>Year</b>: 2021<br>',
+                                 'Number of Accidents or Collisions</b>: %{y}<br>')) %>%
+  layout(title = 'Incidents by Constructor',
+         xaxis = list(title = '<br><br><br>Constructor'), 
+         yaxis = list(title = 'Count of Accidents ors Collisions'),
+         barmode = 'group')
+```
+
+2021 breakdown of incidents by constructor
 ```{r}
 incidents_by_circuit %>%
   filter(year == 2019) %>%
@@ -537,16 +799,18 @@ incidents_by_circuit %>%
   plot_ly(type = "bar",
           x = ~constructor_name, 
           y = ~n,
-          marker = list(color =  c("#9B0000", # Alfa Romeo
-                                  "#DC0000", # Ferrari
-                                  "#F0D787", # Haas
-                                  "#FF8700", # McLaren
-                                  "#00D2BE", # Mercedes
-                                  "#F596C8", # Racing Point
-                                  "#1E41FF", # Red Bull
-                                  "#FFF500", # Renault
-                                  "#469BFF", # Toro Rosso
-                                  "#FFFFFF" # Williams
+          marker = list(color =  c("#B12039", # Alfas Romeo
+                                   "#ED1C24", # Ferrari
+                                   "#B6BABD", # Haas
+                                   "#F58020", # McLaren
+                                   "#6CD3BF", # Mercedes
+                                   "#F596C8", # Racing Point
+                                   "#1E5BC6", # Red Bull
+                                   "#FFF500", # Renault
+                                   "#1E5BC6", # Red Bull
+                                   "#469BFF", # Toro Rosso
+                                   "#37BEDD" # Williams
+                                   
                                   )),
           # text = ~constructor_name,
           hovertemplate = paste('<b>Team</b>: %{x}<br>', 
@@ -554,10 +818,8 @@ incidents_by_circuit %>%
   layout(title = 'Incidents by Constructor in 2019',
          xaxis = list(title = 'Constructor'), 
          yaxis = list(title = 'Count of Accidents or Collisions'))
-```
 
-2021 breakdown of incidents by constructor
-```{r}
+
 incidents_by_circuit %>%
   filter(year == 2021) %>%
   group_by(constructor_name) %>%
@@ -575,6 +837,7 @@ incidents_by_circuit %>%
                                    "#6CD3BF", # Mercedes
                                    "#1E5BC6", # Red Bull
                                    "#37BEDD" # Williams
+                                   
                                   )),
           # text = ~constructor_name,
           hovertemplate = paste('<b>Team</b>: %{x}<br>', 

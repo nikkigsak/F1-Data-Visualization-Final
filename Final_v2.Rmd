@@ -2,7 +2,7 @@
 title: "Comparing the 2019 and the 2021 Formula One Seasons"
 subtitle: "GR5063: Data Visualization Final Project"
 author: "Group F: Lauren Deitz, Donald Stephens, Nikki Gerjarusak, Christa Chiao"
-date: "5/10/2022"
+date: "May 09, 2022"
 output: html_document
 ---
 
@@ -24,7 +24,7 @@ library(maps)
 #  appropriate command for "crosstalk" package
 #  otherwise an "All" entry will appear in filter
 #  select dropdown
-# devtools::install_version(“crosstalk”, version = “1.1.1”)
+# devtools::install_version("crosstalk", version = "1.1.1")
 library(crosstalk)
 library(tidyr)
 library(networkD3)
@@ -54,8 +54,6 @@ cstandings <- read.csv("raw_data/constructor_standings.csv")
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 #helper tables
 
-
-
 xover <- 
   results %>%
   left_join(races, by = ("raceId")) %>%
@@ -63,7 +61,8 @@ xover <-
   select(driverId, constructorId, year) %>%
   left_join(drivers, by = ("driverId")) %>%
   left_join(constructors, by = ("constructorId")) %>%
-  mutate(full_name = paste(forename, surname)) %>%
+  mutate(first_initial = paste0(substr(forename, 1, 1), ".")) %>%
+  mutate(full_name = paste(first_initial, surname)) %>%
   rename(constructor_name = name) %>%
   select(driverId, full_name, constructorId, constructor_name, year) %>%
   group_by(driverId, full_name, constructorId, constructor_name, year) %>% 
@@ -71,9 +70,9 @@ xover <-
 
 xover <- 
   xover %>%
-  mutate(full_name = if_else(full_name == "Kimi RÃ¤ikkÃ¶nen", "Kimi Raikkonen", full_name),
-         full_name = if_else(full_name == "Nico HÃ¼lkenberg", "Nico Hulkenberg", full_name),
-         full_name = if_else(full_name == "Sergio PÃ©rez", "Sergio Perez", full_name))
+  mutate(full_name = if_else(full_name == "K. RÃ¤ikkÃ¶nen", "K. Raikkonen", full_name),
+         full_name = if_else(full_name == "N. HÃ¼lkenberg", "N. Hulkenberg", full_name),
+         full_name = if_else(full_name == "S. PÃ©rez", "S. Perez", full_name))
 
 # xover$full_name <- iconv(xover$full_name, from="UTF-8", to="LATIN1")
 
@@ -217,11 +216,12 @@ links_driver_2021 <-
 
 ## What is Formula One? 
 
-Formula One is the highest class of single-driver racing. There are ten teams and twenty drivers that compete during a Formula One season, with occasional backup drivers for when a main driver is sick or otherwise unavailable. Formula One drivers and teams travel all over the world to participate in Grand Prix races, which are a minimum of 190 miles. A Formula One season can consist of up to 22 races in the same number of countries, although there are a number of historical circuits that are significant to the Formula One sport, including the Monaco Grand Prix (160 miles) and the National Motor Racetrack of Monza (190 miles). 
+Formula One is the highest class of single-driver racing. There are ten teams and twenty drivers that compete during a Formula One season, with occasional backup drivers for when a main driver is sick or otherwise unavailable. Formula One drivers and teams travel all over the world to participate in Grand Prix races, which are a minimum of 190 miles. The one exception to this length of race is the Monaco Grand Prix, which is 160 miles and the most historic race on the calendar. A Formula One season can consist of up to 22 races in the same number of countries, although there are a number of historical circuits that are significant to the Formula One sport, including the Monaco Grand Prix and the National Motor Racetrack of Monza in Italy. 
 
 The aim of Formula One drivers and teams are to compete at the highest level and during the course of the season, earn points towards two main trophies: the Constructor's Championship and the Driver's Championship. Points are earned according to race performance, with the top 10 placing drivers and constructors each earning 25 points for first place, 18 points for second place, 15 points for third place, and so on and so forth, all the way down to tenth place, whose driver and constructor each earn a single point. There are other miscellaneous points earnings that are given for the driver who records the fastest lap of the race (+1 point), and for Sprint Races that take place before the Grand Prix on a handful of weekends during the season.
 
-Formula One is perhaps best explained by the drivers in the sport:
+Formula One is perhaps best explained by the drivers in the sport:<br />
+*Clicking on the image will open a third-party site in a new tab. This video and all of its rights are owned by Formula One*
 
 <div style="display:block;float:left;border-style:solid;border-width:0px;background-color:black;width:520px;height:276px;">
 <a target="_blank" href="https://www.youtube.com/watch?v=twAlqtvVMdc"><img style="cursor:hand;" src="images/f1_drivers_sign.png" /></a>
@@ -231,9 +231,9 @@ Formula One is perhaps best explained by the drivers in the sport:
 
 ### Where do Formula One races take place? 
 
-Formula One races take place all over the world, with circuits on all continents (except Antarctica!) and in many major cities. This map shows the placement of all Formula One circuits that have been used since the beginning of the sport in 1950. 
+Formula One is a global sport with races taking place all over the world. There are circuits on all continents and in most major cities. This map shows the placement of all Formula One circuits that have been used since the beginning of the sport in 1950. 
 
-As you can see, the circuits are heavily concentrated in Europe, where the sport got its start. As Formula One gained popularity around the world, circuits have been built and included in the Formula One calendar. 
+As you can see, the circuits are heavily concentrated in Europe, where the sport got its start. As Formula One gained popularity around the world, new circuits have been built and included in the Formula One calendar, including the Miami Grand Prix, which will get its debut on May 8, 2022. 
 
 Please use the filter to see where circuits are in specific countries. The tool is multi-select.
 
@@ -330,12 +330,18 @@ drivers_df <- drivers_df %>%
   dplyr::select(firstname, lastname, world_ranking, birth_date,
    driver_number, nationality, information
   ) %>%
-    mutate(lastname = if_else(lastname == "RÃ¤ikkÃ¶nen", "Raikkonen", lastname),
-         lastname = if_else(lastname == "HÃ¼lkenberg", "Hulkenberg", lastname),
-         lastname = if_else(lastname == "PÃ©rez", "Perez", lastname)) %>%
+
+  mutate(lastname = if_else(lastname == "RÃ¤ikkÃ¶nen", "Raikkonen", lastname),
+    lastname = if_else(lastname == "HÃ¼lkenberg", "Hulkenberg", lastname),
+    lastname = if_else(lastname == "PÃ©rez", "Sergio Perez", lastname)
+  ) %>%
   arrange(world_ranking, nationality, lastname, firstname,
    birth_date, driver_number
-  ) %>%
+  )
+
+#View(drivers_df)
+
+drivers_table_df <- drivers_df %>%
   rename(
     "First Name" = firstname,
     "Last Name" = lastname,
@@ -345,9 +351,9 @@ drivers_df <- drivers_df %>%
     "Nationality" = nationality
   )
 
-#View(drivers_df)
+#View(drivers_table_df)
 
-datatable(drivers_df,
+datatable(drivers_table_df,
   class = 'cell-border stripe',
   #colnames = c("name", "nationality"),
   caption = '',
@@ -360,8 +366,95 @@ datatable(drivers_df,
   ),
   escape = FALSE
 )
-
 ```
+
+<br />
+
+#### Nationalities of Drivers
+
+This visualization shows the distribution of drivers by nationality. Due to F1's beginnings in Europe, there are a significant number of drivers who come from Europe, although the sport is gaining in popularity globally. 
+<br />
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+#unique_nationalities <- unique(drivers_df$nationality)
+#View(unique_nationalities)
+
+driver_nationalities_df <- drivers_df %>%
+  select(firstname, lastname, nationality) %>%
+  group_by(nationality) %>%
+  summarize(total = n()) %>%
+  ungroup() %>%
+  arrange(desc(total))
+
+#View(driver_nationalities_df)
+
+driver_nationalities_top_df <- driver_nationalities_df %>%
+  top_n(10, total)
+
+driver_nationalities_bottom_df <- driver_nationalities_df %>%
+  top_n(-10, total)
+
+#View(driver_nationalities_top_df)
+
+theme_set(theme_bw(16))
+
+driver_nationalities_top_chart <- ggplot(data = driver_nationalities_top_df) +
+  geom_bar(
+    mapping = aes(x = nationality, y = total),
+    fill = "#00008B",
+    stat = "identity",
+    position = "dodge",
+    show.legend = FALSE
+  ) +
+  coord_polar() +
+  ggtitle("Top 10 Nationalities with Most Drivers") +
+  xlab(NULL) +
+  ylab(NULL) +
+  theme(
+    plot.title=element_text(hjust = 0.5, size = 12),
+    axis.text = element_text(size = 9),
+    legend.title = element_blank()
+  )
+
+driver_nationalities_bottom_chart <- ggplot(data = driver_nationalities_bottom_df) +
+  geom_bar(
+    mapping = aes(x = nationality, y = total),
+    fill = "#900C3F", #  "#C70039",
+    stat = "identity",
+    position = "dodge",
+    show.legend = FALSE
+  ) +
+  coord_polar() +
+  ggtitle("Top 10 Nationalities with Least Drivers") +
+  xlab(NULL) +
+  ylab(NULL) +
+  theme(
+    plot.title=element_text(hjust = 0.5, size = 12),
+    axis.text = element_text(size = 9),
+    legend.title = element_blank()
+  )
+```
+<br />
+<div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;background-color:white;">
+  <div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;background-color:white;">
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE, fig.width=4.7, fig.height=4}
+driver_nationalities_top_chart
+```
+  </div>
+  <div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;width:3px;background-color:white;">
+   &nbsp;
+  </div>
+  <div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;background-color:white;">
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE, fig.width=4.7, fig.height=4}
+driver_nationalities_bottom_chart
+```
+  </div>
+ </div>
+<div style="clear:left;"></div>
+<br />
+
+#### Ages of Drivers
+
+This chart gives the distribution of drivers by age that are currently active. These drivers range in age, with rookies in their early twenties and veteran drivers in the late thirties or early forties. The 2021 Driver's Champion, Max Verstappen, made his Formula One debut in 2015 at age seventeen years and three days, the youngest driver debut of all time.
 
 <br />
 
@@ -410,14 +503,14 @@ Double click on each driver's legend entry to isolate their points accumulation 
 
 points_2021 <- ggplot(races2021, aes(x=date,y=points,group=full_name,color=full_name, linetype=full_name, text=paste("<b>Driver:</b> ",full_name,"<br><b>Team: </b>",constructor_name,"<br><b>Points: </b>",points))) + geom_point() + geom_smooth(se=FALSE) +
   ggtitle("2021") + 
-  scale_linetype_manual(values=xover_2021$line_type, name="full_name") + 
-  scale_color_manual(values=xover_2021$colorcol, name="full_name") + 
+  scale_linetype_manual(values=xover_2021$line_type, name="Full Name") + 
+  scale_color_manual(values=xover_2021$colorcol, name="Full Name") + 
   theme_classic() + xlab("Date") + ylab("Point Total") + theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1))
 
 points_2019 <- ggplot(races2019, aes(x=date,y=points,group=full_name,color=full_name, linetype=full_name,text=paste("<b>Driver:</b> ",full_name,"<br><b>Team: </b>",constructor_name,"<br><b>Points: </b>",points))) + geom_point() + geom_smooth(se=FALSE) + 
   ggtitle("2019") + 
-  scale_linetype_manual(values=xover_2019$line_type, name="full_name") + 
-  scale_color_manual(values=xover_2019$colorcol, name="full_name") + theme_classic() + 
+  scale_linetype_manual(values=xover_2019$line_type, name="Full Name") + 
+  scale_color_manual(values=xover_2019$colorcol, name="Full Name") + theme_classic() + 
   labs (x = "Date", y = "Total Points") + xlab("Date") + ylab("Point Total") + theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1))
 
 points_2019_chart <- ggplotly(points_2019, tooltip="text")
@@ -456,11 +549,11 @@ Double click on each driver's legend entry to isolate their standings over the c
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 wins_2021 <- ggplot(races2021) + 
-  geom_line(aes(x=date,y=reorder(position,-position),group=full_name,color=full_name,linetype=full_name,text=paste("<b>Driver: </b>",full_name,"<br><b>Team:</b> ",constructor_name))) + scale_color_manual(values=xover_2021$colorcol)+ scale_linetype_manual(values=xover_2021$line_type) + ggtitle("2021") + theme_classic() + labs(x = "Date", y = "Position") +
+  geom_line(aes(x=date,y=reorder(position,-position),group=full_name,color=full_name,linetype=full_name,text=paste("<b>Driver: </b>",full_name,"<br><b>Team:</b> ",constructor_name))) + scale_color_manual(values=xover_2021$colorcol, name = "Full Name")+ scale_linetype_manual(values=xover_2021$line_type, name = "Full Name") + ggtitle("2021") + theme_classic() + labs(x = "Date", y = "Position") +
    theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1))
 
 wins_2019 <- ggplot(races2019) + 
-  geom_line(aes(x=date,y=reorder(position,-position),group=full_name,color=full_name,linetype=full_name,text=paste("<b>Driver: </b>",full_name,"<br><b>Team:</b> ",constructor_name))) + scale_color_manual(values=xover_2019$colorcol)+ scale_linetype_manual(values=xover_2019$line_type) + ggtitle("2019") + theme_classic() + labs(x = "Date", y = "Position") + guides(color=guide_legend(ncol=2)) + theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1))
+  geom_line(aes(x=date,y=reorder(position,-position),group=full_name,color=full_name,linetype=full_name,text=paste("<b>Driver: </b>",full_name,"<br><b>Team:</b> ",constructor_name))) + scale_color_manual(values=xover_2019$colorcol, name = "Full Name")+ scale_linetype_manual(values=xover_2019$line_type, name = "Full Name") + ggtitle("2019") + theme_classic() + labs(x = "Date", y = "Position") + guides(color=guide_legend(ncol=2)) + theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1))
 
 ggplotly(wins_2019, tooltip = "text")
 
@@ -483,6 +576,8 @@ The Constructor's championship rewards not only the driver, but seeks to recogni
 These constructors wins show a similar story as the driver's visualizations do, although a new name emerges: Ferrari. In 2019, Mercedes dominated the field, winning 14 of the 20 races. Red Bull Racing won three races in Austria, Germany, and Brazil. Ferrari won three races as well, in Belgium, Italy, and Singapore. Ferrari is one of the best, if not the best, known constructor in the sport. The 2019 Ferrari team showed a dismal performance with three wins, further emphasizing Mercedes's dominance this season. 
 
 The 2021 season saw the rise of Red Bull, with Red Bull winning 11 of the 22 races and Mercedes winning only 9 races. This season also saw two unexpected race winners in McLaren winning the Italian Grand Prix and Alpine F1 Team winning the Hungarian Grand Prix.
+
+<br />
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 ## preparing data
@@ -557,7 +652,9 @@ The 2019 season was Mercedes's runaway season, although Ferrari's three race win
 
 The 2021 season shows Ferrari's continued status as part of the best of the rest, narrowly outearning McLaren Racing, who eventually came in fourth place in the Constructor's Championship. Mercedes narrowly beat out Red Bull for the Constructor's Championship, earning their eighth consecutive championship, an unheard of feat in Formula One. Red Bull, despite Max Verstappen's win in the Driver's Championship, came in second place, with Mercedes clinching the Championship in the final race of the season. 
 
-```{r}
+<br />
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 ## points data frame
 points_df <- df %>%
   filter(year == 2019 | year == 2021) %>%
@@ -738,69 +835,63 @@ status_21_plotly
 Incidents are defined here as "accidents" or "collisions" which happen when drivers their hit each other or cause some other sort of accident. Due to the high speed nature of Formula One, these accidents or collisions often end the involved drivers' races. This graph includes all accidents and collisions, regardless of if they ended that driver's race. 
 
 
-In 2019, Red Bull had over 20 distinct accidents or collisions, certainly contributing to their distant second-place finish behind Mercedes. Second to Red Bull's incident count are the Haas F1 team, followed by Ferrari, both of whom had a high number of accidents or collisions, which led to Ferrari's third place finish and Haas's last place finish.
+In 2019, Red Bull had over 20 distinct accidents or collisions, certainly contributing to their distant second-place finish behind Mercedes. Second to Red Bull's incident count are the Haas F1 team, followed by Ferrari, both of whom had a high number of accidents or collisions, which led to Ferrari's third place finish and Haas's last place finish. In 2021, Haas still led the number of incidents, followed by Red Bull, and Williams racing. Mercedes maintained their overall count of 8 accidents or collisions over the course of the season, likely contributing to their eventually winning the 2021 Constructor Championship.
 
 <br />
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 incidents_by_circuit %>%
-  filter(year == 2019) %>%
+  filter(year == 2019 | year == 2021) %>%
+  mutate(col_sum_2019 = if_else(year == 2019, 1, 0),
+         col_sum_2021 = if_else(year == 2021, 1, 0)) %>%
   group_by(constructor_name) %>%
-  summarise(n = n()) %>%
-  plot_ly(type = "bar",
+  summarise(year_2019 = sum(col_sum_2019),
+            year_2021 = sum(col_sum_2021)) %>%
+  plot_ly(type = "bar", name = '2019',
           x = ~constructor_name, 
-          y = ~n,
-          marker = list(color =  c("#9B0000", # Alfa Romeo
-                                  "#DC0000", # Ferrari
-                                  "#B6BABD", # Haas
-                                  "#FF8700", # McLaren
-                                  "#00D2BE", # Mercedes
-                                  "#F596C8", # Racing Point
-                                  "#1E41FF", # Red Bull
-                                  "#FFF500", # Renault
-                                  "#469BFF", # Toro Rosso
-                                  "#FFFFFF" # Williams
+          y = ~year_2019,
+          marker = list(color =  c("#D07988",
+                                    "#94B0C3",
+                                    "#7ABEE3",
+                                    "#81B4A7",
+                                    "#F4767B",
+                                    "#D3D5D7",
+                                    "#F9B279",
+                                    "#A6E4D8",
+                                    "#F9C0DE",
+                                    "#789CDC",
+                                    "#FFF966",
+                                    "#90C3FF",
+                                    "#87D8EA"
                                   )),
-          # text = ~constructor_name,
-          hovertemplate = paste('<b>Team</b>: %{x}<br>', 
-                                 'Number of Accidents or Collisions</b>: %{y}<br><extra></extra>')) %>%
-  layout(title = 'Incidents by Constructor in 2019',
-         xaxis = list(title = 'Constructor'), 
-         yaxis = list(title = 'Count of Accidents or Collisions'))
-```
-
-
-In 2021, Haas still led the number of incidents, followed by Red Bull, and Williams racing. Mercedes maintained their overall count of 8 accidents or collisions over the course of the season, likely contributing to their eventually winning the 2021 Constructor Championship.
-
-<br />
-
-```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
-incidents_by_circuit %>%
-  filter(year == 2021) %>%
-  group_by(constructor_name) %>%
-  summarise(n = n()) %>%
-  plot_ly(type = "bar",
-          x = ~constructor_name, 
-          y = ~n,
-          marker = list(color =  c("#B12039", # Alfa Romeo
+          hovertemplate = paste('<b>Team</b>: %{x}<br>',
+                                '<b>Year</b>: 2019<br>',
+                                 'Number of Accidents or Collisions</b>: %{y}<br>')) %>%
+  add_trace(y = ~year_2021, name = '2021', 
+            marker = list(color = c("#9B0000", # Alfa Romeo
                                    "#4E7C9B", # Alpha Tauri
                                    "#2293D1", # Alpine
                                    "#2D826D", # Aston Martin
                                    "#ED1C24", # Ferrari
                                    "#B6BABD", # Haas
                                    "#F58020", # McLaren
-                                   "#6CD3BF", # Mercedes
+                                   "#00D2BE", # Mercedes
+                                   "#F596C8", # Racing Point
                                    "#1E5BC6", # Red Bull
+                                   "#FFF500", # Renault
+                                   "#469BFF", # Toro Rosso
                                    "#37BEDD" # Williams
-                                  )),
-          # text = ~constructor_name,
-          hovertemplate = paste('<b>Team</b>: %{x}<br>', 
-                                 'Number of Accidents or Collisions</b>: %{y}<br><extra></extra>')) %>%
-  layout(title = 'Incidents by Constructor in 2021',
-         xaxis = list(title = 'Constructor'), 
-         yaxis = list(title = 'Count of Accidents or Collisions'))
-
+                                   )
+                          ),
+            hovertemplate = paste('<b>Team</b>: %{x}<br>',
+                                '<b>Year</b>: 2021<br>',
+                                 'Number of Accidents or Collisions</b>: %{y}<br>')) %>%
+  layout(title = 'Incidents by Constructor',
+         xaxis = list(title = '<br><br><br>Constructor'), 
+         yaxis = list(title = 'Count of Accidents ors Collisions'),
+         barmode = 'group')
 ```
+
 
 <br />
 
@@ -816,78 +907,162 @@ One aspect of racing that drivers can focus on is qualifying. The qualifying rou
 
 One way to gauge how successful the top two drivers are is how often they are able to convert their pole positions into a win. Both Hamilton and Verstappen are exceptional drivers, but in 2019 did not qualify well, Hamilton only earning five pole positions and Max Verstappen earning two pole positions. Hamilton was able to convert three of the five pole positions he earned to a race victory, securing his other eight victories outside of pole position. Max Verstappen converted only one of his two pole positions into race victories, earning two race wins outside of poll position. 
 
-This sankey diagram shows in the 2019 season, which final race position Lewis Hamilton and Max Verstappen end up in after starting in pole. The teal represents a Mercedes driver, Lewis Hamilton, while the darker blue represents a Red Bull driver, Max Verstappen. 
+These Sankey diagrams show how these two drivers have fared in qualifying when qualifying in first (Q1) or second (Q2) position, and as a result, in final race position. The teal represents Mercedes driver, Lewis Hamilton, while the darker blue represents Red Bull driver, Max Verstappen. 
+
+In the 2019 season, Hamilton only won the final race from pole position three times, but was able to convert qualifying in second place (Q2) to a final position (P1) of five times. This increased his points winning and his ability to convert his place in qualifying to an overall race victory. Verstappen only converted a single first qualifying position (Q1) to a race victory (P1) and a single second qualifying position (Q2) to a race victory (P1). This severely impacted Verstappen's points earnings.
+
+How to use this graph:  
+
+* The qualifying positions for drivers are indicated by a "Q" before their qualifying position. *eg. "Q1" means that the driver qualified first*. The final race positions for drivers are indicated by a "P" before their final position. *e.g. "P2" means that the driver finished the race second*  
+
+* Hover over the grey bars to highlight the different paths the drivers took from qualifying to their final position.  
+
+* The numbers in the middle indicate the number of times the driver went from the qualifying position to the final position.  
+<br />
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 links_driver_lhmv_2019 <- 
   links_driver_2019 %>% 
   filter(full_name == "Lewis Hamilton" | full_name == "Max Verstappen") %>%
-  filter(source == 1)
+  filter(source == 1 | source == 2)
   
 
 links_driver_lhmv_2019 <- as.data.frame(links_driver_lhmv_2019)
 
+# A connection data frame is a list of flows with intensity for each flow
+links_2019 <- data.frame(
+  driver=c(rep("L. Hamilton", 8), rep("M. Verstappen", 5)),
+  source=c("Q1", "Q2", "Q1", "Q2", "Q2", "Q2", "Q2", "Q1", "Q1", "Q2", "Q1", "Q1", "Q1"),
+  target=c("P1", "P1", "P2", "P2", "P3", "P4", "P5", "P9", "P1", "P1", "P2", "P2", "P6"),
+  value=c(3, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+  IDsource=c(0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0),
+  IDtarget=c(2, 2, 3, 3, 4, 5, 6, 7, 2, 2, 3, 3, 8)
+)
 
-nodes19 <- c("0","1","2","3","4","5","6","7","8","9")
+# From these flows we need to create a node data frame: it lists every entities involved in the flow
+nodes_2019 <- data.frame(
+  name = unique(c(as.character(links_2019$source), as.character(links_2019$target)))
+)
 
-nodes19 <- as.data.frame(nodes19)
-
-
-
-
-my_color <-
+my_color_2019 <-
   'd3.scaleOrdinal() .domain(["Lewis Hamilton", "Max Verstappen"]) .range(["#6CD3BF", "#1E41FF"])'
 
-sankeyNetwork(Links = links_driver_lhmv_2019, Nodes = nodes19, Source = "source",
-              Target = "target", Value = "value",
-              NodeID = "nodes19", fontSize= 25, nodeWidth = 20,
-              colourScale=my_color, LinkGroup="full_name",
-              NodeGroup=NULL)
-```
 
+# Make the Network
+p2019 <- sankeyNetwork(Links = links_2019, Nodes = nodes_2019,
+                   Source = "IDsource", Target = "IDtarget",
+                   Value = "value", NodeID = "name", fontSize = 15,
+                   nodeWidth = 20, colourScale=my_color_2019, LinkGroup="driver",
+                   NodeGroup=NULL)
 
-In the 2021 season, Max Verstappen surged in his qualifying skills, earning ten pole positions to Lewis Hamilton's five pole positions. Max was able to convert seven of his pole positions to a victory, earning three race wins outside of pole position, while Lewis Hamilton converted three of his pole positions to a victory, earning five race wins outside of pole.
-
-This sankey diagram shows  which final race position Lewis Hamilton and Max Verstappen end up in after starting in pole during the 2021 season. 
-
-```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 
 links_driver_lhmv_2021 <- 
   links_driver_2021 %>% 
-  filter(full_name == "Lewis Hamilton" | full_name == "Max Verstappen")  %>%
-  filter(source == 1)
+  filter(full_name == "Lewis Hamilton" | full_name == "Max Verstappen") %>%
+  filter(source == 1 | source == 2)
+  
 
 links_driver_lhmv_2021 <- as.data.frame(links_driver_lhmv_2021)
 
-nodes21 <- c("0","1","2","3","4","5")
+# A connection data frame is a list of flows with intensity for each flow
+links_2021 <- data.frame(
+  driver=c(rep("L. Hamilton", 7), rep("M. Verstappen", 5)),
+  source=c("Q1", "Q2", "Q1", "Q2", "Q1", "Q2", "Q2", "Q1", "Q2", "Q1", "Q2", "Q2"),
+  target=c("P1", "P1", "P2", "P2", "P5", "P15", "P17", "P1", "P1", "P2", "P2", "P20"),
+  value=c(5, 2, 2, 5, 1, 1, 1, 7, 1, 1, 3, 1),
+  IDsource=c(0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1),
+  IDtarget=c(2, 2, 3, 3, 4, 5, 6, 2, 2, 3, 3, 7)
+)
 
-nodes21 <- as.data.frame(nodes21)
+# From these flows we need to create a node data frame: it lists every entities involved in the flow
+nodes_2021 <- data.frame(
+  name = unique(c(as.character(links_2021$source), as.character(links_2021$target)))
+)
 
-my_color <-
-  'd3.scaleOrdinal() .domain(["Lewis Hamilton", "Max Verstappen"]) .range(["#6CD3BF", "#1E41FF"])'
+my_color_2021 <-
+  'd3.scaleOrdinal() .domain(["L. Hamilton", "M. Verstappen"]) .range(["#6CD3BF", "#1E41FF"])'
 
-sankeyNetwork(Links = links_driver_lhmv_2021, Nodes = nodes21, Source = "source",
-              Target = "target", Value = "value",
-              NodeID = "nodes21", fontSize= 25, nodeWidth = 20, 
-              colourScale=my_color, LinkGroup = "full_name",
-              NodeGroup = NULL)
+
+# Make the Network
+p2021 <- sankeyNetwork(Links = links_2021, Nodes = nodes_2021,
+                   Source = "IDsource", Target = "IDtarget",
+                   Value = "value", NodeID = "name", fontSize = 15,
+                   nodeWidth = 20, colourScale=my_color_2021, LinkGroup="driver",
+                   NodeGroup=NULL)
+```
+<br />
+
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+
+htmlwidgets::onRender(p2019, '
+  function(el) { 
+    var nodeWidth = this.sankey.nodeWidth();
+    var links = this.sankey.links();
+        
+    links.forEach((d, i) => {
+      var startX = d.source.x + nodeWidth;
+      var endX = d.target.x;
+      
+      var startY = d.source.y + d.sy + d.dy / 2;
+      var endY = d.target.y + d.ty + d.dy / 2;
+      
+      d3.select(el).select("svg g")
+        .append("text")
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "middle")
+        .attr("x", startX + ((endX - startX) / 2))
+        .attr("y", startY + ((endY - startY) / 2))
+        .text(d.value);
+    })
+  }
+')
+```
+<br />
+
+In the 2021 season (right), Max Verstappen surged in his qualifying skills, converting seven pole positions (Q1) to race victories (P1), while Lewis Hamilton was only able to convert five pole positions (Q1) to race victories (P1). 
+
+<br />
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+htmlwidgets::onRender(p2021, '
+  function(el) { 
+    var nodeWidth = this.sankey.nodeWidth();
+    var links = this.sankey.links();
+        
+    links.forEach((d, i) => {
+      var startX = d.source.x + nodeWidth;
+      var endX = d.target.x;
+      
+      var startY = d.source.y + d.sy + d.dy / 2;
+      var endY = d.target.y + d.ty + d.dy / 2;
+      
+      d3.select(el).select("svg g")
+        .append("text")
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "middle")
+        .attr("x", startX + ((endX - startX) / 2))
+        .attr("y", startY + ((endY - startY) / 2))
+        .text(d.value);
+    })
+  }
+')
 ```
 
 <br />
+
 
 #### Fastest Laps
 
 The "Fastest Lap" is a designation given to a driver who completes the fastest lap of all drivers during a race. The driver that wins the fastest lap designation after every race earns one (1) Championship point towards the Driver's Championship *if* that driver finishes in the top ten places. 
 
-In 2019, dominant Lewis Hamilton earned six fastest lap designations, earning him six extra points over the course of the season. Charles LeClerc of Ferrari earned four fastest lap designations, and Max Verstappen tied Hamilton's Mercedes teammate, Valteri Bottas, and earned three fastest lap designations.
+In 2019, dominant Lewis Hamilton earned six fastest lap designations, earning him six extra points over the course of the season. Charles LeClerc of Ferrari earned four fastest lap designations, and Max Verstappen tied Hamilton's Mercedes teammate, Valteri Bottas, and earned three fastest lap designations. In the 2021 season, Max Verstappen, who had risen to the level of Lewis Hamilton this season, earned eight fastest lap designations, to Lewis Hamilton's six fastest laps and Valteri Bottas's three fastest laps. This statistic, along with all the other 2021 Max Verstappen statistics shows how much the driver and the team rose in quality and competitiveness during the season.
 
 <br />
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
-lap_times_by_driver_2019 <- 
+lap_times_by_driver <- 
   lap_times %>%
   left_join(skinny_races_circuits, by = ("raceId")) %>%
-  filter(year == 2019) %>%
+  filter(year == 2019 | year == 2021) %>%
   left_join(xover, by = c("driverId" = "driverId",
                           "year" = "year")) %>%
   group_by(year, raceId, driverId, full_name, constructor_name) %>%
@@ -897,74 +1072,68 @@ lap_times_by_driver_2019 <-
   group_by(year, raceId) %>%
   mutate(rank = rank(fastestLap_s)) %>%
   filter(rank == 1) %>%
-  group_by(full_name, constructor_name) %>%
+  group_by(year, full_name, constructor_name) %>%
   summarise(count_of_fastest_lap = n()) %>%
-  arrange()
+  mutate(fast_laps_2019 = if_else(year == "2019", count_of_fastest_lap, as.integer(0)),
+         fast_laps_2021 = if_else(year == "2021", count_of_fastest_lap, as.integer(0))) %>%
+  group_by(full_name, constructor_name) %>%
+  summarise(year_2019 = sum(fast_laps_2019),
+            year_2021 = sum(fast_laps_2021))
 
-#library(ggplot2)
-#library(plotly)
+library(ggplot2)
+library(plotly)
 
-lap_times_by_driver_2019 %>%
+lap_times_by_driver %>%
   plot_ly(type = "bar",
-          x = ~count_of_fastest_lap, 
+          x = ~year_2019, 
           y = ~full_name,
-          marker = list(color =c("#DC0000", # Charles LeClerc
-                                 "#F0D787", # K Mag (Haas)
-                                 "#00D2BE", # Lewis Hamilton; Mercedes
-                                 "#1E41FF", # Max Verstappen; Red Bull
-                                 "#DC0000", # Vettel Ferrari 2019; Aston Martin 2021
-                                 "#00D2BE")),
+          marker = list(color = 
+                          c("#F4767B", # Charles LeClerc
+                            "#F9B279", # Ricciardo
+                            "#D3D5D7", # K Mag (Haas)
+                            "#A6E4D8", # Lewis Hamilton; Mercedes
+                            "#F58020", # Lando
+                            "#789CDC", # Max Verstappen; Red Bull
+                            "#4E7C9B", # Gasley Alpha Tauri
+                            "#F9C0DE", # Perez for Racing Point
+                            "#F4767B", # Vettel Ferrari 2019; Aston Martin 2021
+                            "#A6E4D8"  # Bottas
+                            )), 
           text = ~constructor_name,
           hovertemplate = paste('<b>Driver</b>: %{y}<br>',
-                                 '<b>Team</b>: %{text}<br>', 
-                                 'Number of Fastest Laps</b>: %{x}<br><extra></extra>')) %>%
-  layout(title = 'Fastest Laps in 2019', xaxis = list(title = 'Count of Fastest Laps'), 
-         yaxis = list(title = 'Driver'))
+                                '<b>Team</b>: %{text}<br>',
+                                '<b>Year</b>: 2019<br>', 
+                                 'Number of Fastest Laps</b>: %{x}<br><extra></extra>'),
+          name = '2019 Season') %>%
+  add_trace(type = "bar",
+            x = ~year_2021, 
+            y = ~full_name,
+            marker = list(color = 
+                            c("#ED1C24", # LeClerc
+                              "#F58020", # Ricciardo Renault 2019, 2021 at McL
+                              "#B6BABD", # Haas - Magnussen
+                              "#6CD3BF", # Lewis Hamilton
+                              "#F58020", # Norris, McLaren
+                              "#1E41FF", # Max Verstappen; Red Bull
+                              "#4E7C9B", # Gasly Toro Rosso 2019/Alpha Tauri 2021
+                              "#1E5BC6", # Perez, Racing Point 2019, RB 2021
+                              "#2D826D", # Vettel but for Aston martin
+                              "#6CD3BF" # Bottas, Mercedes
 
-```
-
-In the 2021 season, Max Verstappen, who had risen to the level of Lewis Hamilton this season, earned eight fastest lap designations, to Lewis Hamilton's six fastest laps and Valteri Bottas's three fastest laps. This statistic, along with all the other 2021 Max Verstappen statistics shows how much the driver and the team rose in quality and competitiveness during the season.
-
-<br />
-
-```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
-
-lap_times_by_driver_2021 <- 
-  lap_times %>%
-  left_join(skinny_races_circuits, by = ("raceId")) %>%
-  filter(year == 2021) %>%
-  left_join(xover, by = c("driverId" = "driverId",
-                          "year" = "year")) %>%
-  group_by(year, raceId, driverId, full_name, constructor_name) %>%
-  summarise(min(milliseconds)) %>%
-  rename(fastestLap_ms = "min(milliseconds)") %>%
-  mutate(fastestLap_s = fastestLap_ms/1000) %>%
-  group_by(year, raceId) %>%
-  mutate(rank = rank(fastestLap_s)) %>%
-  filter(rank == 1) %>%
-  group_by(full_name, constructor_name) %>%
-  summarise(count_of_fastest_lap = n()) %>%
-  arrange()
-
-lap_times_by_driver_2021 %>%
-  plot_ly(type = "bar",
-          x = ~count_of_fastest_lap, 
-          y = ~full_name,
-          marker = list(color =c("#F58020", # Ricciardo Renault 2019, 2021 at McL
-                                 "#F58020", # Norris, McLaren
-                                 "#00D2BE", # Lewis Hamilton; Mercedes
-                                 "#1E41FF", # Max Verstappen; Red Bull
-                                 "#4E7C9B", # Gasly Toro Rosso 2019/Alpha Tauri 2021
-                                 "#1E5BC6", # Perez, Racing Point 2019, RB 2021
-                                 "#00D2BE" # Bottoas, Mercedes
                                  )),
           text = ~constructor_name,
           hovertemplate = paste('<b>Driver</b>: %{y}<br>',
-                                 '<b>Team</b>: %{text}<br>', 
-                                 'Number of Fastest Laps</b>: %{x}<br><extra></extra>')) %>%
-  layout(title = 'Fastest Laps in 2021', xaxis = list(title = 'Count of Fastest Laps'), 
-         yaxis = list(title = 'Driver'))
+                                '<b>Team</b>: %{text}<br>',
+                                '<b>Year</b>: 2021<br>',
+                                'Number of Fastest Laps</b>: %{x}<br><extra></extra>'),
+          name = '2021 Season') %>%
+  layout(title = 'Fastest Laps Designation', 
+         xaxis = list(title = 'Count of Fastest Laps'),
+         yaxis = list(title = ''),
+         barmode = 'group',
+         showlegend = FALSE)
 ```
+
 
 <br />
 
@@ -972,4 +1141,5 @@ lap_times_by_driver_2021 %>%
 
 The 2019 and 2021 seasons of Formula One were incredibly different and interesting seasons, with different driver characteristics and constructor details in full view. The 2019 season was in the middle of Mercedes driver Lewis Hamilton's six-championship winning streak, with Red Bull's Max Verstappen seen as an up and coming young driver. In 2021, Max Verstappen was a greater force to be reckoned with, breaking Lewis Hamilton's championship streak on the final day of the season and being Red Bull's first championship in eight years. 
 
+<br />
 <br />
