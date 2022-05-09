@@ -1267,7 +1267,7 @@ lap_times_by_driver %>%
                                  )),
           text = ~constructor_name,
           hovertemplate = paste('<b>Driver</b>: %{y}<br>',
-                                '<b>Team</b>: %{constructor_name}<br>',
+                                '<b>Team</b>: %{text}<br>',
                                 '<b>Year</b>: 2021<br>',
                                 '<b>Number of Fastest Laps</b>: %{x}<br><extra></extra>'),
           name = '2021 Season') %>%
