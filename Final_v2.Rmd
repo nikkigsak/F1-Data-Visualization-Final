@@ -475,26 +475,35 @@ age_distrib_df <- age_distrib_df %>%
   distinct() %>%
   arrange(age)
 
-#View(age_distrib_df)
-
 age_distrib_df <- age_distrib_df %>%
-  mutate(bins = cut(age, breaks = c(20, 22, 25, 28, 30, 33, 36, 39, 42))) %>%
+  mutate(bins = cut(age, breaks = c(19, 22, 25, 28, 30, 33, 36, 39, 42))) %>%
   group_by(bins) %>%
   summarize(count = n()) %>%
   ungroup() %>%
-  mutate(perc = count / sum(count))
+  mutate(perc = count / sum(count)) %>%
+  mutate(
+    bins_label = case_when(
+      bins == "(19,22]" ~ "20-22",
+      bins == "(22,25]" ~ "23-25",
+      bins == "(25,28]" ~ "26-28",
+      bins == "(30,33]" ~ "31-33",
+      bins == "(33,36]" ~ "34-36",
+      bins == "(36,39]" ~ "37-39",
+      bins == "(39,42]" ~ "40-42"
+    )
+  )
 
 #View(age_distrib_df)
 
 ggplot(data = age_distrib_df) +
   geom_bar(
-    mapping = aes(x = bins, y = perc),
+    mapping = aes(x = bins_label, y = perc),
     fill = "#888888",
     stat = "identity",
     show.legend = FALSE
   ) +
   geom_text(
-    mapping = aes(x = bins, y = perc, label = count),
+    mapping = aes(x = bins_label, y = perc, label = count),
     color = "#FFFFFF",
     vjust = 1.5,
     show.legend = FALSE
@@ -511,19 +520,19 @@ ggplot(data = age_distrib_df) +
     axis.text.y=element_text(size = 10)
   ) +
   geom_segment(
-    aes(xend = "(22,25]", yend = 0.20, x = "(25,28]", y = 0.25),
+    aes(xend = "23-25", yend = 0.20, x = "26-28", y = 0.25), # (22,25] # (25,28]
     arrow = arrow(length = unit(0.2, "cm"))
   ) +
   annotate("text",
-    x = "(30,33]", y = 0.26,
+    x = "31-33", y = 0.26, # (30,33]
     label="Max Verstappen (1st place, Age 24)", color = "#000000", size = 3
   ) +
   geom_segment(
-    aes(xend = "(36,39]", yend = 0.05, x = "(30,33]", y = 0.18),
+    aes(xend = "37-39", yend = 0.05, x = "31-33", y = 0.18), # (36,39] # (30,33]
     arrow = arrow(length = unit(0.2, "cm"))
   ) +
   annotate("text",
-    x = "(30,33]", y = 0.20,
+    x = "31-33", y = 0.20, # (30,33]
     label="Lewis Hamilton (2nd place, Age 37)", color = "#000000", size = 3
   )
 ```
