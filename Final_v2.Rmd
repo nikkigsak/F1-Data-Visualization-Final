@@ -1107,7 +1107,7 @@ p2021 <- sankeyNetwork(Links = links_2021, Nodes = nodes_2021,
 ```
 <br />
 
-```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE, fig.width=4.6, fig.height=4}
 
 htmlwidgets::onRender(p2019, '
   function(el) { 
@@ -1137,7 +1137,7 @@ htmlwidgets::onRender(p2019, '
 In the 2021 season (right), Max Verstappen surged in his qualifying skills, converting seven pole positions (Q1) to race victories (P1), while Lewis Hamilton was only able to convert five pole positions (Q1) to race victories (P1). 
 
 <br />
-```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE, fig.width=4.6, fig.height=4}
 htmlwidgets::onRender(p2021, '
   function(el) { 
     var nodeWidth = this.sankey.nodeWidth();
