@@ -933,6 +933,8 @@ status_21_plotly
  <div style="display:block;float:left;background-color:white;width:85px;height:18px;">&nbsp;&nbsp;Car Failure</div>
  <div style="display:block;float:left;background-color:#FF0000;width:10px;height:18px;">&nbsp;</div>
  <div style="display:block;float:left;background-color:white;width:80px;height:18px;">&nbsp;&nbsp;Collison</div>
+ <div style="display:block;float:left;background-color:#505050;width:10px;height:18px;">&nbsp;</div>
+ <div style="display:block;float:left;background-color:white;width:90px;height:18px;">&nbsp;&nbsp;Disqualified</div>
  <div style="display:block;float:left;background-color:#ADADAD;width:10px;height:18px;">&nbsp;</div>
  <div style="display:block;float:left;background-color:white;width:70px;height:18px;">&nbsp;&nbsp;DNF</div>
  <div style="display:block;float:left;background-color:#1BBC00;width:10px;height:18px;">&nbsp;</div>
