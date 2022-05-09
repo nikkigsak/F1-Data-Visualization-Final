@@ -421,7 +421,7 @@ driver_nationalities_top_chart <- ggplot(data = driver_nationalities_top_df) +
 driver_nationalities_bottom_chart <- ggplot(data = driver_nationalities_bottom_df) +
   geom_bar(
     mapping = aes(x = nationality, y = total),
-    fill = "#900C3F", #  "#C70039",
+    fill = "#C70039", # "#900C3F"
     stat = "identity",
     position = "dodge",
     show.legend = FALSE
