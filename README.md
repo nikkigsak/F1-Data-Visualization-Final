@@ -16,3 +16,7 @@ The Drive to Survive Netflix Docu-series ([Trailer](https://www.youtube.com/watc
 
 ## Draft Website
 The website can be found at: https://rpubs.com/deitzl/f1viz
+
+
+## Link to Video
+https://drive.google.com/file/d/1FhvLFhxB3MlIO9USIgHsDHLb7nfk8gC9/view?usp=sharing
