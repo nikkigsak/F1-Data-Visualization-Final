@@ -595,6 +595,7 @@ points_2021 <- ggplot(races2021, aes(x=racenum,y=points,group=full_name,color=fu
   scale_linetype_manual(values=xover_2021$line_type, name="Driver") + 
   scale_color_manual(values=xover_2021$colorcol, name="Driver") + 
   theme_classic() + xlab("Race Number") + theme(axis.title.y = element_blank(),
+                                                              legend.title = element_text(size=8),
                                                                legend.text = element_text(size=7),
                                                                legend.margin = margin(c(0,0,0,0)),
                                                                legend.spacing.x = unit(0, "mm"),
@@ -605,7 +606,7 @@ points_2019 <- ggplot(races2019, aes(x=racenum,y=points,group=full_name,color=fu
   ggtitle("2019") + 
   scale_linetype_manual(values=xover_2019$line_type, name="Driver") + 
   scale_color_manual(values=xover_2019$colorcol, name="Driver") + 
-  theme_classic() + xlab("Race Number") + ylab("Point Total") + theme(legend.title = element_blank(),
+  theme_classic() + xlab("Race Number") + ylab("Point Total") + theme(legend.title = element_text(size=8),
                                                                legend.text = element_text(size=7),
                                                                legend.margin = margin(c(0,0,0,0)),
                                                                legend.spacing.x = unit(0, "mm"),
@@ -649,13 +650,14 @@ Double click on each driver's legend entry to isolate their standings over the c
 wins_2021 <- ggplot(races2021) + 
   geom_line(aes(x=racenum,y=reorder(position,-position),group=full_name,color=full_name,linetype=full_name,text=paste("<b>Driver: </b>",full_name,"<br><b>Team:</b> ",constructor_name,"<br><b>Race Date:</b> ",date,"<br><b>Race: </b>",name))) + scale_color_manual(values=xover_2021$colorcol, name="Driver")+ scale_linetype_manual(values=xover_2021$line_type, name="Driver") + ggtitle("2021") + theme_classic() + labs(x = "Race Number", y = "Position") + theme(axis.title.y = element_blank(),
          legend.text = element_text(size=7),
+         legend.title = element_text(size=8),
          legend.margin = margin(c(0,0,0,0)),
          legend.spacing.x = unit(0, "mm"),
          legend.spacing.y = unit(0, "mm"))
 
 wins_2019 <- ggplot(races2019) + 
-  geom_line(aes(x=racenum,y=reorder(position,-position),group=full_name,color=full_name,linetype=full_name,text=paste("<b>Driver: </b>",full_name,"<br><b>Team:</b> ",constructor_name,"<br><b>Race Date:</b> ",date,"<br><b>Race: </b>",name))) + scale_color_manual(values=xover_2019$colorcol,name="Driver")+ scale_linetype_manual(values=xover_2019$line_type,name="Driver") + ggtitle("2019") + theme_classic() + labs(x = "Race Number", y = "Position") + guides(color=guide_legend(ncol=2)) + theme(legend.title = element_blank(),
-         legend.text = element_text(size=7),
+  geom_line(aes(x=racenum,y=reorder(position,-position),group=full_name,color=full_name,linetype=full_name,text=paste("<b>Driver: </b>",full_name,"<br><b>Team:</b> ",constructor_name,"<br><b>Race Date:</b> ",date,"<br><b>Race: </b>",name))) + scale_color_manual(values=xover_2019$colorcol,name="Driver")+ scale_linetype_manual(values=xover_2019$line_type,name="Driver") + ggtitle("2019") + theme_classic() + labs(x = "Race Number", y = "Position") + guides(color=guide_legend(ncol=2)) + theme(legend.text = element_text(size=7),
+         legend.title = element_text(size=8),
          legend.margin = margin(c(0,0,0,0)),
          legend.spacing.x = unit(0, "mm"),
          legend.spacing.y = unit(0, "mm"))
