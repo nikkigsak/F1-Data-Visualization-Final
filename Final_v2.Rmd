@@ -1107,11 +1107,8 @@ p2021 <- sankeyNetwork(Links = links_2021, Nodes = nodes_2021,
                    nodeWidth = 20, colourScale=my_color_2021, LinkGroup="driver",
                    NodeGroup=NULL)
 ```
-<br />
-
-```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE, fig.width=4.6, fig.height=4}
-
-htmlwidgets::onRender(p2019, '
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+sankey2019_chart <- htmlwidgets::onRender(p2019, '
   function(el) { 
     var nodeWidth = this.sankey.nodeWidth();
     var links = this.sankey.links();
@@ -1134,13 +1131,11 @@ htmlwidgets::onRender(p2019, '
   }
 ')
 ```
-<br />
 
 In the 2021 season (right), Max Verstappen surged in his qualifying skills, converting seven pole positions (Q1) to race victories (P1), while Lewis Hamilton was only able to convert five pole positions (Q1) to race victories (P1). 
 
-<br />
-```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE, fig.width=4.6, fig.height=4}
-htmlwidgets::onRender(p2021, '
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
+sankey2021_chart <- htmlwidgets::onRender(p2021, '
   function(el) { 
     var nodeWidth = this.sankey.nodeWidth();
     var links = this.sankey.links();
@@ -1165,7 +1160,26 @@ htmlwidgets::onRender(p2021, '
 ```
 
 <br />
-
+<div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;background-color:white;">
+  <div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;background-color:white;">
+  <div style="display:block;float:left;font-size:11pt;margin-left:25px;">2019</div>
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE, fig.width=4.6, fig.height=4}
+sankey2019_chart
+```
+  </div>
+  <div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;width:3px;background-color:white;">
+   &nbsp;
+  </div>
+  <div style="display:block;float:left;border-style:solid;border-width:0px;border-color:#000000;background-color:white;">
+  <div style="display:block;float:left;font-size:11pt;margin-left:25px;">2021</div>
+```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE, fig.width=4.6, fig.height=4}
+sankey2021_chart
+```
+  </div>
+  <div style="clear:left;"></div>
+ </div>
+<div style="clear:left;"></div>
+<br />
 
 #### Fastest Laps
 
