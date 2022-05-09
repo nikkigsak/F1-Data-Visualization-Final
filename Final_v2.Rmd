@@ -332,7 +332,7 @@ drivers_df <- drivers_df %>%
   ) %>%
   mutate(lastname = if_else(lastname == "RÃ¤ikkÃ¶nen", "Raikkonen", lastname),
     lastname = if_else(lastname == "HÃ¼lkenberg", "Hulkenberg", lastname),
-    lastname = if_else(lastname == "PÃ©rez", "Sergio Perez", lastname)
+    lastname = if_else(lastname == "PÃ©rez", "Perez", lastname)
   ) %>%
   arrange(world_ranking, nationality, lastname, firstname,
    birth_date, driver_number
@@ -577,10 +577,9 @@ As mentioned above, and by the Formula One video, drivers earn points throughout
 
 In the 2019 season, Lewis Hamilton (solid teal line), driving in his sixth year with Mercedes, was the runaway points leader, with his teammate Valteri Bottas (dashed teal line) the only other driver coming close to Hamilton's performance. This was a dominant year for Hamilton and Mercedes. The next three drivers, Max Verstappen of Red Bull, and Sebastian Vettel and Charles LeClerc, both driving for Ferrari, fell in the middle of the pack. 
 
-In the 2021 Season, Hamilton's dominance was matched and eventually surpassed by young driver, Max Verstappen of Red Bull. The two drivers immediately set themselves as the best of the best, earning enough points to isolate themselves from the rest of the drivers almost immediately as the season began. Valteri Bottas of Mercedes and Sergio "Checo" Perez of Red Bull are the third and fourth-place finishers in the Driver's Championship, establishing the dominance of Mercedes and Red Bull during the 2021 F1 season. 
+Hamilton's dominance over the rest of the pack continued in 2021, although he was matched and eventually surpassed by Max Verstappen of Red Bull. The two drivers immediately set themselves apart as the best of the best, earning enough points to isolate themselves from the rest of the drivers almost immediately as the season began. Valteri Bottas of Mercedes and Sergio "Checo" Perez of Red Bull are the third and fourth-place finishers in the Driver's Championship, establishing the dominance of Mercedes and Red Bull during the 2021 F1 season. 
 
-Double click on each driver's legend entry to isolate their points accumulation over the course of each season. Double-click to set the graph back to its default.
-
+*Double click on each driver's legend entry to isolate their points accumulation over the course of each season. Double-click to set the graph back to its default.*
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
 
 xlabs2021 <- races2021 %>% arrange(date) %>% distinct(date) %>% ungroup() %>% mutate(racenum=row_number())
@@ -639,11 +638,11 @@ points_2021_chart
 
 Drivers standings' reflect their points accumulation over the course of the season relative to other drivers on the grid. 
 
-The mid-tier teams, or "middle of the pack" teams in 2019 included Racing Point, Alfa Romeo Racing, McLaren, Renault, and Toro Rosso. The drivers on these teams moved around the middle of the standings throughout the season, with Carlos Sainz of McLaren eventually earning sixth place in the Driver's Championship and Pierre Gasley earning seventh place. These top of the middle tier standings are often referred to as the "best of the rest". 
+The mid-tier teams, or "middle of the pack" teams in 2019 included Racing Point, Alfa Romeo Racing, McLaren, Renault, and Toro Rosso. The drivers on these teams moved around the middle of the standings throughout the season, with Carlos Sainz of McLaren eventually earning sixth place in the Driver's Championship and Pierre Gasly earning seventh place. These top of the middle tier standings are often referred to as the "best of the rest". 
 
 The 2021 Season saw significantly less movement in the middle of the pack, with McLaren keeping their momentum as one of the "best of the rest", and the new Alpine F1 team fighting their way to the top of the middle places. The leader of the Driver's Championship changed hands five times, with Lewis Hamilton and Max Verstappen both consistently earning high points finishes and remaining competitive with each other. The 2021 championship leader changed hands almost twice the number of times it changed in the 2019 season, when Lewis Hamilton briefly tussled with his teammate Valteri Bottas for the number one spot. 
 
-Double click on each driver's legend entry to isolate their standings over the course of each season. Double-click to set the graph back to its default. 
+*Double click on each driver's legend entry to isolate their standings over the course of each season. Double-click to set the graph back to its default.* 
 
 
 ```{r, echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, cache = FALSE}
@@ -696,9 +695,9 @@ The Constructor's championship rewards not only the driver, but seeks to recogni
 
 ### Constructor Race Wins
 
-These constructors wins show a similar story as the driver's visualizations do, although a new name emerges: Ferrari. In 2019, Mercedes dominated the field, winning 14 of the 20 races. Red Bull Racing won three races in Austria, Germany, and Brazil. Ferrari won three races as well, in Belgium, Italy, and Singapore. Ferrari is one of the best, if not the best, known constructor in the sport. The 2019 Ferrari team showed a dismal performance with three wins, further emphasizing Mercedes's dominance this season. 
+These constructors wins show a similar story as the driver's visualizations do, although an old name emerges: Ferrari. In 2019, Mercedes dominated the field, winning 14 of the 20 races. Red Bull Racing and Ferrari each won three races. 
 
-The 2021 season saw the rise of Red Bull, with Red Bull winning 11 of the 22 races and Mercedes winning only 9 races. This season also saw two unexpected race winners in McLaren winning the Italian Grand Prix and Alpine F1 Team winning the Hungarian Grand Prix.
+The 2021 season saw the rise of Red Bull, with Red Bull winning 11 of the 22 races and Mercedes winning 9 races. This season also saw two unexpected race winners in Daniel Ricciardo of McLaren winning the Italian Grand Prix and Esteban Ocon of Alpine F1 Team winning the Hungarian Grand Prix.
 
 <br />
 
@@ -771,7 +770,7 @@ wins_plotly
 
 Constructors earn points in the same cadence as drivers, with the first place Constructor earning 25 points, the second place Constructor earning 18 points, and so on and so forth. The maximum number of points that a Constructor can earn on a typical race day is 43 points, if their drivers come in first place (25 points) and second place (18 points).
 
-The 2019 season was Mercedes's runaway season, although Ferrari's three race wins and Red Bull's three race wins show their surging past the rest of the constructors. Ferrari edged Red Bull for second place in the Constructor standings, with a more consistent performance.
+The 2019 season was Mercedes's runaway season, although Ferrari's three race wins and Red Bull's three race wins show their surging past the rest of the constructors. Ferrari edged Red Bull for second place in the Constructor standings, with a more consistent performance, which can be seen in further visualizations of finishing statuses and incidents.
 
 The 2021 season shows Ferrari's continued status as part of the best of the rest, narrowly outearning McLaren Racing, who eventually came in fourth place in the Constructor's Championship. Mercedes narrowly beat out Red Bull for the Constructor's Championship, earning their eighth consecutive championship, an unheard of feat in Formula One. Red Bull, despite Max Verstappen's win in the Driver's Championship, came in second place, with Mercedes clinching the Championship in the final race of the season. 
 
@@ -846,9 +845,9 @@ points_plotly
 
 ### Constructors Finishing Statuses
 
-Formula One drivers, on average, are driving 160 miles per hour (260 kilometers per hour). Highly competitive races and high speeds often mean that lesser capable drivers, or lesser capable cars do not finish races. The reasons for not finishing a race are plentiful, drivers can get into accidents or collisions with other drivers, they could beach on gravel, meaning the car isn't able to restart of its own capacity, or there could be a car failure with a brake line exploding and more. 
+Formula One drivers, on average, are driving 160 miles per hour (260 kilometers per hour). Highly competitive races and high speeds often mean that drivers do not finish races. The reasons for not finishing a race are plentiful, drivers can get into accidents or collisions with other drivers, they could beach on gravel, meaning the car isn't able to restart of its own capacity, or there could be a car failure with a brake line exploding and more. 
 
-These visualizations show the finishing statuses of seven constructors from both 2019 and 2021. In 2019, Mercedes finished 39 races (over 90% of their races) and got through the entire 2019 season without a single collision. These statistics are not replicated by their top four counterparts, with McLaren experiencing a higher number of DNF ("Did Not Finish") statuses and "Car Failures". 
+These visualizations show the finishing statuses of seven constructors from both 2019 and 2021. These constructor statuses reflect *both* drivers finishing statuses during the races. In 2019, Mercedes finished 39 races (over 90% of their races) and got through the entire 2019 season without a single collision. These statistics are not replicated by their top four counterparts, with McLaren experiencing a higher number of DNF ("Did Not Finish") statuses and "Car Failures". 
 
 During the 2021 Season, Red Bull and McLaren increased their races finished by 3 races (33 to 36) and 10 races (18 to 28), respectively. Mercedes ended the 2021 season with 1 less finished race in comparison to 2019, and 3 of their races ending in a collision. Red Bull and Mercedes both saw an increase in the number of collisions that ended their races, often with each other. 
 
@@ -957,10 +956,10 @@ status_21_plotly
 
 #### Incidents
 
-Incidents are defined here as "accidents" or "collisions" which happen when drivers their hit each other or cause some other sort of accident. Due to the high speed nature of Formula One, these accidents or collisions often end the involved drivers' races. This graph includes all accidents and collisions, regardless of if they ended that driver's race. 
+Incidents are defined here as "accidents" or "collisions" which happen when drivers their hit each other or cause some other sort of accident. Due to the high speed nature of Formula One, these accidents or collisions often end the involved drivers' races. This graph includes all accidents and collisions, *regardless of if they ended that driver's race.* 
 
 
-In 2019, Red Bull had over 20 distinct accidents or collisions, certainly contributing to their distant second-place finish behind Mercedes. Second to Red Bull's incident count are the Haas F1 team, followed by Ferrari, both of whom had a high number of accidents or collisions, which led to Ferrari's third place finish and Haas's last place finish. In 2021, Haas still led the number of incidents, followed by Red Bull, and Williams racing. Mercedes maintained their overall count of 8 accidents or collisions over the course of the season, likely contributing to their eventually winning the 2021 Constructor Championship.
+In 2019, Red Bull had over 20 distinct accidents or collisions, certainly contributing to their distant third-place finish behind Mercedes and Ferrari. Second to Red Bull's incident count are the Haas F1 team, followed by Williams, both of whom had a high number of accidents or collisions, which led to Williams's second-to-last place finish and Haas's last place finish. In 2021, Haas still led the number of incidents, followed by Red Bull, and Williams racing. Mercedes maintained their overall count of 8 accidents or collisions over the course of the season, likely contributing to their eventually winning the 2021 Constructor Championship.
 
 <br />
 
