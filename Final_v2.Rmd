@@ -489,7 +489,7 @@ age_distrib_df <- age_distrib_df %>%
 ggplot(data = age_distrib_df) +
   geom_bar(
     mapping = aes(x = bins, y = perc),
-    fill = "#534B4F", # "#56483F", 
+    fill = "#B0B0B0", #"#BEBEBE", #"#534B4F", 
     stat = "identity",
     #width = 1,
     show.legend = FALSE
